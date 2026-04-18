@@ -295,7 +295,6 @@ Exibe apenas pontos que geraram clientes cientes **Alto** e **Médio**.
 ```
 
 > Objetivo: triagem rápida para a equipe de liberação, máx. 1 página.
-> Conteúdo exato a validar com David e Erika.
 
 ### Páginas Seguintes — Checklist Completa
 - Respostas organizadas por ambiente
