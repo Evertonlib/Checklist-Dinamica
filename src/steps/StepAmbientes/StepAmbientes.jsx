@@ -27,14 +27,26 @@ export function StepAmbientes() {
 
   const avancar = () => {
     if (semAmbientes) return
+
+    if (state._meta.origemNavegacao === 'revisao') {
+      dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'revisao' })
+      dispatch({ type: 'SET_META', campo: 'origemNavegacao', valor: null })
+      navigate('/revisao')
+      return
+    }
+
     dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'globais' })
     navigate('/globais')
   }
 
+  const avancarLabel = state._meta.origemNavegacao === 'revisao'
+    ? 'Salvar e voltar ao resumo'
+    : 'AvanÃ§ar'
+
   return (
     <div className={styles.pagina}>
       <p className={styles.instrucao}>
-        Selecione os ambientes que farão parte do projeto e a quantidade de cada um.
+        Selecione os ambientes que farÃ£o parte do projeto e a quantidade de cada um.
       </p>
 
       {AMBIENTES_DISPONIVEIS.map((amb) => {
@@ -46,7 +58,7 @@ export function StepAmbientes() {
             <div className={styles.ambTopo}>
               <span className={styles.ambLabel}>{amb.label}</span>
               <div className={styles.qtdControle}>
-                <button onClick={() => setQtd(amb.id, qtd - 1)} disabled={qtd === 0}>−</button>
+                <button onClick={() => setQtd(amb.id, qtd - 1)} disabled={qtd === 0}>âˆ’</button>
                 <span>{qtd}</span>
                 <button onClick={() => setQtd(amb.id, qtd + 1)}>+</button>
               </div>
@@ -58,7 +70,7 @@ export function StepAmbientes() {
                 <input
                   value={inst.nome}
                   onChange={(e) => setNome(inst.instanceId, e.target.value)}
-                  placeholder={`Ex: Quarto da Joana`}
+                  placeholder="Ex: Quarto da Joana"
                 />
               </div>
             ))}
@@ -71,7 +83,12 @@ export function StepAmbientes() {
       )}
 
       <div className={styles.espacoBar} />
-      <BottomBar onVoltar={voltar} onAvancar={avancar} avancarDisabled={semAmbientes} />
+      <BottomBar
+        onVoltar={voltar}
+        onAvancar={avancar}
+        avancarDisabled={semAmbientes}
+        avancarLabel={avancarLabel}
+      />
     </div>
   )
 }

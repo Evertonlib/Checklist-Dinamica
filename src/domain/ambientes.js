@@ -9,3 +9,14 @@ export const AMBIENTES_DISPONIVEIS = [
   { id: 'varanda',             label: 'Varanda / Área Gourmet',    formType: 'cozinha'    },
   { id: 'outros',              label: 'Outros',                    formType: 'outros'     },
 ]
+
+export function formatarNomeAmbiente(ambiente) {
+  if (!ambiente) return ''
+
+  const nomePersonalizado = ambiente.nome?.trim()
+  if (!nomePersonalizado) {
+    return ambiente.label
+  }
+
+  return `${ambiente.label} — ${nomePersonalizado}`
+}

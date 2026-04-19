@@ -1,9 +1,56 @@
 import { useReducer, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FormContext } from './FormContext.js'
 import { estadoInicial, defaultsPorFormType } from '../domain/schema.js'
 import { AMBIENTES_DISPONIVEIS } from '../domain/ambientes.js'
 
 const STORAGE_KEY = 'byarabi_checklist_rascunho'
+
+function criarEstadoInicial() {
+  return {
+    ...estadoInicial,
+    _meta: {
+      ...estadoInicial._meta,
+      criadoEm: new Date().toISOString(),
+    },
+  }
+}
+
+function normalizarRotaEtapa(etapaAtual) {
+  if (!etapaAtual) return '/identificacao'
+  return etapaAtual.startsWith('/') ? etapaAtual : `/${etapaAtual}`
+}
+
+function normalizarEstadoSalvo(estadoSalvo) {
+  const ambientesSelecionados = estadoSalvo?.ambientesSelecionados || []
+  const respostasPorAmbiente = {}
+
+  ambientesSelecionados.forEach((instancia) => {
+    respostasPorAmbiente[instancia.instanceId] = {
+      ...(defaultsPorFormType[instancia.formType] || {}),
+      ...(estadoSalvo?.respostasPorAmbiente?.[instancia.instanceId] || {}),
+    }
+  })
+
+  return {
+    ...criarEstadoInicial(),
+    ...estadoSalvo,
+    _meta: {
+      ...criarEstadoInicial()._meta,
+      ...(estadoSalvo?._meta || {}),
+    },
+    identificacao: {
+      ...estadoInicial.identificacao,
+      ...(estadoSalvo?.identificacao || {}),
+    },
+    global: {
+      ...estadoInicial.global,
+      ...(estadoSalvo?.global || {}),
+    },
+    ambientesSelecionados,
+    respostasPorAmbiente,
+  }
+}
 
 function reducer(state, action) {
   const now = new Date().toISOString()
@@ -207,12 +254,12 @@ function reducer(state, action) {
     }
 
     case 'RESTORE_STATE': {
-      return action.estadoCompleto
+      return normalizarEstadoSalvo(action.estadoCompleto)
     }
 
     case 'RESET_STATE': {
       localStorage.removeItem(STORAGE_KEY)
-      return { ...estadoInicial, _meta: { ...estadoInicial._meta, criadoEm: new Date().toISOString() } }
+      return criarEstadoInicial()
     }
 
     default:
@@ -221,9 +268,10 @@ function reducer(state, action) {
 }
 
 export function FormProvider({ children }) {
+  const navigate = useNavigate()
   const [ready, setReady] = useState(false)
   const [rascunho, setRascunho] = useState(null)
-  const [state, dispatch] = useReducer(reducer, estadoInicial)
+  const [state, dispatch] = useReducer(reducer, undefined, criarEstadoInicial)
 
   useEffect(() => {
     const salvo = localStorage.getItem(STORAGE_KEY)
@@ -244,15 +292,18 @@ export function FormProvider({ children }) {
   }, [state, ready])
 
   const confirmarRascunho = () => {
-    dispatch({ type: 'RESTORE_STATE', estadoCompleto: rascunho })
+    const estadoRestaurado = normalizarEstadoSalvo(rascunho)
+    dispatch({ type: 'RESTORE_STATE', estadoCompleto: estadoRestaurado })
     setRascunho(null)
     setReady(true)
+    navigate(normalizarRotaEtapa(estadoRestaurado._meta.etapaAtual), { replace: true })
   }
 
   const descartarRascunho = () => {
-    localStorage.removeItem(STORAGE_KEY)
+    dispatch({ type: 'RESET_STATE' })
     setRascunho(null)
     setReady(true)
+    navigate('/identificacao', { replace: true })
   }
 
   if (!ready && rascunho) {

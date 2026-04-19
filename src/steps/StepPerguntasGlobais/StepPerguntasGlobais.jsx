@@ -12,17 +12,33 @@ export function StepPerguntasGlobais() {
   const navigate = useNavigate()
   const { global: g, ambientesSelecionados } = state
 
-  const respondido = (val) => val !== null && val !== undefined
+  const respondido = (valor) => valor !== null && valor !== undefined
 
-  const tudo_ok =
+  const g1Ok =
     respondido(g.g1_temIluminacaoExterna) &&
+    (g.g1_temIluminacaoExterna === false || g.g1_ambientes.length > 0)
+
+  const g2Ok =
     respondido(g.g2_temReforma) &&
-    (g.g2_temReforma === false ||
-      (respondido(g.g2_1_temReboco) &&
-        (g.g2_1_temReboco === false ||
-          respondido(g.g2_2_temRevestimento)))) &&
+    (g.g2_temReforma === false || g.g2_ambientes.length > 0)
+
+  const g2_1Ok = g.g2_temReforma !== true || respondido(g.g2_1_temReboco)
+  const g2_2Ok =
+    g.g2_temReforma !== true ||
+    g.g2_1_temReboco !== true ||
+    respondido(g.g2_2_temRevestimento)
+
+  const g3Ok =
     respondido(g.g3_pontosNaPosicaoFinal) &&
-    respondido(g.g4_temRebaixo)
+    (g.g3_pontosNaPosicaoFinal === true || g.g3_ambientesPendentes.length > 0)
+
+  const g4Ok =
+    respondido(g.g4_temRebaixo) &&
+    (g.g4_temRebaixo === false ||
+      (g.g4_ambientes.length > 0 &&
+        g.g4_ambientes.every((ambiente) => String(ambiente.cm ?? '').trim() !== '')))
+
+  const tudoOk = g1Ok && g2Ok && g2_1Ok && g2_2Ok && g3Ok && g4Ok
 
   const voltar = () => {
     dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'ambientes' })
@@ -30,20 +46,27 @@ export function StepPerguntasGlobais() {
   }
 
   const avancar = () => {
-    if (!tudo_ok) return
+    if (!tudoOk) return
+
     const origem = state._meta.origemNavegacao
-    dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: `ambiente/${ambientesSelecionados[0]?.instanceId}` })
     if (origem === 'revisao') {
+      dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'revisao' })
       dispatch({ type: 'SET_META', campo: 'origemNavegacao', valor: null })
       navigate('/revisao')
-    } else {
-      navigate(`/ambiente/${ambientesSelecionados[0]?.instanceId}`)
+      return
     }
+
+    dispatch({
+      type: 'SET_META',
+      campo: 'etapaAtual',
+      valor: `ambiente/${ambientesSelecionados[0]?.instanceId}`,
+    })
+    navigate(`/ambiente/${ambientesSelecionados[0]?.instanceId}`)
   }
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
     ? 'Salvar e voltar ao resumo'
-    : 'Avançar'
+    : 'AvanÃ§ar'
 
   return (
     <div className={styles.pagina}>
@@ -55,7 +78,7 @@ export function StepPerguntasGlobais() {
       <BottomBar
         onVoltar={voltar}
         onAvancar={avancar}
-        avancarDisabled={!tudo_ok}
+        avancarDisabled={!tudoOk}
         avancarLabel={avancarLabel}
       />
     </div>

@@ -1,4 +1,5 @@
 import { useFormContext } from '../../context/FormContext.js'
+import { formatarNomeAmbiente } from '../../domain/ambientes.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
 import styles from './StepPerguntasGlobais.module.css'
 
@@ -13,13 +14,14 @@ export function BlocoIluminacao() {
     const lista = g1_ambientes.includes(instanceId)
       ? g1_ambientes.filter((id) => id !== instanceId)
       : [...g1_ambientes, instanceId]
+
     setGlobal('g1_ambientes', lista)
   }
 
   return (
-    <FieldGroup titulo="G1 — Iluminação">
+    <FieldGroup titulo="G1 â€” IluminaÃ§Ã£o">
       <p className={styles.pergunta}>
-        O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi?
+        O projeto terÃ¡ alguma iluminaÃ§Ã£o embutida na marcenaria adquirida externamente Ã  By Arabi?
         (fitas de LED, spots, etc.)
       </p>
       <div className={styles.botoesSimNao}>
@@ -29,8 +31,11 @@ export function BlocoIluminacao() {
         >Sim</button>
         <button
           className={g1_temIluminacaoExterna === false ? styles.ativo : ''}
-          onClick={() => setGlobal('g1_temIluminacaoExterna', false)}
-        >Não</button>
+          onClick={() => {
+            setGlobal('g1_temIluminacaoExterna', false)
+            setGlobal('g1_ambientes', [])
+          }}
+        >NÃ£o</button>
       </div>
 
       {g1_temIluminacaoExterna === true && (
@@ -40,16 +45,15 @@ export function BlocoIluminacao() {
             <button onClick={() => setGlobal('g1_ambientes', ambientes.map((a) => a.instanceId))}>
               Todos
             </button>
-            <button onClick={() => setGlobal('g1_ambientes', [])}>Nenhum</button>
           </div>
           <div className={styles.chips}>
-            {ambientes.map((a) => (
+            {ambientes.map((ambiente) => (
               <button
-                key={a.instanceId}
-                className={g1_ambientes.includes(a.instanceId) ? styles.chipAtivo : styles.chip}
-                onClick={() => toggleAmbiente(a.instanceId)}
+                key={ambiente.instanceId}
+                className={g1_ambientes.includes(ambiente.instanceId) ? styles.chipAtivo : styles.chip}
+                onClick={() => toggleAmbiente(ambiente.instanceId)}
               >
-                {a.nome || a.label}
+                {formatarNomeAmbiente(ambiente)}
               </button>
             ))}
           </div>

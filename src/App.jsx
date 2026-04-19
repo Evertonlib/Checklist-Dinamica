@@ -1,6 +1,7 @@
-import { HashRouter, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { FormProvider } from './context/FormProvider.jsx'
 import { useFormContext } from './context/FormContext.js'
+import { formatarNomeAmbiente } from './domain/ambientes.js'
 import { Header } from './components/Header/Header.jsx'
 import { Stepper } from './components/Stepper/Stepper.jsx'
 import { StepIdentificacao } from './steps/StepIdentificacao/StepIdentificacao.jsx'
@@ -14,8 +15,6 @@ import './index.css'
 function AppLayout() {
   const { state } = useFormContext()
   const location = useLocation()
-  const params = useParams()
-
   const ambientes = state.ambientesSelecionados
   const totalEtapas = 3 + ambientes.length
 
@@ -38,7 +37,7 @@ function AppLayout() {
     if (idx >= 0) {
       etapaNum = 4 + idx
       const amb = ambientes[idx]
-      etapaNome = amb.nome || amb.label
+      etapaNome = formatarNomeAmbiente(amb)
     }
   }
 

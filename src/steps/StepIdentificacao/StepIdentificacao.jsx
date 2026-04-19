@@ -8,6 +8,32 @@ import styles from './StepIdentificacao.module.css'
 
 const REGEX_CONTRATO = /^(IT|SM|TA|PIN|STA)\d+$/
 
+function mascararCep(valor) {
+  const digitos = valor.replace(/\D/g, '').slice(0, 8)
+  if (digitos.length <= 5) {
+    return digitos
+  }
+
+  return `${digitos.slice(0, 5)}-${digitos.slice(5)}`
+}
+
+function obterErrosIdentificacao(identificacao) {
+  const erros = {}
+
+  if (!identificacao.nome.trim()) erros.nome = 'Campo obrigatÃ³rio'
+  if (!REGEX_CONTRATO.test(identificacao.contrato.trim())) {
+    erros.contrato = 'O contrato deve comeÃ§ar com IT, SM, TA, PIN ou STA seguido dos nÃºmeros'
+  }
+  if (identificacao.cep.replace(/\D/g, '').length !== 8) erros.cep = 'CEP invÃ¡lido'
+  if (!identificacao.logradouro.trim()) erros.logradouro = 'Campo obrigatÃ³rio'
+  if (!identificacao.bairro.trim()) erros.bairro = 'Campo obrigatÃ³rio'
+  if (!identificacao.cidade.trim()) erros.cidade = 'Campo obrigatÃ³rio'
+  if (identificacao.uf.trim().length !== 2) erros.uf = 'UF deve ter exatamente 2 caracteres'
+  if (!identificacao.telefone.trim()) erros.telefone = 'Campo obrigatÃ³rio'
+
+  return erros
+}
+
 export function StepIdentificacao() {
   const { state, dispatch } = useFormContext()
   const navigate = useNavigate()
@@ -16,81 +42,112 @@ export function StepIdentificacao() {
   const [buscando, setBuscando] = useState(false)
   const [erros, setErros] = useState({})
 
-  const set = (campo, valor) =>
+  const set = (campo, valor, proximoEstado = null) => {
     dispatch({ type: 'SET_IDENTIFICACAO', campo, valor })
+
+    if (Object.keys(erros).length > 0) {
+      setErros(obterErrosIdentificacao(proximoEstado || { ...id, [campo]: valor }))
+    }
+  }
 
   const handleCepBlur = async () => {
     const cep = id.cep.replace(/\D/g, '')
     if (cep.length !== 8) return
+
     setBuscando(true)
     setCepMsg('')
     const res = await buscarCep(cep)
     setBuscando(false)
-    if (res.erro === 'CEP não encontrado') {
-      setCepMsg('CEP não encontrado — você pode preencher o endereço manualmente.')
-    } else if (res.erro) {
-      setCepMsg('Não foi possível consultar o CEP agora — preencha o endereço manualmente.')
-    } else {
-      set('logradouro', res.logradouro)
-      set('bairro', res.bairro)
-      set('cidade', res.cidade)
-      set('uf', res.uf)
-      setCepMsg('')
+
+    if (res.erro === 'CEP nÃ£o encontrado') {
+      setCepMsg('CEP nÃ£o encontrado â€” vocÃª pode preencher o endereÃ§o manualmente.')
+      return
     }
+
+    if (res.erro) {
+      setCepMsg('NÃ£o foi possÃ­vel consultar o CEP agora â€” preencha o endereÃ§o manualmente.')
+      return
+    }
+
+    const proximoEstado = {
+      ...id,
+      logradouro: res.logradouro,
+      bairro: res.bairro,
+      cidade: res.cidade,
+      uf: res.uf,
+    }
+
+    set('logradouro', res.logradouro, proximoEstado)
+    set('bairro', res.bairro, proximoEstado)
+    set('cidade', res.cidade, proximoEstado)
+    set('uf', res.uf, proximoEstado)
+    setCepMsg('')
   }
 
-  const validar = () => {
-    const e = {}
-    if (!id.nome.trim()) e.nome = 'Campo obrigatório'
-    if (!REGEX_CONTRATO.test(id.contrato.trim()))
-      e.contrato = 'O contrato deve começar com IT, SM, TA, PIN ou STA seguido dos números'
-    if (id.cep.replace(/\D/g, '').length !== 8) e.cep = 'CEP inválido'
-    if (!id.logradouro.trim()) e.logradouro = 'Campo obrigatório'
-    if (!id.bairro.trim()) e.bairro = 'Campo obrigatório'
-    if (!id.cidade.trim()) e.cidade = 'Campo obrigatório'
-    if (!id.uf.trim()) e.uf = 'Campo obrigatório'
-    if (!id.telefone.trim()) e.telefone = 'Campo obrigatório'
-    setErros(e)
-    return Object.keys(e).length === 0
-  }
+  const errosAtuais = obterErrosIdentificacao(id)
+  const identificacaoValida = Object.keys(errosAtuais).length === 0
 
   const avancar = () => {
-    if (!validar()) return
+    if (!identificacaoValida) {
+      setErros(errosAtuais)
+      return
+    }
+
+    if (state._meta.origemNavegacao === 'revisao') {
+      dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'revisao' })
+      dispatch({ type: 'SET_META', campo: 'origemNavegacao', valor: null })
+      navigate('/revisao')
+      return
+    }
+
     dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'ambientes' })
     navigate('/ambientes')
   }
 
-  const campo = (label, campo, props = {}) => (
+  const campo = (label, campoNome, props = {}) => (
     <div className={styles.campo}>
       <label>{label}</label>
       <input
-        value={id[campo] ?? ''}
-        onChange={(e) => set(campo, e.target.value)}
+        value={id[campoNome] ?? ''}
+        onChange={(e) => set(campoNome, e.target.value)}
         {...props}
       />
-      {erros[campo] && <span className={styles.erro}>{erros[campo]}</span>}
+      {erros[campoNome] && <span className={styles.erro}>{erros[campoNome]}</span>}
     </div>
   )
 
+  const avancarLabel = state._meta.origemNavegacao === 'revisao'
+    ? 'Salvar e voltar ao resumo'
+    : 'AvanÃ§ar'
+
   return (
     <div className={styles.pagina}>
-      <FieldGroup titulo="Identificação">
+      <FieldGroup titulo="IdentificaÃ§Ã£o">
         {campo('Nome completo', 'nome', { autoComplete: 'name' })}
-        {campo('Número do contrato', 'contrato', { placeholder: 'Ex: IT01234' })}
+        {campo('NÃºmero do contrato', 'contrato', {
+          placeholder: 'Ex: IT01234',
+          onChange: (e) => {
+            const contrato = e.target.value.toUpperCase()
+            set('contrato', contrato, { ...id, contrato })
+          },
+        })}
         {campo('Telefone / celular', 'telefone', { type: 'tel', autoComplete: 'tel' })}
       </FieldGroup>
 
-      <FieldGroup titulo="Endereço da obra">
+      <FieldGroup titulo="EndereÃ§o da obra">
         <div className={styles.campo}>
           <label>CEP</label>
           <input
             value={id.cep}
-            onChange={(e) => set('cep', e.target.value)}
+            onChange={(e) => {
+              const cep = mascararCep(e.target.value)
+              set('cep', cep, { ...id, cep })
+            }}
             onBlur={handleCepBlur}
             placeholder="00000-000"
             maxLength={9}
           />
-          {buscando && <span className={styles.info}>Buscando CEP…</span>}
+          {buscando && <span className={styles.info}>Buscando CEPâ€¦</span>}
           {cepMsg && <span className={styles.aviso}>{cepMsg}</span>}
           {erros.cep && <span className={styles.erro}>{erros.cep}</span>}
         </div>
@@ -103,7 +160,10 @@ export function StepIdentificacao() {
             <label>UF</label>
             <input
               value={id.uf ?? ''}
-              onChange={(e) => set('uf', e.target.value.toUpperCase())}
+              onChange={(e) => {
+                const uf = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 2)
+                set('uf', uf, { ...id, uf })
+              }}
               maxLength={2}
             />
             {erros.uf && <span className={styles.erro}>{erros.uf}</span>}
@@ -112,7 +172,12 @@ export function StepIdentificacao() {
       </FieldGroup>
 
       <div className={styles.espacoBar} />
-      <BottomBar semVoltar onAvancar={avancar} />
+      <BottomBar
+        semVoltar
+        onAvancar={avancar}
+        avancarDisabled={!identificacaoValida}
+        avancarLabel={avancarLabel}
+      />
     </div>
   )
 }

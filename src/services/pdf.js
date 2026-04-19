@@ -1,268 +1,415 @@
 import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import { formatarNomeAmbiente } from '../domain/ambientes.js'
 import { calcularScore } from '../domain/scoreEngine.js'
 import { construirCCs } from '../domain/ccBuilder.js'
 
-const NIVEL_EMOJI = { ALTO: '🔴', MÉDIO: '🟡', BAIXO: '🟢' }
+const NIVEL_MEDIO = 'M\u00c9DIO'
+
 const COR_NIVEL = {
-  ALTO:  [220, 53, 69],
-  MÉDIO: [255, 193, 7],
-  BAIXO: [40, 167, 69],
+  ALTO: [180, 0, 0],
+  [NIVEL_MEDIO]: [200, 120, 0],
+  BAIXO: [0, 130, 0],
+}
+
+function formatarDataLocal(data) {
+  return data.toLocaleDateString('pt-BR')
+}
+
+function formatarDataArquivo(data) {
+  const ano = data.getFullYear()
+  const mes = String(data.getMonth() + 1).padStart(2, '0')
+  const dia = String(data.getDate()).padStart(2, '0')
+  return `${ano}-${mes}-${dia}`
+}
+
+function formatarListaAmbientes(ambientes, instanceIds, vazio = 'Nenhum') {
+  if (!instanceIds?.length) return vazio
+
+  return instanceIds
+    .map((instanceId) => ambientes.find((ambiente) => ambiente.instanceId === instanceId))
+    .filter(Boolean)
+    .map((ambiente) => formatarNomeAmbiente(ambiente))
+    .join(', ')
+}
+
+function formatarListaRebaixo(ambientes, rebaixos) {
+  if (!rebaixos?.length) return 'Nenhum'
+
+  return rebaixos
+    .map((item) => {
+      const ambiente = ambientes.find((amb) => amb.instanceId === item.instanceId)
+      const nome = ambiente ? formatarNomeAmbiente(ambiente) : item.instanceId
+      return `${nome} (${item.cm} cm)`
+    })
+    .join(', ')
+}
+
+function descreverEletro(eletro) {
+  const partes = [eletro.tipo]
+
+  if (eletro.descricao) {
+    partes.push(eletro.descricao)
+  }
+  if (eletro.subtipo) {
+    partes.push(eletro.subtipo)
+  }
+
+  return partes.join(' — ')
+}
+
+function descreverEletronico(eletronico) {
+  const partes = [eletronico.tipo]
+
+  if (eletronico.subtipo) {
+    partes.push(eletronico.subtipo)
+  }
+  if (eletronico.modelo) {
+    partes.push(eletronico.modelo)
+  }
+
+  return partes.join(' — ')
 }
 
 /**
  * Gera e dispara download do PDF.
- * @param {object} state - Estado completo do formulário
+ * @param {object} state - Estado completo do formulÃ¡rio
  */
 export async function gerarPdf(state) {
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' })
   const { scoreGlobal, scorePorAmbiente, gatilhosAtivados } = calcularScore(state)
   const ccs = construirCCs(state, gatilhosAtivados)
-  const hoje = new Date().toLocaleDateString('pt-BR')
+  const agora = new Date()
+  const dataCapa = formatarDataLocal(agora)
+  const dataArquivo = formatarDataArquivo(agora)
   const { nome, contrato } = state.identificacao
 
-  // ── PÁGINA 1: CAPA ──────────────────────────────────────────────────────
+  const margemEsquerda = 20
+  const margemDireita = 20
+  const margemSuperior = 20
+  const margemInferior = 20
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const larguraConteudo = pageWidth - margemEsquerda - margemDireita
+
+  const ambientePorId = new Map(
+    state.ambientesSelecionados.map((ambiente) => [ambiente.instanceId, ambiente])
+  )
+  const ccPorId = new Map(ccs.map((cc) => [cc.id, cc]))
+
+  const nomeAmbiente = (escopo) => {
+    if (escopo === 'Global') return 'Global'
+    const ambiente = ambientePorId.get(escopo)
+    return ambiente ? formatarNomeAmbiente(ambiente) : escopo
+  }
+
   doc.setFont('times', 'bold')
   doc.setFontSize(22)
-  doc.text('By Arabi Planejados', 105, 40, { align: 'center' })
+  doc.text('By Arabi Planejados', pageWidth / 2, 40, { align: 'center' })
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(14)
-  doc.text('Checklist de Liberação de Projeto', 105, 52, { align: 'center' })
+  doc.text('Checklist de LiberaÃ§Ã£o de Projeto', pageWidth / 2, 52, { align: 'center' })
 
   doc.setDrawColor(180, 150, 80)
   doc.setLineWidth(0.5)
-  doc.line(20, 58, 190, 58)
+  doc.line(margemEsquerda, 58, pageWidth - margemDireita, 58)
 
   doc.setFontSize(12)
-  doc.text(`Cliente: ${nome}`, 20, 70)
-  doc.text(`Contrato: ${contrato}`, 20, 80)
-  doc.text(`Data: ${hoje}`, 20, 90)
+  doc.text(`Cliente: ${nome}`, margemEsquerda, 72)
+  doc.text(`Contrato: ${contrato}`, margemEsquerda, 82)
+  doc.text(`Data: ${dataCapa}`, margemEsquerda, 92)
 
-  // Score badge
-  const [r, g, b] = COR_NIVEL[scoreGlobal.classificacao]
-  doc.setFillColor(r, g, b)
-  doc.roundedRect(20, 100, 170, 20, 4, 4, 'F')
-  doc.setTextColor(255, 255, 255)
+  const corScoreCapa = COR_NIVEL[scoreGlobal.classificacao]
+  doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
-  doc.text(
-    `${NIVEL_EMOJI[scoreGlobal.classificacao]} RISCO ${scoreGlobal.classificacao} — ${scoreGlobal.pontos} pontos`,
-    105, 113, { align: 'center' }
-  )
+  doc.text('ClassificaÃ§Ã£o de risco global:', margemEsquerda, 110)
+  doc.setTextColor(...corScoreCapa)
+  doc.text(`RISCO ${scoreGlobal.classificacao}`, margemEsquerda, 122)
   doc.setTextColor(0, 0, 0)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`(${scoreGlobal.pontos} pontos)`, margemEsquerda + 44, 122)
 
-  // ── PÁGINA 2: RESUMO EXECUTIVO ───────────────────────────────────────────
   doc.addPage()
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(16)
-  doc.text('Resumo Executivo', 20, 20)
-  doc.setLineWidth(0.3)
-  doc.line(20, 24, 190, 24)
 
-  let y = 32
-  const margin = 20
-  const largura = 170
+  let y = margemSuperior
 
-  const ccsAlto  = ccs.filter((c) => c.tipo === 'CC' && c.nivel === 'ALTO')
-  const ccsMedio = ccs.filter((c) => c.tipo === 'CC' && c.nivel === 'MÉDIO')
-  const ccsBaixo = ccs.filter((c) => c.tipo === 'CC' && c.nivel === 'BAIXO')
+  const garantirEspaco = (alturaNecessaria = 8) => {
+    if (y + alturaNecessaria <= pageHeight - margemInferior) return
+    doc.addPage()
+    y = margemSuperior
+  }
 
-  const escreverCC = (cc, cor) => {
-    const ambLabel = cc.escopo === 'Global'
-      ? 'Global'
-      : (state.ambientesSelecionados.find((a) => a.instanceId === cc.escopo)?.nome ||
-         state.ambientesSelecionados.find((a) => a.instanceId === cc.escopo)?.label || cc.escopo)
+  const escreverLinhas = (linhas, x, incremento = 5) => {
+    linhas.forEach((linha) => {
+      garantirEspaco(incremento)
+      doc.text(linha, x, y)
+      y += incremento
+    })
+  }
 
+  const escreverTituloSecao = (titulo) => {
+    garantirEspaco(12)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...cor)
-    doc.setFontSize(10)
-    doc.text(`${NIVEL_EMOJI[cc.nivel]} RISCO ${cc.nivel} — ${ambLabel}`, margin, y)
+    doc.setFontSize(16)
     doc.setTextColor(0, 0, 0)
-    y += 6
+    doc.text(titulo, margemEsquerda, y)
+    y += 4
+    doc.setLineWidth(0.3)
+    doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+    y += 8
+  }
+
+  const escreverResumoItem = (cc) => {
+    garantirEspaco(16)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(...COR_NIVEL[cc.nivel])
+    const titulo = `RISCO ${cc.nivel} — ${nomeAmbiente(cc.escopo)}`
+    escreverLinhas(doc.splitTextToSize(titulo, larguraConteudo), margemEsquerda, 5)
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
-    const linhas = doc.splitTextToSize(`   ${cc.textoCompleto}`, largura)
-    linhas.forEach((l) => {
-      if (y > 270) { doc.addPage(); y = 20 }
-      doc.text(l, margin, y)
-      y += 5
-    })
+    doc.setTextColor(0, 0, 0)
+    escreverLinhas(doc.splitTextToSize(`CC: ${cc.textoCompleto}`, larguraConteudo), margemEsquerda, 4.5)
     y += 3
   }
 
-  ccsAlto.forEach((cc) => escreverCC(cc, COR_NIVEL.ALTO))
-  ccsMedio.forEach((cc) => escreverCC(cc, COR_NIVEL.MÉDIO))
+  const escreverInline = (item) => {
+    const cor = item.nivel ? COR_NIVEL[item.nivel] : [90, 90, 90]
+    const texto = item.tipo === 'CC' ? `CC: ${item.textoCompleto}` : item.textoCompleto
 
-  if (ccsBaixo.length > 0) {
-    if (y > 265) { doc.addPage(); y = 20 }
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(10)
-    doc.setTextColor(...COR_NIVEL.BAIXO)
-    doc.text('🟢 BAIXOS:', margin, y)
-    doc.setTextColor(0, 0, 0)
-    y += 6
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...cor)
+    escreverLinhas(doc.splitTextToSize(texto, larguraConteudo - 4), margemEsquerda + 4, 4.5)
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
-    const textoBaixos = ccsBaixo.map((c) => {
-      const amb = c.escopo === 'Global' ? 'Global' :
-        (state.ambientesSelecionados.find((a) => a.instanceId === c.escopo)?.nome ||
-         state.ambientesSelecionados.find((a) => a.instanceId === c.escopo)?.label || c.escopo)
-      return `[${amb}] ${c.textoCompleto}`
-    }).join(' | ')
-    const linhasBaixo = doc.splitTextToSize(textoBaixos, largura)
-    linhasBaixo.forEach((l) => {
-      if (y > 270) { doc.addPage(); y = 20 }
-      doc.text(l, margin, y)
-      y += 5
-    })
+    doc.setTextColor(0, 0, 0)
+    y += 1
   }
 
-  // ── PÁGINAS SEGUINTES: CHECKLIST POR AMBIENTE ────────────────────────────
-  for (const instancia of state.ambientesSelecionados) {
-    doc.addPage()
-    const { instanceId, label, formType } = instancia
-    const nomeAmb = instancia.nome || label
+  const escreverPergunta = (pergunta, resposta, itensRelacionados = []) => {
+    garantirEspaco(14)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(0, 0, 0)
+    escreverLinhas(doc.splitTextToSize(pergunta, larguraConteudo), margemEsquerda, 5)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    escreverLinhas(doc.splitTextToSize(`Resposta: ${resposta ?? '—'}`, larguraConteudo), margemEsquerda, 4.5)
+
+    itensRelacionados.filter(Boolean).forEach((item) => escreverInline(item))
+    y += 2
+  }
+
+  const ccsResumo = ccs.filter((cc) => cc.tipo === 'CC')
+  const ccsAlto = ccsResumo.filter((cc) => cc.nivel === 'ALTO')
+  const ccsMedio = ccsResumo.filter((cc) => cc.nivel === NIVEL_MEDIO)
+  const ccsBaixo = ccsResumo.filter((cc) => cc.nivel === 'BAIXO')
+
+  escreverTituloSecao('Resumo Executivo')
+  ;[...ccsAlto, ...ccsMedio, ...ccsBaixo].forEach((cc) => escreverResumoItem(cc))
+
+  doc.addPage()
+  y = margemSuperior
+
+  escreverTituloSecao('Checklist Completa')
+
+  const { global } = state
+  const idsEmReforma = global.g2_ambientes || []
+
+  escreverPergunta(
+    'G1 â€” O projeto terÃ¡ alguma iluminaÃ§Ã£o embutida na marcenaria adquirida externamente Ã  By Arabi? (fitas de LED, spots, etc.)',
+    global.g1_temIluminacaoExterna === true
+      ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g1_ambientes)}`
+      : 'NÃ£o',
+    [ccPorId.get('ILUMINACAO_EXTERNA')]
+  )
+
+  escreverPergunta(
+    'G2 â€” Algum ambiente estÃ¡ em reforma?',
+    global.g2_temReforma === true
+      ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientes)}`
+      : 'NÃ£o'
+  )
+
+  escreverPergunta(
+    'G2.1 â€” Em quais ambientes em reforma as paredes jÃ¡ possuem reboco (argamassa) finalizado?',
+    global.g2_temReforma === true
+      ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_1_ambientes)
+      : 'NÃ£o se aplica',
+    [ccPorId.get('REFORM_SEM_REBOCO')]
+  )
+
+  escreverPergunta(
+    'G2.2 â€” Em quais ambientes em reforma o revestimento final das paredes jÃ¡ estÃ¡ aplicado?',
+    global.g2_temReforma === true && global.g2_1_temReboco === true
+      ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_2_ambientes)
+      : 'NÃ£o se aplica',
+    [ccPorId.get('REFORM_SEM_REVESTIMENTO')]
+  )
+
+  escreverPergunta(
+    'G3 â€” Os pontos elÃ©tricos/hidrÃ¡ulicos/gÃ¡s jÃ¡ estÃ£o nas posiÃ§Ãµes finais em todos os ambientes?',
+    global.g3_pontosNaPosicaoFinal === false
+      ? `NÃ£o — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
+      : 'Sim',
+    [ccPorId.get('PONTOS_INDEFINIDOS')]
+  )
+
+  escreverPergunta(
+    'G4 â€” Algum ambiente terÃ¡ rebaixo de teto?',
+    global.g4_temRebaixo === true
+      ? `Sim — ${formatarListaRebaixo(state.ambientesSelecionados, global.g4_ambientes)}`
+      : 'NÃ£o',
+    (global.g4_ambientes || []).map((item) => ccPorId.get(`REBAIXO_${item.instanceId}`))
+  )
+
+  state.ambientesSelecionados.forEach((instancia) => {
+    const { instanceId, formType } = instancia
     const resp = state.respostasPorAmbiente[instanceId] || {}
     const score = scorePorAmbiente[instanceId]
-    const ccsAmb = ccs.filter((c) => c.escopo === instanceId)
 
+    garantirEspaco(18)
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(14)
-    doc.text(nomeAmb, margin, 20)
+    doc.setFontSize(13)
+    doc.setTextColor(0, 0, 0)
+    doc.text(formatarNomeAmbiente(instancia), margemEsquerda, y)
+    y += 6
 
     if (score) {
-      const [cr, cg, cb] = COR_NIVEL[score.classificacao]
-      doc.setTextColor(cr, cg, cb)
-      doc.setFontSize(10)
-      doc.text(`${NIVEL_EMOJI[score.classificacao]} ${score.classificacao} (${score.pontos} pts)`, margin, 28)
-      doc.setTextColor(0, 0, 0)
-    }
-
-    doc.line(margin, 32, 190, 32)
-    let ay = 38
-
-    const linha = (rotulo, valor) => {
-      if (ay > 270) { doc.addPage(); ay = 20 }
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9)
-      doc.text(`${rotulo}:`, margin, ay)
-      doc.setFont('helvetica', 'normal')
-      const linhas = doc.splitTextToSize(String(valor ?? '—'), 130)
-      doc.text(linhas, 70, ay)
-      ay += linhas.length * 5 + 2
+      doc.setTextColor(...COR_NIVEL[score.classificacao])
+      doc.text(`RISCO ${score.classificacao} (${score.pontos} pts)`, margemEsquerda, y)
+      y += 5
     }
 
-    const ccInline = (id) => {
-      const cc = ccsAmb.find((c) => c.id === id)
-      if (!cc) return
-      if (ay > 265) { doc.addPage(); ay = 20 }
-      const cor = cc.nivel ? COR_NIVEL[cc.nivel] : [100, 100, 100]
-      doc.setTextColor(...cor)
-      doc.setFont('helvetica', 'italic')
-      doc.setFontSize(8)
-      const ls = doc.splitTextToSize(`   ↳ ${cc.tipo}: ${cc.textoCompleto}`, largura)
-      ls.forEach((l) => { doc.text(l, margin, ay); ay += 4.5 })
-      doc.setTextColor(0, 0, 0)
-      ay += 2
-    }
+    doc.setTextColor(0, 0, 0)
+    doc.setLineWidth(0.3)
+    doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+    y += 7
 
-    // Renderização por formType
     if (['cozinha', 'banheiro', 'outros'].includes(formType)) {
-      linha('Granito/Pia existente', resp.granito === true ? 'Sim' : resp.granito === false ? 'Não' : '—')
+      escreverPergunta(
+        'Existe granito ou pia existente no local?',
+        resp.granito === true ? 'Sim' : resp.granito === false ? 'NÃ£o' : '—'
+      )
       if (resp.granito === true) {
-        linha('Móveis adaptados ao granito', resp.granitoadaptar === true ? 'Sim' : 'Não')
-        ccInline(`GRANITO_RETIRAR_${instanceId}`)
+        escreverPergunta(
+          'Os mÃ³veis serÃ£o adaptados?',
+          resp.granitoadaptar === true ? 'Sim' : resp.granitoadaptar === false ? 'NÃ£o' : '—',
+          [ccPorId.get(`GRANITO_RETIRAR_${instanceId}`)]
+        )
       }
     }
 
     if (['cozinha', 'outros'].includes(formType)) {
-      linha('Tanque existente', resp.tanque === true ? 'Sim' : resp.tanque === false ? 'Não' : '—')
+      escreverPergunta(
+        'Existe tanque no local?',
+        resp.tanque === true ? 'Sim' : resp.tanque === false ? 'NÃ£o' : '—'
+      )
       if (resp.tanque === true) {
-        linha('Haverá móveis na região do tanque', resp.tanqueMoveis === true ? 'Sim' : 'Não')
-        ccInline(`TANQUE_RETIRAR_${instanceId}`)
+        escreverPergunta(
+          'HaverÃ¡ mÃ³veis na regiÃ£o do tanque?',
+          resp.tanqueMoveis === true ? 'Sim' : resp.tanqueMoveis === false ? 'NÃ£o' : '—',
+          [ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)]
+        )
       }
     }
 
     if (['dormitorio', 'home', 'outros'].includes(formType)) {
-      linha('TV no ambiente', resp.tv === true ? 'Sim' : resp.tv === false ? 'Não' : '—')
+      escreverPergunta(
+        'TerÃ¡ TV neste ambiente?',
+        resp.tv === true ? 'Sim' : resp.tv === false ? 'NÃ£o' : '—'
+      )
       if (resp.tv === true) {
-        linha('Ponto elétrico na posição final', resp.tvPontoFinal === true ? 'Sim' : 'Não')
-        ccInline(`TV_PONTO_${instanceId}`)
-        linha('Polegadas', resp.tv_polegadas ?? '—')
-        if (resp.tv_modelo) linha('Modelo', resp.tv_modelo)
-        if (resp.tv_largura_cm) linha('Largura (cm)', resp.tv_largura_cm)
-        if (resp.tv_altura_cm) linha('Altura (cm)', resp.tv_altura_cm)
-        if (resp.tv_profundidade_cm) linha('Profundidade (cm)', resp.tv_profundidade_cm)
-        if (resp.tv_link) linha('Link', resp.tv_link)
+        escreverPergunta(
+          'O ponto elÃ©trico da TV jÃ¡ estÃ¡ na posiÃ§Ã£o final?',
+          resp.tvPontoFinal === true ? 'Sim' : resp.tvPontoFinal === false ? 'NÃ£o' : '—',
+          [ccPorId.get(`TV_PONTO_${instanceId}`)]
+        )
+        escreverPergunta('Polegadas', resp.tv_polegadas ?? '—')
+        if (resp.tv_modelo) escreverPergunta('Modelo', resp.tv_modelo)
+        if (resp.tv_largura_cm) escreverPergunta('Largura (cm)', resp.tv_largura_cm)
+        if (resp.tv_altura_cm) escreverPergunta('Altura (cm)', resp.tv_altura_cm)
+        if (resp.tv_profundidade_cm) escreverPergunta('Profundidade (cm)', resp.tv_profundidade_cm)
+        if (resp.tv_link) escreverPergunta('Link', resp.tv_link)
       }
     }
 
     if (['dormitorio', 'outros'].includes(formType)) {
-      linha('Tamanho da cama', resp.tamanhoCama ?? '—')
+      escreverPergunta('Qual o tamanho da cama neste ambiente?', resp.tamanhoCama ?? '—')
       if (resp.tamanhoCama === 'outro') {
-        linha('Largura (cm)', resp.camaLargura_cm)
-        linha('Comprimento (cm)', resp.camaComprimento_cm)
+        escreverPergunta('Largura (cm)', resp.camaLargura_cm ?? '—')
+        escreverPergunta('Comprimento (cm)', resp.camaComprimento_cm ?? '—')
       }
     }
 
     if (['dormitorio', 'home', 'outros'].includes(formType)) {
-      linha('Cortineiro', resp.cortineiro === true ? 'Sim' : resp.cortineiro === false ? 'Não' : '—')
+      escreverPergunta(
+        'HaverÃ¡ cortineiro neste ambiente?',
+        resp.cortineiro === true ? 'Sim' : resp.cortineiro === false ? 'NÃ£o' : '—'
+      )
       if (resp.cortineiro === true) {
-        linha('Cortineiro instalado', resp.cortieneiroInstalado === true ? 'Sim' : 'Não')
-        ccInline(`CORTINEIRO_NAOINSTALADO_${instanceId}`)
+        escreverPergunta(
+          'O cortineiro jÃ¡ estÃ¡ instalado?',
+          resp.cortieneiroInstalado === true ? 'Sim' : resp.cortieneiroInstalado === false ? 'NÃ£o' : '—',
+          [ccPorId.get(`CORTINEIRO_NAOINSTALADO_${instanceId}`)]
+        )
       }
-      linha('Rodapé existente', resp.rodape === true ? 'Sim' : resp.rodape === false ? 'Não' : '—')
-      ccInline(`RODAPE_EXISTENTE_${instanceId}`)
-      ccInline(`RODAPE_AUSENTE_${instanceId}`)
+
+      escreverPergunta(
+        'Existe rodapÃ© na regiÃ£o dos mÃ³veis?',
+        resp.rodape === true ? 'Sim' : resp.rodape === false ? 'NÃ£o' : '—',
+        [ccPorId.get(`RODAPE_EXISTENTE_${instanceId}`), ccPorId.get(`RODAPE_AUSENTE_${instanceId}`)]
+      )
     }
 
     if (['cozinha', 'outros'].includes(formType)) {
-      linha('Eletrodomésticos definidos', resp.eletrosDefined === true ? 'Sim' : resp.eletrosDefined === false ? 'Não' : '—')
-      ccInline(`ELETROS_NAODEF_${instanceId}`)
+      escreverPergunta(
+        'JÃ¡ possui ou tem intenÃ§Ã£o de compra especÃ­fica dos eletrodomÃ©sticos?',
+        resp.eletrosDefined === true ? 'Sim' : resp.eletrosDefined === false ? 'NÃ£o' : '—',
+        [ccPorId.get(`ELETROS_NAODEF_${instanceId}`)]
+      )
+
       if (resp.eletrosDefined === true && resp.eletros?.length > 0) {
-        resp.eletros.forEach((el, i) => {
-          linha(`Eletro ${i + 1}`, `${el.tipo}${el.subtipo ? ' — ' + el.subtipo : ''}`)
-          if (el.modelo) linha('  Modelo', el.modelo)
-          if (el.largura_cm) linha('  Largura (cm)', el.largura_cm)
-          if (el.altura_cm) linha('  Altura (cm)', el.altura_cm)
-          if (el.profundidade_cm) linha('  Profundidade (cm)', el.profundidade_cm)
-          if (el.link) linha('  Link', el.link)
+        resp.eletros.forEach((eletro, index) => {
+          escreverPergunta(`Eletro ${index + 1}`, descreverEletro(eletro))
+          if (eletro.modelo) escreverPergunta('Modelo', eletro.modelo)
+          if (eletro.largura_cm) escreverPergunta('Largura (cm)', eletro.largura_cm)
+          if (eletro.altura_cm) escreverPergunta('Altura (cm)', eletro.altura_cm)
+          if (eletro.profundidade_cm) escreverPergunta('Profundidade (cm)', eletro.profundidade_cm)
+          if (eletro.link) escreverPergunta('Link', eletro.link)
         })
       }
     }
 
     if (['home', 'outros'].includes(formType)) {
-      linha('Eletrônicos definidos', resp.eletronicos === true ? 'Sim' : resp.eletronicos === false ? 'Não' : '—')
-      ccInline(`ELETRONICOS_NAODEF_${instanceId}`)
+      escreverPergunta(
+        'Possui ou pretende adquirir eletrÃ´nicos para este ambiente?',
+        resp.eletronicos === true ? 'Sim' : resp.eletronicos === false ? 'NÃ£o' : '—',
+        [ccPorId.get(`ELETRONICOS_NAODEF_${instanceId}`)]
+      )
+
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
-        resp.eletronicosList.forEach((el, i) => {
-          linha(`Eletrônico ${i + 1}`, `${el.tipo}${el.modelo ? ' — ' + el.modelo : ''}`)
-          if (el.largura_cm) linha('  Largura (cm)', el.largura_cm)
-          if (el.altura_cm) linha('  Altura (cm)', el.altura_cm)
-          if (el.link) linha('  Link', el.link)
+        resp.eletronicosList.forEach((eletronico, index) => {
+          escreverPergunta(`EletrÃ´nico ${index + 1}`, descreverEletronico(eletronico))
+          if (eletronico.largura_cm) escreverPergunta('Largura (cm)', eletronico.largura_cm)
+          if (eletronico.altura_cm) escreverPergunta('Altura (cm)', eletronico.altura_cm)
+          if (eletronico.link) escreverPergunta('Link', eletronico.link)
         })
       }
     }
 
-    if (formType === 'banheiro' || formType === 'outros') {
-      linha('Tipo de cuba', resp.cuba ?? '—')
-    }
-
-    // Rebaixo global no ambiente
-    const g4amb = state.global.g4_ambientes.find((a) => a.instanceId === instanceId)
-    if (g4amb) {
-      linha('Rebaixo de teto', `${g4amb.cm ?? '?'} cm`)
-      ccInline(`REBAIXO_${instanceId}`)
+    if (formType === 'banheiro' || (formType === 'outros' && resp.cuba)) {
+      escreverPergunta('Tipo de cuba', resp.cuba ?? '—')
     }
 
     if (resp.observacoes) {
-      linha('Observações', resp.observacoes)
+      escreverPergunta('ObservaÃ§Ãµes', resp.observacoes)
     }
-  }
+  })
 
-  // Nome do arquivo
-  const dataStr = new Date().toISOString().slice(0, 10)
-  doc.save(`Checklist_ByArabi_${contrato}_${dataStr}.pdf`)
+  doc.save(`Checklist_ByArabi_${contrato}_${dataArquivo}.pdf`)
 }
