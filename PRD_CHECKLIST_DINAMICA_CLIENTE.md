@@ -180,6 +180,10 @@ Cada critério descreve **entrada** → **resultado esperado** e inclui cenário
 **Entrada:** cliente digita CEP "01310-100" e a API ViaCEP está fora do ar (ou sem conexão).
 **Esperado:** após timeout de 5 segundos, formulário exibe "Não foi possível consultar o CEP agora — preencha o endereço manualmente" e libera os campos. O cliente consegue avançar normalmente.
 
+### CA-3B — Botão de ajuda "Vendedor"
+**Entrada:** cliente está em qualquer etapa do formulário e clica no botão "Vendedor" fixo na barra inferior.
+**Esperado:** abre um modal com o texto "Precisa de ajuda com essa pergunta? Entre em contato com seu vendedor projetista para obter essa informação. Quando tiver a resposta, retorne aqui — seu progresso estará salvo." e um botão "Entendido, vou consultar o vendedor" que fecha o modal. Nenhuma navegação ocorre, nenhum dado é alterado. O botão deve estar visível em todas as etapas do formulário.
+
 ### CA-4 — Etapa 1: contrato com formato inválido
 **Entrada:** cliente digita "ABC123" no campo contrato.
 **Esperado:** ao tentar avançar, mensagem "O contrato deve começar com IT, SM, TA, PIN ou STA seguido dos números" próxima ao campo. Botão "Avançar" permanece desabilitado.
@@ -194,7 +198,12 @@ Cada critério descreve **entrada** → **resultado esperado** e inclui cenário
 
 ### CA-7 — Etapa 3: gatilho de risco alto direto (G2.1)
 **Entrada:** na pergunta G2, cliente responde SIM (há reforma); em G2.1 responde NÃO (sem reboco).
-**Esperado:** pop-up imediato avisando que o projeto é classificado como Risco Alto; o texto de CC é adicionado à lista; a pergunta G2.2 não aparece (regra de supressão); score global passa para ALTO independente de outras respostas.
+**Esperado:** exibe imediatamente um pop-up de risco alto com o texto: "Ambiente não está pronto para liberação. [nome do ambiente] ainda não possui reboco (argamassa) finalizado nas paredes. Nessa condição, o projeto não pode ser liberado sem adequação prévia. Seu progresso está salvo."
+O pop-up oferece dois botões:
+- "← Voltar" — fecha o pop-up e retorna à pergunta G2.1 para o cliente corrigir a resposta.
+- "Assumo o risco e continuar" — fecha o pop-up e permite avançar normalmente; o gatilho de risco alto permanece ativo e o CC correspondente é adicionado à lista; a pergunta G2.2 não aparece (regra de supressão).
+
+O formulário não encerra neste ponto em nenhuma das opções.
 
 ### CA-8 — Etapa 3: G2.1 SIM e G2.2 NÃO
 **Entrada:** G2 = SIM, G2.1 = SIM, G2.2 = NÃO.
@@ -210,11 +219,12 @@ Cada critério descreve **entrada** → **resultado esperado** e inclui cenário
 
 ### CA-11 — Etapa 4 Dormitório: TV com ponto fora da posição final
 **Entrada:** cliente marca SIM para TV, NÃO para ponto elétrico na posição final.
-**Esperado:** CC de deslocamento de ponto é gerado; +2 pontos no ambiente; campos de dimensões da TV **não** aparecem (regra: dimensões só quando ponto já está na posição final).
+**Esperado:** CC de deslocamento de ponto é gerado ("CLIENTE CIENTE E DE ACORDO QUE DEVERÁ DESLOCAR OS PONTOS ELÉTRICOS PARA DENTRO DA POSIÇÃO DO PAINEL DE TV ATÉ O DIA DA MONTAGEM PARA OCULTAÇÃO ADEQUADA DA FIAÇÃO"); +2 pontos no ambiente.
+Em seguida, os campos de dados da TV são exibidos normalmente: Polegadas (obrigatório), Modelo (opcional — sem aviso visível ao cliente, apenas não bloqueia o avanço), Largura cm (opcional), Altura cm (opcional), Profundidade cm (opcional), Link (opcional — exibir placeholder "Cole aqui o link do produto, se tiver"). O cliente pode avançar sem preencher os campos opcionais.
 
 ### CA-12 — Etapa 4: dois dormitórios com scores diferentes
 **Entrada:** "Dormitório Amélia" com todos os itens em risco; "Dormitório Felipe" com nada em risco.
-**Esperado:** score de Amélia é ALTO, de Felipe é BAIXO, e o global é ALTO (reflete o pior ambiente).
+**Esperado:** score de Amélia é ALTO, de Felipe é BAIXO, e o global é ALTO (reflete o pior ambiente). A tela de revisão exibe abaixo do score global uma linha explicativa: "Risco global classificado como ALTO porque um ou mais ambientes apresentam condição de risco alto."
 
 ### CA-13 — Revisão: voltar e alterar resposta
 **Entrada:** cliente na tela de revisão com score MÉDIO volta à Etapa 3 e muda G2.1 de SIM para NÃO.
@@ -240,9 +250,13 @@ Cada critério descreve **entrada** → **resultado esperado** e inclui cenário
 **Entrada:** formulário aberto em celular com tela de 360px de largura.
 **Esperado:** todos os campos legíveis sem rolagem horizontal; botões com área de toque adequada; stepper visível; pop-ups adaptados à tela.
 
+### CA-18B — Indicador de progresso por etapa
+**Entrada:** cliente navega pelo formulário.
+**Esperado:** a barra superior exibe o formato "Etapa X de 4 — [Nome da etapa]", onde X é o número da etapa atual e o nome é: Identificação, Ambientes, Perguntas Gerais, ou o nome do ambiente em preenchimento na Etapa 4. O indicador avança a cada etapa concluída. Não é uma barra de porcentagem contínua.
+
 ### CA-19 — Ambiente "Outros"
 **Entrada:** cliente marca "Outros" na Etapa 2 e nomeia como "Lavanderia Externa".
-**Esperado:** na Etapa 4, o ambiente "Lavanderia Externa" recebe o conjunto completo de perguntas (mesmo que ainda não haja modelo específico — usa o superset das perguntas por ambiente), e seu score é calculado separadamente.
+**Esperado:** na Etapa 4, o ambiente recebe o conjunto completo (superset) de todas as perguntas por ambiente, na seguinte ordem: granito ou pia existente, tanque existente, TV, cortineiro, rodapé, tamanho de cama, eletrodomésticos, cuba, eletrônicos, observações. O cliente responde apenas o que for aplicável — perguntas condicionais seguem as mesmas regras dos outros ambientes. Score calculado separadamente.
 
 ### CA-20 — Deploy GitHub Pages
 **Entrada:** commit na branch `main`.
