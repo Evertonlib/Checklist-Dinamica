@@ -188,6 +188,10 @@ Cada critério descreve **entrada** → **resultado esperado** e inclui cenário
 **Entrada:** cliente digita "ABC123" no campo contrato.
 **Esperado:** ao tentar avançar, mensagem "O contrato deve começar com IT, SM, TA, PIN ou STA seguido dos números" próxima ao campo. Botão "Avançar" permanece desabilitado.
 
+### CA-4B — Etapa 1: telefone obrigatório
+**Entrada:** cliente preenche todos os campos da Etapa 1 exceto telefone e tenta avançar.
+**Esperado:** mensagem de validação próxima ao campo indicando que o telefone é obrigatório. Botão "Avançar" permanece desabilitado.
+
 ### CA-5 — Etapa 2: seleção com quantidade maior que 1
 **Entrada:** cliente marca "Dormitório Solteiro" com quantidade 2.
 **Esperado:** aparecem dois blocos com campos de nome ("Dormitório Solteiro 1" e "Dormitório Solteiro 2") pedindo um rótulo para diferenciar. Na Etapa 4, cada dormitório abre seu próprio formulário.
@@ -216,6 +220,14 @@ O formulário não encerra neste ponto em nenhuma das opções.
 ### CA-10 — Etapa 4 Cozinha: granito existente a ser retirado
 **Entrada:** cliente responde SIM para granito existente e NÃO para "os móveis serão adaptados".
 **Esperado:** CC de retirada de granito é adicionado; cozinha recebe +2 de pontuação; score visível na tela de revisão.
+
+### CA-10B — Etapa 4 Cozinha: eletrodoméstico sem dimensões
+**Entrada:** cliente seleciona "Fogão" com subtipo "Piso" e tenta avançar sem preencher largura, altura ou profundidade.
+**Esperado:** mensagem de validação nos campos faltantes. Botão "Avançar" desabilitado até preenchimento completo.
+
+### CA-10C — Etapa 4 Cozinha: Depurador Embutido sem modelo e link
+**Entrada:** cliente seleciona "Depurador" com subtipo "Embutido" e tenta avançar sem preencher modelo ou link.
+**Esperado:** mensagem de validação indicando que modelo e link são obrigatórios para Depurador Embutido. Botão "Avançar" desabilitado.
 
 ### CA-11 — Etapa 4 Dormitório: TV com ponto fora da posição final
 **Entrada:** cliente marca SIM para TV, NÃO para ponto elétrico na posição final.

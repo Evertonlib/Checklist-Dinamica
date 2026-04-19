@@ -42,8 +42,6 @@ checklist-dinamica/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml                        # Pipeline GitHub Actions → GitHub Pages
-├── public/
-│   └── logo-byarabi.png                      # Fornecido via skill byarabi-design
 ├── src/
 │   ├── main.jsx                              # Entrypoint Vite
 │   ├── App.jsx                               # HashRouter + FormProvider + layout global
@@ -349,21 +347,27 @@ Formato: `{ambienteId}-{índice}` (ex.: `"dormitorio_solteiro-0"`, `"dormitorio_
 | `#/identificacao` | `StepIdentificacao` — Etapa 1 |
 | `#/ambientes` | `StepAmbientes` — Etapa 2 |
 | `#/globais` | `StepPerguntasGlobais` — Etapa 3 |
-| `#/ambiente/:instanceId` | `StepPerguntasPorAmbiente` — Etapa 4 (uma rota por instância) |
+| `#/ambiente/:instanceId` | `StepPerguntasPorAmbiente` — Etapas 4 a 3+N (uma rota por instância; N = total de ambientes selecionados) |
 | `#/revisao` | `StepRevisao` |
 | `#/sucesso` | `StepSucesso` |
 
 Sequência de navegação na Etapa 4: ambientes na ordem em que aparecem em `state.ambientesSelecionados`. "Avançar" no último ambiente vai para `#/revisao`; "Voltar" no primeiro ambiente vai para `#/globais`.
 
 ### 7.2 Stepper (CA-18B)
-Componente `Stepper` exibido em todas as telas de formulário. Formato: **"Etapa X de 4 — [Nome]"**.
+Componente `Stepper` exibido em todas as telas de formulário. Formato: **"Etapa X de [totalEtapas] — [Nome]"**.
 
-| Rota | X | Nome exibido |
+O total de etapas é calculado dinamicamente:
+- `totalEtapas = 3 + N` (3 etapas fixas: Identificação, Ambientes, Globais; N = quantidade de ambientes selecionados).
+- Cada ambiente selecionado recebe número de etapa sequencial a partir de 4. Exemplo: Cozinha + Dormitório Casal + Banheiro → etapa 4 = Cozinha, etapa 5 = Dormitório Casal, etapa 6 = Banheiro.
+- `totalEtapas` é recalculado sempre que `ambientesSelecionados` muda.
+- `StepRevisao` e `StepSucesso` não exibem número de etapa.
+
+| Rota | Etapa | Nome exibido no Stepper |
 |---|---|---|
 | `#/identificacao` | 1 | Identificação |
 | `#/ambientes` | 2 | Ambientes |
 | `#/globais` | 3 | Perguntas Gerais |
-| `#/ambiente/:instanceId` | 4 | label do ambiente (ex.: "Dormitório Amélia") |
+| `#/ambiente/:instanceId` | 4 até 3+N | label do ambiente |
 
 Não é barra de progresso percentual — apenas texto e número.
 
@@ -417,8 +421,8 @@ Em nenhum caso o formulário bloqueia o avanço por falha de CEP (CA-2, CA-3).
 **Depois:** lista os ambientes de `domain/ambientes.js` com controle de quantidade (botões + e −).
 
 - Quantidade mínima por ambiente: 0. Quantidade padrão ao selecionar: 1.
-- Quando quantidade > 1: exibe N campos de texto para nomear cada instância (CA-5).
-- `SET_AMBIENTE_QUANTIDADE` reconstrói as instâncias mantendo nomes já digitados.
+- Quando quantidade = 1: nenhum campo de nome é exibido. O ambiente é identificado apenas pelo seu label padrão (ex.: "Dormitório Casal"). Qualquer nome previamente digitado é descartado pelo reducer ao processar `SET_AMBIENTE_QUANTIDADE` com quantidade = 1.
+- Quando quantidade > 1: exibe N campos de nome, um por instância. Nomes já digitados para instâncias existentes são preservados ao aumentar quantidade; ao reduzir, instâncias removidas perdem seus nomes (sem recuperação).
 - Botão "Avançar" desabilitado se `ambientesSelecionados` estiver vazio (CA-6).
 - Ao criar nova instância, o reducer inicializa `respostasPorAmbiente[instanceId]` com os defaults do `formType` correspondente.
 
@@ -435,6 +439,8 @@ Em nenhum caso o formulário bloqueia o avanço por falha de CEP (CA-2, CA-3).
 |---|---|---|---|
 | "O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi? (fitas de LED, spots, etc.)" | Sempre | — | — |
 | "Em quais ambientes?" (botões com ambientes selecionados) | `g1_temIluminacaoExterna = true` | CC: "CLIENTE CIENTE E DE ACORDO QUE FIAÇÃO ELÉTRICA, INSTALAÇÃO DE ILUMINAÇÕES E SERVIÇOS DE ELETRICISTA É POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL NO DIA DA MONTAGEM." | Médio +2 (global) |
+
+Botões **"Todos"** e **"Nenhum"** exibidos no topo do grupo de botões de ambientes em G1: "Todos" seleciona todos os ambientes da lista; "Nenhum" desmarca todos.
 
 ### 10.2 G2 — Reforma (`BlocoReforma`)
 
@@ -457,12 +463,16 @@ Implementado como `Modal` com conteúdo fixo:
 
 **Regra de supressão G2.1/G2.2:** G2.2 só aparece quando `g2_1_temReboco = true`. Quando G2.1 = NÃO (sem reboco), G2.2 é ocultada e o gatilho `REFORM_SEM_REVESTIMENTO` não é calculado. Os dois CCs compartilham o mesmo texto — apenas um pode ser gerado por preenchimento.
 
+**Botões "Todos" e "Nenhum" em G2, G2.1 e G2.2:** disponíveis no topo do grupo de botões de ambientes. "Todos" seleciona todos os ambientes da lista; "Nenhum" desmarca todos. Em G2.1, clicar "Todos" NÃO dispara o pop-up de risco alto (CA-7). Qualquer seleção parcial (não "Todos") em G2.1 dispara o pop-up normalmente.
+
 ### 10.3 G3 — Pontos Elétricos/Hidráulicos/Gás (`BlocoPontosUtilidades`)
 
 | Pergunta | Condicional | CC | Score |
 |---|---|---|---|
 | "Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?" | Sempre | — | — |
 | "Em quais ambientes ainda não estão?" (botões) | `g3_pontosNaPosicaoFinal = false` | CC: "CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO." | Médio +2 (global) |
+
+Botões **"Todos"** e **"Nenhum"** exibidos no topo do grupo de botões de ambientes em G3: "Todos" seleciona todos os ambientes da lista; "Nenhum" desmarca todos.
 
 ### 10.4 G4 — Rebaixo de Teto (`BlocoRebaixo`)
 
@@ -505,7 +515,11 @@ Implementado como `Modal` com conteúdo fixo:
 | Lava-roupa | Abertura Frontal / Abertura Superior |
 | Outros | campo de texto livre |
 
-Para cada eletro selecionado: Tipo + Subtipo (quando aplicável) + Modelo + Largura (cm) + Altura (cm) + Profundidade (cm) + Link (todos opcionais exceto Tipo).
+Para cada eletro selecionado:
+- **Subtipo:** obrigatório quando o eletro tiver subtipos disponíveis.
+- **Largura (cm), Altura (cm), Profundidade (cm):** obrigatórios para todos os eletros selecionados.
+- **Modelo:** opcional para todos, exceto Depurador com subtipo Embutido (obrigatório).
+- **Link:** opcional para todos, exceto Depurador com subtipo Embutido (obrigatório).
 
 ### 11.2 FormDormitorio — `formType: "dormitorio"` (Casal e Solteiro)
 
@@ -517,8 +531,8 @@ Para cada eletro selecionado: Tipo + Subtipo (quando aplicável) + Modelo + Larg
 | P2.1: "O ponto elétrico da TV já está na posição final?" | `tv = true` | CC se NÃO: "CLIENTE CIENTE E DE ACORDO QUE DEVERÁ DESLOCAR OS PONTOS ELÉTRICOS PARA DENTRO DA POSIÇÃO DO PAINEL DE TV ATÉ O DIA DA MONTAGEM PARA OCULTAÇÃO ADEQUADA DA FIAÇÃO." | Médio +2 |
 | Dados da TV: Polegadas (obrigatório) / Modelo / Largura / Altura / Profundidade / Link | `tv = true` — **sempre exibido quando tv = true, independente de P2.1** (ver DIV-01) | — | — |
 | P3: "Haverá cortineiro neste ambiente?" | Sempre | — | — |
-| P3.1: "O cortineiro já está instalado?" | `cortineiro = true` | AVISO se NÃO (não é CC): "CLIENTE CIENTE E DE ACORDO QUE SERÁ CONSIDERADO VÃO DE 150MM PARA CORTINEIRO NÃO INSTALADO." | Baixo +1 |
-| P4: "Existe rodapé na região dos móveis?" | Sempre | AVISO se SIM (não é CC): "ROUPEIROS SERÃO INSTALADOS À FRENTE DO RODAPÉ EXISTENTE, COM ACABAMENTO EM MEIA-CANA NA PARTE DE TRÁS." (sem score); CC se NÃO: "CLIENTE CIENTE E DE ACORDO QUE NÃO DEVERÁ INSTALAR RODAPÉ NA REGIÃO DOS MÓVEIS ATÉ A FINALIZAÇÃO DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO." | NÃO → Baixo +1 |
+| P3.1: "O cortineiro já está instalado?" | `cortineiro = true` | AVISO se NÃO (não é CC): "AVISO: SERÁ CONSIDERADO VÃO DE 150MM PARA CORTINEIRO NÃO INSTALADO." | Baixo +1 |
+| P4: "Existe rodapé na região dos móveis?" | Sempre | AVISO se SIM (não é CC): "ROUPEIROS SERÃO INSTALADOS À FRENTE DO RODAPÉ EXISTENTE, COM ACABAMENTO EM MEIA-CANA NA PARTE DE TRÁS." (sem score); CC se NÃO: "CLIENTE CIENTE E DE ACORDO QUE DEVERÁ INSTALAR RODAPÉ NA REGIÃO DOS MÓVEIS SOMENTE APÓS A FINALIZAÇÃO DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO." | NÃO → Baixo +1 |
 | P5: Observações (máx. 300 chars) | Sempre | — | — |
 
 **Opções de tamanho de cama:**
@@ -544,7 +558,10 @@ Para cada eletro selecionado: Tipo + Subtipo (quando aplicável) + Modelo + Larg
 | P5: Observações (máx. 300 chars) | Sempre | — | — |
 
 **Eletrônicos disponíveis:** TV / Home Theater / Videogame / Computador / Outros.
-Para cada eletrônico: Tipo + Modelo + Largura (cm) + Altura (cm) + Link (opcional).
+Para cada eletrônico selecionado:
+- **Subtipo:** obrigatório quando disponível.
+- **Largura (cm), Altura (cm):** obrigatórios.
+- **Modelo, Link:** opcionais.
 
 ### 11.4 FormBanheiro — `formType: "banheiro"`
 
@@ -624,7 +641,7 @@ Para cada `instanceId`:
 1. Coleta gatilhos com `_{instanceId}` no ID + gatilho `REBAIXO_{instanceId}`.
 2. `isAlto = gatilhos.some(nivel === "Alto" || nivel === "AltoDireto")`.
 3. `pontos = sum(gatilhos.map(g => g.pontos))`.
-4. Classificação: **ALTO** se `isAlto || pontos >= 7`; **MÉDIO** se `pontos >= 3`; **BAIXO** se `pontos <= 2`.
+4. Classificação: **ALTO** se `isAlto || pontos >= 8`; **MÉDIO** se `pontos >= 4`; **BAIXO** se `pontos <= 3`.
 
 ### 12.4 Classificação Global
 
@@ -638,6 +655,7 @@ Para cada `instanceId`:
 - `REFORM_SEM_REBOCO` (Alto DIRETO): contribui 0 pontos mas `isAlto = true`.
 - `REFORM_SEM_REBOCO` ativo → `REFORM_SEM_REVESTIMENTO` não é calculado (G2.2 não é exibida, condição impossível de disparar).
 - Score global = ALTO quando qualquer ambiente for ALTO (CA-12). A tela de revisão exibe: "Risco global classificado como ALTO porque um ou mais ambientes apresentam condição de risco alto."
+- `TV_PONTO_{instanceId}` com `PONTOS_INDEFINIDOS` ativo: o gatilho gera CC normalmente, mas contribui **0 pontos** ao score em vez de +2 (ver DIV-07).
 
 ---
 
@@ -673,8 +691,8 @@ Para cada `instanceId`:
 | `TV_PONTO_{instanceId}` | CC | MÉDIO | "CLIENTE CIENTE E DE ACORDO QUE DEVERÁ DESLOCAR OS PONTOS ELÉTRICOS PARA DENTRO DA POSIÇÃO DO PAINEL DE TV ATÉ O DIA DA MONTAGEM PARA OCULTAÇÃO ADEQUADA DA FIAÇÃO." |
 | `ELETROS_NAODEF_{instanceId}` | CC | BAIXO | "CLIENTE CIENTE E DE ACORDO QUE OS ELETRODOMÉSTICOS NÃO FORAM DEFINIDOS NO PROJETO E DEVERÃO SER ADQUIRIDOS DE ACORDO COM OS VÃOS PREVISTOS." |
 | `ELETRONICOS_NAODEF_{instanceId}` | CC | BAIXO | "CLIENTE CIENTE E DE ACORDO QUE OS ELETRÔNICOS NÃO FORAM DEFINIDOS NO PROJETO E DEVERÃO SER ADQUIRIDOS DE ACORDO COM OS VÃOS PREVISTOS." |
-| `RODAPE_AUSENTE_{instanceId}` | CC | BAIXO | "CLIENTE CIENTE E DE ACORDO QUE NÃO DEVERÁ INSTALAR RODAPÉ NA REGIÃO DOS MÓVEIS ATÉ A FINALIZAÇÃO DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO." |
-| `CORTINEIRO_NAOINSTALADO_{instanceId}` | **AVISO** | BAIXO | "CLIENTE CIENTE E DE ACORDO QUE SERÁ CONSIDERADO VÃO DE 150MM PARA CORTINEIRO NÃO INSTALADO." — contribui +1 ao score mas não aparece no Resumo Executivo |
+| `RODAPE_AUSENTE_{instanceId}` | CC | BAIXO | "CLIENTE CIENTE E DE ACORDO QUE DEVERÁ INSTALAR RODAPÉ NA REGIÃO DOS MÓVEIS SOMENTE APÓS A FINALIZAÇÃO DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO." |
+| `CORTINEIRO_NAOINSTALADO_{instanceId}` | **AVISO** | BAIXO | "AVISO: SERÁ CONSIDERADO VÃO DE 150MM PARA CORTINEIRO NÃO INSTALADO." — contribui +1 ao score mas não aparece no Resumo Executivo |
 | `RODAPE_EXISTENTE_{instanceId}` | **AVISO** | null | "ROUPEIROS SERÃO INSTALADOS À FRENTE DO RODAPÉ EXISTENTE, COM ACABAMENTO EM MEIA-CANA NA PARTE DE TRÁS." — sem score, aparece apenas nas páginas de checklist |
 
 ### 13.3 Regra de Supressão G2.1/G2.2
@@ -699,7 +717,7 @@ Na prática, a UI impede que ambos sejam ativos simultaneamente. A verificação
 2. Linha explicativa quando global = ALTO por ambiente: "Risco global classificado como ALTO porque um ou mais ambientes apresentam condição de risco alto." (CA-12).
 3. Score por ambiente, listado individualmente.
 4. Lista de CCs gerados por `ccBuilder`, agrupados por nível.
-5. Resumo de respostas por etapa (links para voltar a cada etapa).
+5. Links para voltar a cada etapa. Ao clicar em qualquer link de etapa a partir do resumo, o estado registra `_meta.origemNavegacao = 'revisao'`. Nas etapas de formulário, se `origemNavegacao = 'revisao'`, o botão "Avançar" é substituído por "Salvar e voltar ao resumo", que navega diretamente para `#/revisao` após gravar as respostas, sem percorrer etapas intermediárias. Ao chegar ao resumo, `_meta.origemNavegacao` é limpo.
 6. Botão "Gerar PDF" → chama `services/pdf.js`.
 7. Se `gerarPdf` lançar exceção: "Não foi possível gerar o PDF agora — tente novamente" + botão "Tentar Novamente" (CA-15).
 
@@ -718,7 +736,7 @@ Score e CCs são recalculados toda vez que o componente monta (inclui retorno de
 
 | Elemento | Fonte |
 |---|---|
-| Logotipo By Arabi | `public/logo-byarabi.png` |
+| Cabeçalho da capa | Texto "By Arabi Planejados" em fonte serifada, sem imagem |
 | Nome do cliente | `state.identificacao.nome` |
 | Número do contrato | `state.identificacao.contrato` |
 | Data de preenchimento | Data atual gerada no momento do download |
@@ -820,3 +838,15 @@ As divergências abaixo foram identificadas entre `especificacao-checklist-dinam
 - **Spec:** menciona que "Outros recebe o mesmo conjunto completo de perguntas" sem definir ordem.
 - **PRD CA-19:** define a ordem: granito → tanque → TV → cortineiro → rodapé → cama → eletros → cuba → eletrônicos → observações.
 - **Resolução:** seguir ordem do PRD CA-19 (seção 11.5 deste SPEC).
+
+### DIV-07 — Supressão de score de TV quando PONTOS_INDEFINIDOS ativo
+
+- **Comportamento anterior:** `TV_PONTO_{instanceId}` sempre contribui +2 ao score do ambiente.
+- **Decisão:** quando `PONTOS_INDEFINIDOS` está ativo (`g3_pontosNaPosicaoFinal = false`), o gatilho `TV_PONTO_{instanceId}` continua gerando CC normalmente, mas contribui **0 pontos** ao score.
+- **Justificativa:** o CC de G3 (pontos indefinidos) já cobre a pendência elétrica; pontuar TV duplamente seria redundante nesse contexto.
+
+### DIV-08 — Logo na capa do PDF
+
+- **Spec original:** previa `public/logo-byarabi.png` como logotipo na capa do PDF.
+- **Decisão:** usar texto "By Arabi Planejados" em fonte serifada, sem imagem.
+- **Justificativa:** o CSS da marca não é renderizável por jsPDF; texto simples é mais robusto para a Fase 1.
