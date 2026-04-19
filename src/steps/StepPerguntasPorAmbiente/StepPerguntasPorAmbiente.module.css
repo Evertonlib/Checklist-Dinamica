@@ -1,0 +1,210 @@
+.pagina {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pergunta {
+  font-size: 0.97rem;
+  color: #222;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.subpergunta {
+  font-size: 0.92rem;
+  color: #333;
+  margin: 12px 0 8px;
+  font-style: italic;
+}
+
+.botoesSimNao {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.botoesSimNao button {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.ativo {
+  border-color: #c8a84b !important;
+  background: #fff8e6 !important;
+  font-weight: bold;
+  color: #7a6030;
+}
+
+.aviso {
+  background: #fff8e6;
+  border: 1px solid #c8a84b;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #7a6030;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.campo label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.campo input,
+.campo select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  min-height: 40px;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: 2px solid #c8a84b;
+}
+
+.erro {
+  color: #c0392b;
+  font-size: 0.78rem;
+  margin-top: 3px;
+}
+
+.linha2 {
+  display: flex;
+  gap: 10px;
+}
+
+.linha3 {
+  display: flex;
+  gap: 8px;
+}
+
+.tvCampos {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #ddd;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chip {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-height: 36px;
+}
+
+.chipAtivo {
+  composes: chip;
+  border-color: #c8a84b;
+  background: #fff8e6;
+  color: #7a6030;
+  font-weight: 500;
+}
+
+.opcoesCama {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opcaoCama {
+  padding: 10px 14px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-align: left;
+  min-height: 44px;
+}
+
+.eletroArea {
+  margin-top: 12px;
+}
+
+.eletroGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btnEletro {
+  padding: 8px 14px;
+  border: 1px solid #c8a84b;
+  border-radius: 20px;
+  background: #fff8e6;
+  color: #7a6030;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.eletroCard {
+  background: #f9f7f3;
+  border: 1px solid #e0d8c8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.eletroHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.btnRemover {
+  background: transparent;
+  border: none;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+}
+
+.textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.contador {
+  font-size: 0.78rem;
+  color: #999;
+  text-align: right;
+  display: block;
+  margin-top: 4px;
+}
+
+.espacoBar { height: 80px; }

@@ -1,0 +1,58 @@
+.pagina {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.campo label {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.campo input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+.campo input:focus {
+  outline: 2px solid #c8a84b;
+  border-color: #c8a84b;
+}
+
+.erro {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.aviso {
+  color: #b8860b;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.info {
+  color: #888;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.linha {
+  display: flex;
+  gap: 12px;
+}
+
+.espacoBar {
+  height: 80px;
+}

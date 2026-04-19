@@ -1,0 +1,15 @@
+.grupo {
+  background: #fff;
+  border: 1px solid #e0d8c8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.titulo {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e0d8c8;
+  padding-bottom: 8px;
+}

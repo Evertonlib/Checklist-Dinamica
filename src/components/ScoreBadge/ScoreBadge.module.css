@@ -1,0 +1,13 @@
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.alto  { background: #fde8ea; color: #c0392b; }
+.medio { background: #fff8e1; color: #b8860b; }
+.baixo { background: #e8f5e9; color: #1b5e20; }
+
+.pontos { font-weight: normal; font-size: 0.85em; }

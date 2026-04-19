@@ -1,0 +1,79 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f7f5f0;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+/* Rascunho dialog */
+.rascunho-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px;
+}
+
+.rascunho-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 24px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.rascunho-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+.rascunho-card p {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.rascunho-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rascunho-acoes button {
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  border: none;
+  min-height: 44px;
+}
+
+.rascunho-acoes button:first-child {
+  background: #1a1a1a;
+  color: #c8a84b;
+}
+
+.btn-secundario {
+  background: transparent !important;
+  color: #555 !important;
+  border: 1px solid #ccc !important;
+}
