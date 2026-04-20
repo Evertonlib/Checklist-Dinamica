@@ -81,7 +81,7 @@ export async function gerarPdf(state) {
   const agora = new Date()
   const dataCapa = formatarDataLocal(agora)
   const dataArquivo = formatarDataArquivo(agora)
-  const { nome, contrato } = state.identificacao
+  const { nome, contrato, logradouro, numero, complemento, bairro, cidade, uf, telefone } = state.identificacao
 
   const margemEsquerda = 20
   const margemDireita = 20
@@ -117,17 +117,26 @@ export async function gerarPdf(state) {
   doc.setFontSize(12)
   doc.text(`Cliente: ${nome}`, margemEsquerda, 72)
   doc.text(`Contrato: ${contrato}`, margemEsquerda, 82)
-  doc.text(`Data: ${dataCapa}`, margemEsquerda, 92)
+
+  const linhaEndereco1 = [logradouro, numero].filter(Boolean).join(', ') + (complemento ? ` — ${complemento}` : '')
+  const linhaEndereco2 = [bairro, cidade && uf ? `${cidade}/${uf}` : cidade || uf].filter(Boolean).join(' — ')
+  let yEndereco = 92
+  if (linhaEndereco1) { doc.text(linhaEndereco1, margemEsquerda, yEndereco); yEndereco += 10 }
+  if (linhaEndereco2) { doc.text(linhaEndereco2, margemEsquerda, yEndereco); yEndereco += 10 }
+  if (telefone) { doc.text(`Telefone: ${telefone}`, margemEsquerda, yEndereco); yEndereco += 10 }
+
+  doc.text(`Data: ${dataCapa}`, margemEsquerda, yEndereco)
+  yEndereco += 18
 
   const corScoreCapa = COR_NIVEL[scoreGlobal.classificacao]
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
-  doc.text('Classificação de risco global:', margemEsquerda, 110)
+  doc.text('Classificação de risco global:', margemEsquerda, yEndereco)
   doc.setTextColor(...corScoreCapa)
-  doc.text(`RISCO ${scoreGlobal.classificacao}`, margemEsquerda, 122)
+  doc.text(`RISCO ${scoreGlobal.classificacao}`, margemEsquerda, yEndereco + 12)
   doc.setTextColor(0, 0, 0)
   doc.setFont('helvetica', 'normal')
-  doc.text(`(${scoreGlobal.pontos} pontos)`, margemEsquerda + 44, 122)
+  doc.text(`(${scoreGlobal.pontos} pontos)`, margemEsquerda + 44, yEndereco + 12)
 
   doc.addPage()
 

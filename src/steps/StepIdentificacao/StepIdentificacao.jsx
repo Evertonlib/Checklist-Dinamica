@@ -26,6 +26,7 @@ function obterErrosIdentificacao(identificacao) {
   }
   if (identificacao.cep.replace(/\D/g, '').length !== 8) erros.cep = 'CEP inválido'
   if (!identificacao.logradouro.trim()) erros.logradouro = 'Campo obrigatório'
+  if (!identificacao.numero.trim()) erros.numero = 'Campo obrigatório'
   if (!identificacao.bairro.trim()) erros.bairro = 'Campo obrigatório'
   if (!identificacao.cidade.trim()) erros.cidade = 'Campo obrigatório'
   if (identificacao.uf.trim().length !== 2) erros.uf = 'UF deve ter exatamente 2 caracteres'
@@ -152,6 +153,7 @@ export function StepIdentificacao() {
           {erros.cep && <span className={styles.erro}>{erros.cep}</span>}
         </div>
         {campo('Logradouro', 'logradouro')}
+        {campo('Número', 'numero')}
         {campo('Complemento (opcional)', 'complemento')}
         {campo('Bairro', 'bairro')}
         <div className={styles.linha}>

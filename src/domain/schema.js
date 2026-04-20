@@ -90,6 +90,7 @@ export const estadoInicial = {
     contrato: '',
     cep: '',
     logradouro: '',
+    numero: '',
     complemento: '',
     bairro: '',
     cidade: '',
