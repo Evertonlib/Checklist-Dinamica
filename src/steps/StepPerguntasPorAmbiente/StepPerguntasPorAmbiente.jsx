@@ -25,7 +25,7 @@ export function StepPerguntasPorAmbiente() {
   const [erros, setErros] = useState({})
 
   const instancia = state.ambientesSelecionados.find((ambiente) => ambiente.instanceId === instanceId)
-  if (!instancia) return <p style={{ padding: 16 }}>Ambiente nÃ£o encontrado.</p>
+  if (!instancia) return <p style={{ padding: 16 }}>Ambiente não encontrado.</p>
 
   const { formType } = instancia
   const FormComponent = FORM_MAP[formType] || FormOutros
@@ -79,7 +79,7 @@ export function StepPerguntasPorAmbiente() {
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
     ? 'Salvar e voltar ao resumo'
-    : proximo ? 'AvanÃ§ar' : 'Ir para RevisÃ£o'
+    : proximo ? 'Avançar' : 'Ir para Revisão'
 
   return (
     <div className={styles.pagina}>

@@ -28,8 +28,8 @@ export function BlocoRebaixo() {
   const selecionado = (instanceId) => g4_ambientes.some((ambiente) => ambiente.instanceId === instanceId)
 
   return (
-    <FieldGroup titulo="G4 â€” Rebaixo de Teto">
-      <p className={styles.pergunta}>Algum ambiente terÃ¡ rebaixo de teto?</p>
+    <FieldGroup titulo="G4 — Rebaixo de Teto">
+      <p className={styles.pergunta}>Algum ambiente terá rebaixo de teto?</p>
       <div className={styles.botoesSimNao}>
         <button
           className={g4_temRebaixo === true ? styles.ativo : ''}
@@ -41,7 +41,7 @@ export function BlocoRebaixo() {
             setGlobal('g4_temRebaixo', false)
             setGlobal('g4_ambientes', [])
           }}
-        >NÃ£o</button>
+        >Não</button>
       </div>
 
       {g4_temRebaixo === true && (
@@ -65,7 +65,7 @@ export function BlocoRebaixo() {
 
             return (
               <div key={ambienteRebaixo.instanceId} className={styles.campoRebaixo}>
-                <label>{formatarNomeAmbiente(ambiente)} â€” Quantos cm serÃ¡ rebaixado?</label>
+                <label>{formatarNomeAmbiente(ambiente)} — Quantos cm será rebaixado?</label>
                 <input
                   type="number"
                   min="1"

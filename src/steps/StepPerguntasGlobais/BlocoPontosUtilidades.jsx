@@ -19,9 +19,9 @@ export function BlocoPontosUtilidades() {
   }
 
   return (
-    <FieldGroup titulo="G3 â€” Pontos ElÃ©tricos / HidrÃ¡ulicos / GÃ¡s">
+    <FieldGroup titulo="G3 — Pontos Elétricos / Hidráulicos / Gás">
       <p className={styles.pergunta}>
-        Os pontos elÃ©tricos/hidrÃ¡ulicos/gÃ¡s jÃ¡ estÃ£o nas posiÃ§Ãµes finais em todos os ambientes?
+        Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?
       </p>
       <div className={styles.botoesSimNao}>
         <button
@@ -34,12 +34,12 @@ export function BlocoPontosUtilidades() {
         <button
           className={g3_pontosNaPosicaoFinal === false ? styles.ativo : ''}
           onClick={() => setGlobal('g3_pontosNaPosicaoFinal', false)}
-        >NÃ£o</button>
+        >Não</button>
       </div>
 
       {g3_pontosNaPosicaoFinal === false && (
         <div className={styles.subbloco}>
-          <p className={styles.subpergunta}>Em quais ambientes ainda nÃ£o estÃ£o?</p>
+          <p className={styles.subpergunta}>Em quais ambientes ainda não estão?</p>
           <div className={styles.chipTodos}>
             <button onClick={() => setGlobal('g3_ambientesPendentes', ambientes.map((a) => a.instanceId))}>
               Todos

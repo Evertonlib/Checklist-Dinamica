@@ -10,7 +10,7 @@ import {
 } from './checklistTextos.js'
 
 /**
- * ConstrÃ³i a lista de CCs e Avisos sem duplicatas.
+ * Constrói a lista de CCs e Avisos sem duplicatas.
  * @param {object} state
  * @param {string[]} gatilhosAtivados
  * @returns {Array<{id, tipo, nivel, escopo, textoCompleto, perguntaOrigem}>}
@@ -29,7 +29,7 @@ export function construirCCs(state, gatilhosAtivados) {
       nivel: 'ALTO',
       escopo: 'Global',
       textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE MEDIÃ‡ÃƒO TÃ‰CNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÃ RESPEITAR A ALÃNEA (I) DA CLÃUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
+        'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
       perguntaOrigem: 'G2.1',
     })
   }
@@ -41,7 +41,7 @@ export function construirCCs(state, gatilhosAtivados) {
       nivel: 'ALTO',
       escopo: 'Global',
       textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE MEDIÃ‡ÃƒO TÃ‰CNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÃ RESPEITAR A ALÃNEA (I) DA CLÃUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
+        'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
       perguntaOrigem: 'G2.2',
     })
   }
@@ -50,10 +50,10 @@ export function construirCCs(state, gatilhosAtivados) {
     resultado.push({
       id: 'ILUMINACAO_EXTERNA',
       tipo: 'CC',
-      nivel: 'MÃ‰DIO',
+      nivel: 'MÉDIO',
       escopo: 'Global',
       textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE FIAÃ‡ÃƒO ELÃ‰TRICA, INSTALAÃ‡ÃƒO DE ILUMINAÃ‡Ã•ES E SERVIÃ‡OS DE ELETRICISTA Ã‰ POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL NO DIA DA MONTAGEM.',
+        'CLIENTE CIENTE E DE ACORDO QUE FIAÇÃO ELÉTRICA, INSTALAÇÃO DE ILUMINAÇÕES E SERVIÇOS DE ELETRICISTA É POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL NO DIA DA MONTAGEM.',
       perguntaOrigem: 'G1',
     })
   }
@@ -62,10 +62,10 @@ export function construirCCs(state, gatilhosAtivados) {
     resultado.push({
       id: 'PONTOS_INDEFINIDOS',
       tipo: 'CC',
-      nivel: 'MÃ‰DIO',
+      nivel: 'MÉDIO',
       escopo: 'Global',
       textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE DEVERÃ ALTERAR E/OU PROVIDENCIAR PONTOS ELÃ‰TRICOS/HIDRÃULICOS/GÃS ATÃ‰ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÃ‡ÃƒO DO PROJETO.',
+        'CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO.',
       perguntaOrigem: 'G3',
     })
   }
@@ -82,7 +82,7 @@ export function construirCCs(state, gatilhosAtivados) {
         tipo: 'CC',
         nivel: 'BAIXO',
         escopo: instanceId,
-        textoCompleto: `CLIENTE CIENTE E DE ACORDO QUE DEVERÃ FINALIZAR O REBAIXO DE TETO EM ${cm}CM ATÃ‰ O DIA DA MONTAGEM PARA CORRETA ADEQUAÃ‡ÃƒO DO PROJETO.`,
+        textoCompleto: `CLIENTE CIENTE E DE ACORDO QUE DEVERÁ FINALIZAR O REBAIXO DE TETO EM ${cm}CM ATÉ O DIA DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO.`,
         perguntaOrigem: 'G4',
       })
     }
@@ -91,7 +91,7 @@ export function construirCCs(state, gatilhosAtivados) {
       resultado.push({
         id: `GRANITO_RETIRAR_${instanceId}`,
         tipo: 'CC',
-        nivel: 'MÃ‰DIO',
+        nivel: 'MÉDIO',
         escopo: instanceId,
         textoCompleto: TEXTO_GRANITO_RETIRAR,
         perguntaOrigem: 'P1.1',
@@ -102,7 +102,7 @@ export function construirCCs(state, gatilhosAtivados) {
       resultado.push({
         id: `TANQUE_RETIRAR_${instanceId}`,
         tipo: 'CC',
-        nivel: 'MÃ‰DIO',
+        nivel: 'MÉDIO',
         escopo: instanceId,
         textoCompleto: TEXTO_TANQUE_RETIRAR,
         perguntaOrigem: 'P2.1',
@@ -113,7 +113,7 @@ export function construirCCs(state, gatilhosAtivados) {
       resultado.push({
         id: `TV_PONTO_${instanceId}`,
         tipo: 'CC',
-        nivel: 'MÃ‰DIO',
+        nivel: 'MÉDIO',
         escopo: instanceId,
         textoCompleto: TEXTO_TV_PONTO_FORA,
         perguntaOrigem: 'P2.1',

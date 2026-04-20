@@ -38,7 +38,7 @@ export function StepRevisao() {
       await gerarPdf(state)
       navigate('/sucesso')
     } catch {
-      setErroPdf('NÃ£o foi possÃ­vel gerar o PDF agora â€” tente novamente.')
+      setErroPdf('Não foi possível gerar o PDF agora — tente novamente.')
     } finally {
       setGerando(false)
     }
@@ -52,13 +52,13 @@ export function StepRevisao() {
 
   return (
     <div className={styles.pagina}>
-      <h2 className={styles.titulo}>RevisÃ£o do Preenchimento</h2>
+      <h2 className={styles.titulo}>Revisão do Preenchimento</h2>
 
       <div className={styles.scoreBox}>
         <ScoreBadge classificacao={scoreGlobal.classificacao} pontos={scoreGlobal.pontos} />
         {scoreGlobal.isAlto && Object.values(scorePorAmbiente).some((score) => score.isAlto) && (
           <p className={styles.explicacaoAlto}>
-            Risco global classificado como ALTO porque um ou mais ambientes apresentam condiÃ§Ã£o de risco alto.
+            Risco global classificado como ALTO porque um ou mais ambientes apresentam condição de risco alto.
           </p>
         )}
       </div>
@@ -85,7 +85,7 @@ export function StepRevisao() {
 
       {ccsCC.filter((cc) => cc.nivel === 'ALTO').length > 0 && (
         <div className={styles.secao}>
-          <h3 className={styles.tituloAlto}>ðŸ”´ Risco Alto</h3>
+          <h3 className={styles.tituloAlto}>🔴 Risco Alto</h3>
           {ccsCC.filter((cc) => cc.nivel === 'ALTO').map((cc) => (
             <div key={cc.id} className={`${styles.ccCard} ${styles.cardAlto}`}>
               <span className={styles.ccAmbiente}>{nomeAmbiente(cc.escopo)}</span>
@@ -95,10 +95,10 @@ export function StepRevisao() {
         </div>
       )}
 
-      {ccsCC.filter((cc) => cc.nivel === 'MÃ‰DIO').length > 0 && (
+      {ccsCC.filter((cc) => cc.nivel === 'MÉDIO').length > 0 && (
         <div className={styles.secao}>
-          <h3 className={styles.tituloMedio}>ðŸŸ¡ Risco MÃ©dio</h3>
-          {ccsCC.filter((cc) => cc.nivel === 'MÃ‰DIO').map((cc) => (
+          <h3 className={styles.tituloMedio}>🟡 Risco Médio</h3>
+          {ccsCC.filter((cc) => cc.nivel === 'MÉDIO').map((cc) => (
             <div key={cc.id} className={`${styles.ccCard} ${styles.cardMedio}`}>
               <span className={styles.ccAmbiente}>{nomeAmbiente(cc.escopo)}</span>
               <p>{cc.textoCompleto}</p>
@@ -109,7 +109,7 @@ export function StepRevisao() {
 
       {ccsCC.filter((cc) => cc.nivel === 'BAIXO').length > 0 && (
         <div className={styles.secao}>
-          <h3 className={styles.tituloBaixo}>ðŸŸ¢ Risco Baixo</h3>
+          <h3 className={styles.tituloBaixo}>🟢 Risco Baixo</h3>
           {ccsCC.filter((cc) => cc.nivel === 'BAIXO').map((cc) => (
             <div key={cc.id} className={`${styles.ccCard} ${styles.cardBaixo}`}>
               <span className={styles.ccAmbiente}>{nomeAmbiente(cc.escopo)}</span>
@@ -133,13 +133,13 @@ export function StepRevisao() {
 
       <div className={styles.linksEtapas}>
         <button className={styles.btnLink} onClick={() => irParaEtapa('/identificacao')}>
-          âœï¸ Editar IdentificaÃ§Ã£o
+          ✏️ Editar Identificação
         </button>
         <button className={styles.btnLink} onClick={() => irParaEtapa('/ambientes')}>
-          âœï¸ Editar Ambientes
+          ✏️ Editar Ambientes
         </button>
         <button className={styles.btnLink} onClick={() => irParaEtapa('/globais')}>
-          âœï¸ Editar Perguntas Gerais
+          ✏️ Editar Perguntas Gerais
         </button>
       </div>
 
@@ -152,7 +152,7 @@ export function StepRevisao() {
           onClick={handleGerarPdf}
           disabled={gerando}
         >
-          {gerando ? 'Gerando PDFâ€¦' : 'ðŸ“„ Gerar PDF'}
+          {gerando ? 'Gerando PDF…' : '📄 Gerar PDF'}
         </button>
         {erroPdf && (
           <button className={styles.btnGerar} onClick={handleGerarPdf}>

@@ -94,13 +94,13 @@ export function BlocoReforma() {
   }
 
   const textoPendencia = modalRisco?.tipo === 'revestimento'
-    ? 'ainda nÃ£o possui(em) revestimento final aplicado nas paredes.'
-    : 'ainda nÃ£o possui(em) reboco (argamassa) finalizado nas paredes.'
+    ? 'ainda não possui(em) revestimento final aplicado nas paredes.'
+    : 'ainda não possui(em) reboco (argamassa) finalizado nas paredes.'
 
   return (
     <>
-      <FieldGroup titulo="G2 â€” Reforma">
-        <p className={styles.pergunta}>Algum ambiente estÃ¡ em reforma?</p>
+      <FieldGroup titulo="G2 — Reforma">
+        <p className={styles.pergunta}>Algum ambiente está em reforma?</p>
         <div className={styles.botoesSimNao}>
           <button
             className={g2_temReforma === true ? styles.ativo : ''}
@@ -113,7 +113,7 @@ export function BlocoReforma() {
               setGlobal('g2_ambientes', [])
               resetarDependencias()
             }}
-          >NÃ£o</button>
+          >Não</button>
         </div>
 
         {g2_temReforma === true && (
@@ -146,7 +146,7 @@ export function BlocoReforma() {
             </div>
 
             <p className={styles.subpergunta}>
-              G2.1 â€” Em quais ambientes em reforma as paredes jÃ¡ possuem reboco (argamassa)
+              G2.1 — Em quais ambientes em reforma as paredes já possuem reboco (argamassa)
               finalizado?
             </p>
             <div className={styles.chipTodos}>
@@ -177,7 +177,7 @@ export function BlocoReforma() {
             {g2_1_temReboco === true && (
               <>
                 <p className={styles.subpergunta}>
-                  G2.2 â€” Em quais ambientes em reforma o revestimento final das paredes jÃ¡ estÃ¡
+                  G2.2 — Em quais ambientes em reforma o revestimento final das paredes já está
                   aplicado?
                 </p>
                 <div className={styles.chipTodos}>
@@ -211,15 +211,15 @@ export function BlocoReforma() {
       </FieldGroup>
 
       <Modal aberto={Boolean(modalRisco)} onFechar={() => {}}>
-        <h3 className={styles.modalTitulo}>âš ï¸ Risco Alto</h3>
+        <h3 className={styles.modalTitulo}>⚠️ Risco Alto</h3>
         <p>
-          Ambiente nÃ£o estÃ¡ pronto para liberaÃ§Ã£o. <strong>{labelsEmRisco}</strong> {textoPendencia}
-          {' '}Nessa condiÃ§Ã£o, o projeto nÃ£o pode ser liberado sem adequaÃ§Ã£o prÃ©via. Seu progresso
-          estÃ¡ salvo.
+          Ambiente não está pronto para liberação. <strong>{labelsEmRisco}</strong> {textoPendencia}
+          {' '}Nessa condição, o projeto não pode ser liberado sem adequação prévia. Seu progresso
+          está salvo.
         </p>
         <div className={styles.modalAcoes}>
           <button className={styles.btnSecundarioModal} onClick={handleVoltarModal}>
-            â† Voltar
+            ← Voltar
           </button>
           <button className={styles.btnRisco} onClick={handleAssumirRisco}>
             Assumo o risco e continuar

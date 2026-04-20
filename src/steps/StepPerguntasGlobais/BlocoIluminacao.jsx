@@ -19,9 +19,9 @@ export function BlocoIluminacao() {
   }
 
   return (
-    <FieldGroup titulo="G1 â€” IluminaÃ§Ã£o">
+    <FieldGroup titulo="G1 — Iluminação">
       <p className={styles.pergunta}>
-        O projeto terÃ¡ alguma iluminaÃ§Ã£o embutida na marcenaria adquirida externamente Ã  By Arabi?
+        O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi?
         (fitas de LED, spots, etc.)
       </p>
       <div className={styles.botoesSimNao}>
@@ -35,7 +35,7 @@ export function BlocoIluminacao() {
             setGlobal('g1_temIluminacaoExterna', false)
             setGlobal('g1_ambientes', [])
           }}
-        >NÃ£o</button>
+        >Não</button>
       </div>
 
       {g1_temIluminacaoExterna === true && (

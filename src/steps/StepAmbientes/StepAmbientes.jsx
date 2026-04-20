@@ -41,12 +41,12 @@ export function StepAmbientes() {
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
     ? 'Salvar e voltar ao resumo'
-    : 'AvanÃ§ar'
+    : 'Avançar'
 
   return (
     <div className={styles.pagina}>
       <p className={styles.instrucao}>
-        Selecione os ambientes que farÃ£o parte do projeto e a quantidade de cada um.
+        Selecione os ambientes que farão parte do projeto e a quantidade de cada um.
       </p>
 
       {AMBIENTES_DISPONIVEIS.map((amb) => {
@@ -58,7 +58,7 @@ export function StepAmbientes() {
             <div className={styles.ambTopo}>
               <span className={styles.ambLabel}>{amb.label}</span>
               <div className={styles.qtdControle}>
-                <button onClick={() => setQtd(amb.id, qtd - 1)} disabled={qtd === 0}>âˆ’</button>
+                <button onClick={() => setQtd(amb.id, qtd - 1)} disabled={qtd === 0}>−</button>
                 <span>{qtd}</span>
                 <button onClick={() => setQtd(amb.id, qtd + 1)}>+</button>
               </div>

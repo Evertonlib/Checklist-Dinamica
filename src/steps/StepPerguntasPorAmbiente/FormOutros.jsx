@@ -35,7 +35,7 @@ export function FormOutros({ instanceId, erros = {} }) {
           onFalse?.()
         }}
       >
-        NÃ£o
+        Não
       </button>
     </div>
   )
@@ -82,7 +82,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
-            <p className={styles.subpergunta}>Os mÃ³veis serÃ£o adaptados?</p>
+            <p className={styles.subpergunta}>Os móveis serão adaptados?</p>
             {simNao('granitoadaptar')}
             {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
@@ -98,7 +98,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         {erros.tanque && <span className={styles.erro}>{erros.tanque}</span>}
         {resp.tanque === true && (
           <>
-            <p className={styles.subpergunta}>HaverÃ¡ mÃ³veis na regiÃ£o do tanque?</p>
+            <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
             {simNao('tanqueMoveis')}
             {erros.tanqueMoveis && <span className={styles.erro}>{erros.tanqueMoveis}</span>}
             {resp.tanqueMoveis === true && (
@@ -109,12 +109,12 @@ export function FormOutros({ instanceId, erros = {} }) {
       </FieldGroup>
 
       <FieldGroup titulo="3. TV">
-        <p className={styles.pergunta}>TerÃ¡ TV neste ambiente?</p>
+        <p className={styles.pergunta}>Terá TV neste ambiente?</p>
         {simNao('tv')}
         {erros.tv && <span className={styles.erro}>{erros.tv}</span>}
         {resp.tv === true && (
           <>
-            <p className={styles.subpergunta}>O ponto elÃ©trico da TV jÃ¡ estÃ¡ na posiÃ§Ã£o final?</p>
+            <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
             {simNao('tvPontoFinal')}
             {erros.tvPontoFinal && <span className={styles.erro}>{erros.tvPontoFinal}</span>}
             {resp.tvPontoFinal === false && (
@@ -174,12 +174,12 @@ export function FormOutros({ instanceId, erros = {} }) {
       </FieldGroup>
 
       <FieldGroup titulo="4. Cortineiro">
-        <p className={styles.pergunta}>HaverÃ¡ cortineiro neste ambiente?</p>
+        <p className={styles.pergunta}>Haverá cortineiro neste ambiente?</p>
         {simNao('cortineiro')}
         {erros.cortineiro && <span className={styles.erro}>{erros.cortineiro}</span>}
         {resp.cortineiro === true && (
           <>
-            <p className={styles.subpergunta}>O cortineiro jÃ¡ estÃ¡ instalado?</p>
+            <p className={styles.subpergunta}>O cortineiro já está instalado?</p>
             {simNao('cortieneiroInstalado')}
             {erros.cortieneiroInstalado && (
               <span className={styles.erro}>{erros.cortieneiroInstalado}</span>
@@ -191,8 +191,8 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="5. RodapÃ©">
-        <p className={styles.pergunta}>Existe rodapÃ© na regiÃ£o dos mÃ³veis?</p>
+      <FieldGroup titulo="5. Rodapé">
+        <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
         {erros.rodape && <span className={styles.erro}>{erros.rodape}</span>}
         {resp.rodape === true && (
@@ -204,7 +204,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       </FieldGroup>
 
       <FieldGroup titulo="6. Tamanho de Cama">
-        <p className={styles.pergunta}>Qual o tamanho da cama? (se aplicÃ¡vel)</p>
+        <p className={styles.pergunta}>Qual o tamanho da cama? (se aplicável)</p>
         <div className={styles.opcoesCama}>
           {TAMANHOS_CAMA.map((tamanho) => (
             <button
@@ -242,8 +242,8 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="7. EletrodomÃ©sticos">
-        <p className={styles.pergunta}>JÃ¡ possui ou tem intenÃ§Ã£o de compra especÃ­fica dos eletrodomÃ©sticos?</p>
+      <FieldGroup titulo="7. Eletrodomésticos">
+        <p className={styles.pergunta}>Já possui ou tem intenção de compra específica dos eletrodomésticos?</p>
         {simNao('eletrosDefined')}
         {erros.eletrosDefined && <span className={styles.erro}>{erros.eletrosDefined}</span>}
         {resp.eletrosDefined === false && (
@@ -272,7 +272,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                       onClick={() => dispatch({ type: 'REMOVE_ELETRO', instanceId, index })}
                       className={styles.btnRemover}
                     >
-                      âœ•
+                      ✕
                     </button>
                   </div>
 
@@ -299,7 +299,7 @@ export function FormOutros({ instanceId, erros = {} }) {
 
                   {eletro.tipo === 'Outros' && (
                     <div className={styles.campo}>
-                      <label>Qual eletro Ã©? *</label>
+                      <label>Qual eletro é? *</label>
                       <input
                         value={eletro.descricao || ''}
                         onChange={(e) => dispatch({
@@ -412,7 +412,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       </FieldGroup>
 
       <FieldGroup titulo="8. Cuba">
-        <p className={styles.pergunta}>Tipo de cuba: (se aplicÃ¡vel)</p>
+        <p className={styles.pergunta}>Tipo de cuba: (se aplicável)</p>
         <div className={styles.chips}>
           {TIPOS_CUBA.map((tipo) => (
             <button
@@ -426,8 +426,8 @@ export function FormOutros({ instanceId, erros = {} }) {
         </div>
       </FieldGroup>
 
-      <FieldGroup titulo="9. EletrÃ´nicos">
-        <p className={styles.pergunta}>Possui ou pretende adquirir eletrÃ´nicos para este ambiente?</p>
+      <FieldGroup titulo="9. Eletrônicos">
+        <p className={styles.pergunta}>Possui ou pretende adquirir eletrônicos para este ambiente?</p>
         {simNao('eletronicos')}
         {erros.eletronicos && <span className={styles.erro}>{erros.eletronicos}</span>}
         {resp.eletronicos === false && (
@@ -455,7 +455,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                       onClick={() => dispatch({ type: 'REMOVE_ELETRONICO', instanceId, index })}
                       className={styles.btnRemover}
                     >
-                      âœ•
+                      ✕
                     </button>
                   </div>
 
@@ -552,13 +552,13 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="10. ObservaÃ§Ãµes (opcional)">
+      <FieldGroup titulo="10. Observações (opcional)">
         <textarea
           className={styles.textarea}
           value={resp.observacoes || ''}
           maxLength={300}
           onChange={(e) => set('observacoes', e.target.value)}
-          placeholder="ObservaÃ§Ãµes adicionais..."
+          placeholder="Observações adicionais..."
           rows={3}
         />
         <span className={styles.contador}>{(resp.observacoes || '').length}/300</span>

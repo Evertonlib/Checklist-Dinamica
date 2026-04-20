@@ -14,7 +14,7 @@ export function FormBanheiro({ instanceId, erros = {} }) {
   const simNao = (campo) => (
     <div className={styles.botoesSimNao}>
       <button className={resp[campo] === true ? styles.ativo : ''} onClick={() => set(campo, true)}>Sim</button>
-      <button className={resp[campo] === false ? styles.ativo : ''} onClick={() => set(campo, false)}>NÃ£o</button>
+      <button className={resp[campo] === false ? styles.ativo : ''} onClick={() => set(campo, false)}>Não</button>
     </div>
   )
 
@@ -26,7 +26,7 @@ export function FormBanheiro({ instanceId, erros = {} }) {
         {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
-            <p className={styles.subpergunta}>Os mÃ³veis serÃ£o adaptados?</p>
+            <p className={styles.subpergunta}>Os móveis serão adaptados?</p>
             {simNao('granitoadaptar')}
             {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
@@ -52,13 +52,13 @@ export function FormBanheiro({ instanceId, erros = {} }) {
         {erros.cuba && <span className={styles.erro}>{erros.cuba}</span>}
       </FieldGroup>
 
-      <FieldGroup titulo="ObservaÃ§Ãµes (opcional)">
+      <FieldGroup titulo="Observações (opcional)">
         <textarea
           className={styles.textarea}
           value={resp.observacoes || ''}
           maxLength={300}
           onChange={(e) => set('observacoes', e.target.value)}
-          placeholder="ObservaÃ§Ãµes adicionais..."
+          placeholder="Observações adicionais..."
           rows={3}
         />
         <span className={styles.contador}>{(resp.observacoes || '').length}/300</span>

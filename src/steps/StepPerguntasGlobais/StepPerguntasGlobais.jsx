@@ -66,7 +66,7 @@ export function StepPerguntasGlobais() {
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
     ? 'Salvar e voltar ao resumo'
-    : 'AvanÃ§ar'
+    : 'Avançar'
 
   return (
     <div className={styles.pagina}>

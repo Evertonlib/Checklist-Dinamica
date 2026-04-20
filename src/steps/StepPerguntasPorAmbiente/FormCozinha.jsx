@@ -51,7 +51,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
           set(campo, false)
           onFalse?.()
         }}
-      >{valorFalse ?? 'NÃ£o'}</button>
+      >{valorFalse ?? 'Não'}</button>
     </div>
   )
 
@@ -63,7 +63,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
         {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
-            <p className={styles.subpergunta}>Os mÃ³veis serÃ£o adaptados para este granito/pia?</p>
+            <p className={styles.subpergunta}>Os móveis serão adaptados para este granito/pia?</p>
             {simNao('granitoadaptar')}
             {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
@@ -79,7 +79,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
         {erros.tanque && <span className={styles.erro}>{erros.tanque}</span>}
         {resp.tanque === true && (
           <>
-            <p className={styles.subpergunta}>HaverÃ¡ mÃ³veis na regiÃ£o do tanque?</p>
+            <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
             {simNao('tanqueMoveis')}
             {erros.tanqueMoveis && <span className={styles.erro}>{erros.tanqueMoveis}</span>}
             {resp.tanqueMoveis === true && (
@@ -89,9 +89,9 @@ export function FormCozinha({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="EletrodomÃ©sticos">
+      <FieldGroup titulo="Eletrodomésticos">
         <p className={styles.pergunta}>
-          JÃ¡ possui ou tem intenÃ§Ã£o de compra especÃ­fica dos eletrodomÃ©sticos?
+          Já possui ou tem intenção de compra específica dos eletrodomésticos?
         </p>
         {simNao('eletrosDefined')}
         {erros.eletrosDefined && <span className={styles.erro}>{erros.eletrosDefined}</span>}
@@ -121,7 +121,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                 <div key={index} className={styles.eletroCard}>
                   <div className={styles.eletroHeader}>
                     <strong>{eletro.tipo}</strong>
-                    <button onClick={() => remEletro(index)} className={styles.btnRemover}>âœ•</button>
+                    <button onClick={() => remEletro(index)} className={styles.btnRemover}>✕</button>
                   </div>
 
                   {config.subtipos.length > 0 && (
@@ -141,7 +141,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
 
                   {eletro.tipo === 'Outros' && (
                     <div className={styles.campo}>
-                      <label>Qual eletro Ã©? *</label>
+                      <label>Qual eletro é? *</label>
                       <input
                         value={eletro.descricao || ''}
                         onChange={(e) => updEletro(index, 'descricao', e.target.value)}
@@ -214,13 +214,13 @@ export function FormCozinha({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="ObservaÃ§Ãµes (opcional)">
+      <FieldGroup titulo="Observações (opcional)">
         <textarea
           className={styles.textarea}
           value={resp.observacoes || ''}
           maxLength={300}
           onChange={(e) => set('observacoes', e.target.value)}
-          placeholder="ObservaÃ§Ãµes adicionais..."
+          placeholder="Observações adicionais..."
           rows={3}
         />
         <span className={styles.contador}>{(resp.observacoes || '').length}/300</span>

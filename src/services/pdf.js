@@ -72,7 +72,7 @@ function descreverEletronico(eletronico) {
 
 /**
  * Gera e dispara download do PDF.
- * @param {object} state - Estado completo do formulÃ¡rio
+ * @param {object} state - Estado completo do formulário
  */
 export async function gerarPdf(state) {
   const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' })
@@ -108,7 +108,7 @@ export async function gerarPdf(state) {
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(14)
-  doc.text('Checklist de LiberaÃ§Ã£o de Projeto', pageWidth / 2, 52, { align: 'center' })
+  doc.text('Checklist de Liberação de Projeto', pageWidth / 2, 52, { align: 'center' })
 
   doc.setDrawColor(180, 150, 80)
   doc.setLineWidth(0.5)
@@ -122,7 +122,7 @@ export async function gerarPdf(state) {
   const corScoreCapa = COR_NIVEL[scoreGlobal.classificacao]
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
-  doc.text('ClassificaÃ§Ã£o de risco global:', margemEsquerda, 110)
+  doc.text('Classificação de risco global:', margemEsquerda, 110)
   doc.setTextColor(...corScoreCapa)
   doc.text(`RISCO ${scoreGlobal.classificacao}`, margemEsquerda, 122)
   doc.setTextColor(0, 0, 0)
@@ -219,49 +219,49 @@ export async function gerarPdf(state) {
   const idsEmReforma = global.g2_ambientes || []
 
   escreverPergunta(
-    'G1 â€” O projeto terÃ¡ alguma iluminaÃ§Ã£o embutida na marcenaria adquirida externamente Ã  By Arabi? (fitas de LED, spots, etc.)',
+    'G1 — O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi? (fitas de LED, spots, etc.)',
     global.g1_temIluminacaoExterna === true
       ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g1_ambientes)}`
-      : 'NÃ£o',
+      : 'Não',
     [ccPorId.get('ILUMINACAO_EXTERNA')]
   )
 
   escreverPergunta(
-    'G2 â€” Algum ambiente estÃ¡ em reforma?',
+    'G2 — Algum ambiente está em reforma?',
     global.g2_temReforma === true
       ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientes)}`
-      : 'NÃ£o'
+      : 'Não'
   )
 
   escreverPergunta(
-    'G2.1 â€” Em quais ambientes em reforma as paredes jÃ¡ possuem reboco (argamassa) finalizado?',
+    'G2.1 — Em quais ambientes em reforma as paredes já possuem reboco (argamassa) finalizado?',
     global.g2_temReforma === true
       ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_1_ambientes)
-      : 'NÃ£o se aplica',
+      : 'Não se aplica',
     [ccPorId.get('REFORM_SEM_REBOCO')]
   )
 
   escreverPergunta(
-    'G2.2 â€” Em quais ambientes em reforma o revestimento final das paredes jÃ¡ estÃ¡ aplicado?',
+    'G2.2 — Em quais ambientes em reforma o revestimento final das paredes já está aplicado?',
     global.g2_temReforma === true && global.g2_1_temReboco === true
       ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_2_ambientes)
-      : 'NÃ£o se aplica',
+      : 'Não se aplica',
     [ccPorId.get('REFORM_SEM_REVESTIMENTO')]
   )
 
   escreverPergunta(
-    'G3 â€” Os pontos elÃ©tricos/hidrÃ¡ulicos/gÃ¡s jÃ¡ estÃ£o nas posiÃ§Ãµes finais em todos os ambientes?',
+    'G3 — Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?',
     global.g3_pontosNaPosicaoFinal === false
-      ? `NÃ£o — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
+      ? `Não — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
       : 'Sim',
     [ccPorId.get('PONTOS_INDEFINIDOS')]
   )
 
   escreverPergunta(
-    'G4 â€” Algum ambiente terÃ¡ rebaixo de teto?',
+    'G4 — Algum ambiente terá rebaixo de teto?',
     global.g4_temRebaixo === true
       ? `Sim — ${formatarListaRebaixo(state.ambientesSelecionados, global.g4_ambientes)}`
-      : 'NÃ£o',
+      : 'Não',
     (global.g4_ambientes || []).map((item) => ccPorId.get(`REBAIXO_${item.instanceId}`))
   )
 
@@ -293,12 +293,12 @@ export async function gerarPdf(state) {
     if (['cozinha', 'banheiro', 'outros'].includes(formType)) {
       escreverPergunta(
         'Existe granito ou pia existente no local?',
-        resp.granito === true ? 'Sim' : resp.granito === false ? 'NÃ£o' : '—'
+        resp.granito === true ? 'Sim' : resp.granito === false ? 'Não' : '—'
       )
       if (resp.granito === true) {
         escreverPergunta(
-          'Os mÃ³veis serÃ£o adaptados?',
-          resp.granitoadaptar === true ? 'Sim' : resp.granitoadaptar === false ? 'NÃ£o' : '—',
+          'Os móveis serão adaptados?',
+          resp.granitoadaptar === true ? 'Sim' : resp.granitoadaptar === false ? 'Não' : '—',
           [ccPorId.get(`GRANITO_RETIRAR_${instanceId}`)]
         )
       }
@@ -307,12 +307,12 @@ export async function gerarPdf(state) {
     if (['cozinha', 'outros'].includes(formType)) {
       escreverPergunta(
         'Existe tanque no local?',
-        resp.tanque === true ? 'Sim' : resp.tanque === false ? 'NÃ£o' : '—'
+        resp.tanque === true ? 'Sim' : resp.tanque === false ? 'Não' : '—'
       )
       if (resp.tanque === true) {
         escreverPergunta(
-          'HaverÃ¡ mÃ³veis na regiÃ£o do tanque?',
-          resp.tanqueMoveis === true ? 'Sim' : resp.tanqueMoveis === false ? 'NÃ£o' : '—',
+          'Haverá móveis na região do tanque?',
+          resp.tanqueMoveis === true ? 'Sim' : resp.tanqueMoveis === false ? 'Não' : '—',
           [ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)]
         )
       }
@@ -320,13 +320,13 @@ export async function gerarPdf(state) {
 
     if (['dormitorio', 'home', 'outros'].includes(formType)) {
       escreverPergunta(
-        'TerÃ¡ TV neste ambiente?',
-        resp.tv === true ? 'Sim' : resp.tv === false ? 'NÃ£o' : '—'
+        'Terá TV neste ambiente?',
+        resp.tv === true ? 'Sim' : resp.tv === false ? 'Não' : '—'
       )
       if (resp.tv === true) {
         escreverPergunta(
-          'O ponto elÃ©trico da TV jÃ¡ estÃ¡ na posiÃ§Ã£o final?',
-          resp.tvPontoFinal === true ? 'Sim' : resp.tvPontoFinal === false ? 'NÃ£o' : '—',
+          'O ponto elétrico da TV já está na posição final?',
+          resp.tvPontoFinal === true ? 'Sim' : resp.tvPontoFinal === false ? 'Não' : '—',
           [ccPorId.get(`TV_PONTO_${instanceId}`)]
         )
         escreverPergunta('Polegadas', resp.tv_polegadas ?? '—')
@@ -348,28 +348,28 @@ export async function gerarPdf(state) {
 
     if (['dormitorio', 'home', 'outros'].includes(formType)) {
       escreverPergunta(
-        'HaverÃ¡ cortineiro neste ambiente?',
-        resp.cortineiro === true ? 'Sim' : resp.cortineiro === false ? 'NÃ£o' : '—'
+        'Haverá cortineiro neste ambiente?',
+        resp.cortineiro === true ? 'Sim' : resp.cortineiro === false ? 'Não' : '—'
       )
       if (resp.cortineiro === true) {
         escreverPergunta(
-          'O cortineiro jÃ¡ estÃ¡ instalado?',
-          resp.cortieneiroInstalado === true ? 'Sim' : resp.cortieneiroInstalado === false ? 'NÃ£o' : '—',
+          'O cortineiro já está instalado?',
+          resp.cortieneiroInstalado === true ? 'Sim' : resp.cortieneiroInstalado === false ? 'Não' : '—',
           [ccPorId.get(`CORTINEIRO_NAOINSTALADO_${instanceId}`)]
         )
       }
 
       escreverPergunta(
-        'Existe rodapÃ© na regiÃ£o dos mÃ³veis?',
-        resp.rodape === true ? 'Sim' : resp.rodape === false ? 'NÃ£o' : '—',
+        'Existe rodapé na região dos móveis?',
+        resp.rodape === true ? 'Sim' : resp.rodape === false ? 'Não' : '—',
         [ccPorId.get(`RODAPE_EXISTENTE_${instanceId}`), ccPorId.get(`RODAPE_AUSENTE_${instanceId}`)]
       )
     }
 
     if (['cozinha', 'outros'].includes(formType)) {
       escreverPergunta(
-        'JÃ¡ possui ou tem intenÃ§Ã£o de compra especÃ­fica dos eletrodomÃ©sticos?',
-        resp.eletrosDefined === true ? 'Sim' : resp.eletrosDefined === false ? 'NÃ£o' : '—',
+        'Já possui ou tem intenção de compra específica dos eletrodomésticos?',
+        resp.eletrosDefined === true ? 'Sim' : resp.eletrosDefined === false ? 'Não' : '—',
         [ccPorId.get(`ELETROS_NAODEF_${instanceId}`)]
       )
 
@@ -387,14 +387,14 @@ export async function gerarPdf(state) {
 
     if (['home', 'outros'].includes(formType)) {
       escreverPergunta(
-        'Possui ou pretende adquirir eletrÃ´nicos para este ambiente?',
-        resp.eletronicos === true ? 'Sim' : resp.eletronicos === false ? 'NÃ£o' : '—',
+        'Possui ou pretende adquirir eletrônicos para este ambiente?',
+        resp.eletronicos === true ? 'Sim' : resp.eletronicos === false ? 'Não' : '—',
         [ccPorId.get(`ELETRONICOS_NAODEF_${instanceId}`)]
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
         resp.eletronicosList.forEach((eletronico, index) => {
-          escreverPergunta(`EletrÃ´nico ${index + 1}`, descreverEletronico(eletronico))
+          escreverPergunta(`Eletrônico ${index + 1}`, descreverEletronico(eletronico))
           if (eletronico.largura_cm) escreverPergunta('Largura (cm)', eletronico.largura_cm)
           if (eletronico.altura_cm) escreverPergunta('Altura (cm)', eletronico.altura_cm)
           if (eletronico.link) escreverPergunta('Link', eletronico.link)
@@ -407,7 +407,7 @@ export async function gerarPdf(state) {
     }
 
     if (resp.observacoes) {
-      escreverPergunta('ObservaÃ§Ãµes', resp.observacoes)
+      escreverPergunta('Observações', resp.observacoes)
     }
   })
 

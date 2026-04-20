@@ -20,16 +20,16 @@ function mascararCep(valor) {
 function obterErrosIdentificacao(identificacao) {
   const erros = {}
 
-  if (!identificacao.nome.trim()) erros.nome = 'Campo obrigatÃ³rio'
+  if (!identificacao.nome.trim()) erros.nome = 'Campo obrigatório'
   if (!REGEX_CONTRATO.test(identificacao.contrato.trim())) {
-    erros.contrato = 'O contrato deve comeÃ§ar com IT, SM, TA, PIN ou STA seguido dos nÃºmeros'
+    erros.contrato = 'O contrato deve começar com IT, SM, TA, PIN ou STA seguido dos números'
   }
-  if (identificacao.cep.replace(/\D/g, '').length !== 8) erros.cep = 'CEP invÃ¡lido'
-  if (!identificacao.logradouro.trim()) erros.logradouro = 'Campo obrigatÃ³rio'
-  if (!identificacao.bairro.trim()) erros.bairro = 'Campo obrigatÃ³rio'
-  if (!identificacao.cidade.trim()) erros.cidade = 'Campo obrigatÃ³rio'
+  if (identificacao.cep.replace(/\D/g, '').length !== 8) erros.cep = 'CEP inválido'
+  if (!identificacao.logradouro.trim()) erros.logradouro = 'Campo obrigatório'
+  if (!identificacao.bairro.trim()) erros.bairro = 'Campo obrigatório'
+  if (!identificacao.cidade.trim()) erros.cidade = 'Campo obrigatório'
   if (identificacao.uf.trim().length !== 2) erros.uf = 'UF deve ter exatamente 2 caracteres'
-  if (!identificacao.telefone.trim()) erros.telefone = 'Campo obrigatÃ³rio'
+  if (!identificacao.telefone.trim()) erros.telefone = 'Campo obrigatório'
 
   return erros
 }
@@ -59,13 +59,13 @@ export function StepIdentificacao() {
     const res = await buscarCep(cep)
     setBuscando(false)
 
-    if (res.erro === 'CEP nÃ£o encontrado') {
-      setCepMsg('CEP nÃ£o encontrado â€” vocÃª pode preencher o endereÃ§o manualmente.')
+    if (res.erro === 'CEP não encontrado') {
+      setCepMsg('CEP não encontrado — você pode preencher o endereço manualmente.')
       return
     }
 
     if (res.erro) {
-      setCepMsg('NÃ£o foi possÃ­vel consultar o CEP agora â€” preencha o endereÃ§o manualmente.')
+      setCepMsg('Não foi possível consultar o CEP agora — preencha o endereço manualmente.')
       return
     }
 
@@ -118,13 +118,13 @@ export function StepIdentificacao() {
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
     ? 'Salvar e voltar ao resumo'
-    : 'AvanÃ§ar'
+    : 'Avançar'
 
   return (
     <div className={styles.pagina}>
-      <FieldGroup titulo="IdentificaÃ§Ã£o">
+      <FieldGroup titulo="Identificação">
         {campo('Nome completo', 'nome', { autoComplete: 'name' })}
-        {campo('NÃºmero do contrato', 'contrato', {
+        {campo('Número do contrato', 'contrato', {
           placeholder: 'Ex: IT01234',
           onChange: (e) => {
             const contrato = e.target.value.toUpperCase()
@@ -134,7 +134,7 @@ export function StepIdentificacao() {
         {campo('Telefone / celular', 'telefone', { type: 'tel', autoComplete: 'tel' })}
       </FieldGroup>
 
-      <FieldGroup titulo="EndereÃ§o da obra">
+      <FieldGroup titulo="Endereço da obra">
         <div className={styles.campo}>
           <label>CEP</label>
           <input
@@ -147,7 +147,7 @@ export function StepIdentificacao() {
             placeholder="00000-000"
             maxLength={9}
           />
-          {buscando && <span className={styles.info}>Buscando CEPâ€¦</span>}
+          {buscando && <span className={styles.info}>Buscando CEP…</span>}
           {cepMsg && <span className={styles.aviso}>{cepMsg}</span>}
           {erros.cep && <span className={styles.erro}>{erros.cep}</span>}
         </div>
