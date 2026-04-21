@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { FormProvider } from './context/FormProvider.jsx'
 import { useFormContext } from './context/FormContext.js'
@@ -42,6 +43,10 @@ function AppLayout() {
   }
 
   const mostrarStepper = etapaNum !== null
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
   return (
     <div>

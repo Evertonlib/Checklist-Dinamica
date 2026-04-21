@@ -371,7 +371,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                   </div>
 
                   <div className={styles.campo}>
-                    <label>Modelo {depuradorEmbutido ? '*' : '(opcional)'}</label>
+                    <label>Modelo{depuradorEmbutido ? ' *' : ''}</label>
                     <input
                       value={eletro.modelo || ''}
                       onChange={(e) => dispatch({

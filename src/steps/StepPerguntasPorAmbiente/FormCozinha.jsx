@@ -189,7 +189,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                   </div>
 
                   <div className={styles.campo}>
-                    <label>Modelo {depuradorEmbutido ? '*' : '(opcional)'}</label>
+                    <label>Modelo{depuradorEmbutido ? ' *' : ''}</label>
                     <input value={eletro.modelo} onChange={(e) => updEletro(index, 'modelo', e.target.value)} />
                     {erros[`eletro_${index}_modelo`] && (
                       <span className={styles.erro}>{erros[`eletro_${index}_modelo`]}</span>

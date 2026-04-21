@@ -3,7 +3,6 @@ import {
   TEXTO_CORTINEIRO_NAO_INSTALADO,
   TEXTO_ELETRONICOS_NAO_DEFINIDOS,
   TEXTO_RODAPE_AUSENTE,
-  TEXTO_RODAPE_EXISTENTE,
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
@@ -233,9 +232,6 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
         <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
         {erros.rodape && <span className={styles.erro}>{erros.rodape}</span>}
-        {resp.rodape === true && (
-          <p className={styles.aviso}>AVISO: {TEXTO_RODAPE_EXISTENTE}</p>
-        )}
         {resp.rodape === false && (
           <p className={styles.aviso}>CC: {TEXTO_RODAPE_AUSENTE}</p>
         )}
