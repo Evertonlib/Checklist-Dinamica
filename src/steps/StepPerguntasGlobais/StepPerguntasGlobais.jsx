@@ -46,7 +46,14 @@ export function StepPerguntasGlobais() {
   }
 
   const avancar = () => {
-    if (!tudoOk) return
+    if (!tudoOk) {
+      const primeiroIncompleto = !g1Ok ? 'bloco-g1'
+        : !g2Ok || !g2_1Ok || !g2_2Ok ? 'bloco-g2'
+        : !g3Ok ? 'bloco-g3'
+        : 'bloco-g4'
+      document.getElementById(primeiroIncompleto)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
 
     const origem = state._meta.origemNavegacao
     if (origem === 'revisao') {
@@ -70,15 +77,15 @@ export function StepPerguntasGlobais() {
 
   return (
     <div className={styles.pagina}>
-      <BlocoIluminacao />
-      <BlocoReforma />
-      <BlocoPontosUtilidades />
-      <BlocoRebaixo />
+      <div id="bloco-g1"><BlocoIluminacao /></div>
+      <div id="bloco-g2"><BlocoReforma /></div>
+      <div id="bloco-g3"><BlocoPontosUtilidades /></div>
+      <div id="bloco-g4"><BlocoRebaixo /></div>
       <div className={styles.espacoBar} />
       <BottomBar
         onVoltar={voltar}
         onAvancar={avancar}
-        avancarDisabled={!tudoOk}
+        avancarDisabled={false}
         avancarLabel={avancarLabel}
       />
     </div>

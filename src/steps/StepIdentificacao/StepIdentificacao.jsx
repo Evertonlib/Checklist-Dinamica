@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFormContext } from '../../context/FormContext.js'
 import { buscarCep } from '../../services/cep.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
 import { BottomBar } from '../../components/BottomBar/BottomBar.jsx'
 import styles from './StepIdentificacao.module.css'
+import { scrollToFirstError } from '../../utils/scrollUtils.js'
 
 const REGEX_CONTRATO = /^(IT|SM|TA|PIN|STA)\d+$/
 
@@ -52,6 +53,10 @@ export function StepIdentificacao() {
   const [cepMsg, setCepMsg] = useState('')
   const [buscando, setBuscando] = useState(false)
   const [erros, setErros] = useState({})
+
+  useEffect(() => {
+    if (Object.keys(erros).length > 0) scrollToFirstError()
+  }, [erros])
 
   const set = (campo, valor, proximoEstado = null) => {
     dispatch({ type: 'SET_IDENTIFICACAO', campo, valor })
@@ -123,7 +128,7 @@ export function StepIdentificacao() {
         onChange={(e) => set(campoNome, e.target.value)}
         {...props}
       />
-      {erros[campoNome] && <span className={styles.erro}>{erros[campoNome]}</span>}
+      {erros[campoNome] && <span className={`${styles.erro} erro-campo`}>{erros[campoNome]}</span>}
     </div>
   )
 
@@ -169,7 +174,7 @@ export function StepIdentificacao() {
           />
           {buscando && <span className={styles.info}>Buscando CEP…</span>}
           {cepMsg && <span className={styles.aviso}>{cepMsg}</span>}
-          {erros.cep && <span className={styles.erro}>{erros.cep}</span>}
+          {erros.cep && <span className={`${styles.erro} erro-campo`}>{erros.cep}</span>}
         </div>
         {campo('Logradouro', 'logradouro')}
         {campo('Número', 'numero')}
@@ -187,7 +192,7 @@ export function StepIdentificacao() {
               }}
               maxLength={2}
             />
-            {erros.uf && <span className={styles.erro}>{erros.uf}</span>}
+            {erros.uf && <span className={`${styles.erro} erro-campo`}>{erros.uf}</span>}
           </div>
         </div>
       </FieldGroup>

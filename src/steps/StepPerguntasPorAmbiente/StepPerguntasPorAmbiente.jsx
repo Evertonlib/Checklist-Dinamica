@@ -8,6 +8,7 @@ import { FormHomeSalaOffice } from './FormHomeSalaOffice.jsx'
 import { FormBanheiro } from './FormBanheiro.jsx'
 import { FormOutros } from './FormOutros.jsx'
 import { validarFormularioAmbiente } from './formUtils.js'
+import { scrollToFirstError } from '../../utils/scrollUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 const FORM_MAP = {
@@ -38,6 +39,10 @@ export function StepPerguntasPorAmbiente() {
   useEffect(() => {
     setErros({})
   }, [instanceId])
+
+  useEffect(() => {
+    if (Object.keys(erros).length > 0) scrollToFirstError()
+  }, [erros])
 
   const validar = () => {
     const novosErros = validarFormularioAmbiente(formType, resp)

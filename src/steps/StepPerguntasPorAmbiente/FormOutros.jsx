@@ -79,12 +79,12 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="1. Granito ou Pia Existente">
         <p className={styles.pergunta}>Existe granito ou pia existente no local?</p>
         {simNao('granito')}
-        {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
+        {erros.granito && <span className={`${styles.erro} erro-campo`}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
             <p className={styles.subpergunta}>Os móveis serão adaptados?</p>
             {simNao('granitoadaptar')}
-            {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
+            {erros.granitoadaptar && <span className={`${styles.erro} erro-campo`}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
               <p className={styles.aviso}>CC: {TEXTO_GRANITO_RETIRAR}</p>
             )}
@@ -95,12 +95,12 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="2. Tanque Existente">
         <p className={styles.pergunta}>Existe tanque no local?</p>
         {simNao('tanque')}
-        {erros.tanque && <span className={styles.erro}>{erros.tanque}</span>}
+        {erros.tanque && <span className={`${styles.erro} erro-campo`}>{erros.tanque}</span>}
         {resp.tanque === true && (
           <>
             <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
             {simNao('tanqueMoveis')}
-            {erros.tanqueMoveis && <span className={styles.erro}>{erros.tanqueMoveis}</span>}
+            {erros.tanqueMoveis && <span className={`${styles.erro} erro-campo`}>{erros.tanqueMoveis}</span>}
             {resp.tanqueMoveis === true && (
               <p className={styles.aviso}>CC: {TEXTO_TANQUE_RETIRAR}</p>
             )}
@@ -111,12 +111,12 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="3. TV">
         <p className={styles.pergunta}>Terá TV neste ambiente?</p>
         {simNao('tv')}
-        {erros.tv && <span className={styles.erro}>{erros.tv}</span>}
+        {erros.tv && <span className={`${styles.erro} erro-campo`}>{erros.tv}</span>}
         {resp.tv === true && (
           <>
             <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
             {simNao('tvPontoFinal')}
-            {erros.tvPontoFinal && <span className={styles.erro}>{erros.tvPontoFinal}</span>}
+            {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
             {resp.tvPontoFinal === false && (
               <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
             )}
@@ -128,7 +128,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                   value={resp.tv_polegadas ?? ''}
                   onChange={(e) => set('tv_polegadas', e.target.value)}
                 />
-                {erros.tv_polegadas && <span className={styles.erro}>{erros.tv_polegadas}</span>}
+                {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
               </div>
               <div className={styles.campo}>
                 <label>Modelo (opcional)</label>
@@ -176,13 +176,13 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="4. Cortineiro">
         <p className={styles.pergunta}>Haverá cortineiro neste ambiente?</p>
         {simNao('cortineiro')}
-        {erros.cortineiro && <span className={styles.erro}>{erros.cortineiro}</span>}
+        {erros.cortineiro && <span className={`${styles.erro} erro-campo`}>{erros.cortineiro}</span>}
         {resp.cortineiro === true && (
           <>
             <p className={styles.subpergunta}>O cortineiro já está instalado?</p>
             {simNao('cortieneiroInstalado')}
             {erros.cortieneiroInstalado && (
-              <span className={styles.erro}>{erros.cortieneiroInstalado}</span>
+              <span className={`${styles.erro} erro-campo`}>{erros.cortieneiroInstalado}</span>
             )}
             {resp.cortieneiroInstalado === false && (
               <p className={styles.aviso}>{TEXTO_CORTINEIRO_NAO_INSTALADO}</p>
@@ -194,7 +194,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="5. Rodapé">
         <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
-        {erros.rodape && <span className={styles.erro}>{erros.rodape}</span>}
+        {erros.rodape && <span className={`${styles.erro} erro-campo`}>{erros.rodape}</span>}
         {resp.rodape === true && (
           <p className={styles.aviso}>AVISO: {TEXTO_RODAPE_EXISTENTE}</p>
         )}
@@ -225,7 +225,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                 value={resp.camaLargura_cm ?? ''}
                 onChange={(e) => set('camaLargura_cm', e.target.value)}
               />
-              {erros.camaLargura_cm && <span className={styles.erro}>{erros.camaLargura_cm}</span>}
+              {erros.camaLargura_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaLargura_cm}</span>}
             </div>
             <div className={styles.campo}>
               <label>Comprimento (cm) *</label>
@@ -235,7 +235,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                 onChange={(e) => set('camaComprimento_cm', e.target.value)}
               />
               {erros.camaComprimento_cm && (
-                <span className={styles.erro}>{erros.camaComprimento_cm}</span>
+                <span className={`${styles.erro} erro-campo`}>{erros.camaComprimento_cm}</span>
               )}
             </div>
           </div>
@@ -245,7 +245,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="7. Eletrodomésticos">
         <p className={styles.pergunta}>Já possui ou tem intenção de compra específica dos eletrodomésticos?</p>
         {simNao('eletrosDefined')}
-        {erros.eletrosDefined && <span className={styles.erro}>{erros.eletrosDefined}</span>}
+        {erros.eletrosDefined && <span className={`${styles.erro} erro-campo`}>{erros.eletrosDefined}</span>}
         {resp.eletrosDefined === false && (
           <p className={styles.aviso}>CC: {TEXTO_ELETROS_NAO_DEFINIDOS}</p>
         )}
@@ -258,7 +258,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                 </button>
               ))}
             </div>
-            {erros.eletros && <span className={styles.erro}>{erros.eletros}</span>}
+            {erros.eletros && <span className={`${styles.erro} erro-campo`}>{erros.eletros}</span>}
 
             {(resp.eletros || []).map((eletro, index) => {
               const config = ELETROS_CONFIG.find((item) => item.tipo === eletro.tipo) || { subtipos: [] }
@@ -292,7 +292,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         {config.subtipos.map((subtipo) => <option key={subtipo}>{subtipo}</option>)}
                       </select>
                       {erros[`eletro_${index}_subtipo`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_subtipo`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_subtipo`]}</span>
                       )}
                     </div>
                   )}
@@ -311,7 +311,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletro_${index}_descricao`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_descricao`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_descricao`]}</span>
                       )}
                     </div>
                   )}
@@ -331,7 +331,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletro_${index}_largura`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_largura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_largura`]}</span>
                       )}
                     </div>
                     <div className={styles.campo}>
@@ -348,7 +348,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletro_${index}_altura`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_altura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_altura`]}</span>
                       )}
                     </div>
                     <div className={styles.campo}>
@@ -365,7 +365,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletro_${index}_prof`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_prof`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_prof`]}</span>
                       )}
                     </div>
                   </div>
@@ -383,7 +383,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                       })}
                     />
                     {erros[`eletro_${index}_modelo`] && (
-                      <span className={styles.erro}>{erros[`eletro_${index}_modelo`]}</span>
+                      <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_modelo`]}</span>
                     )}
                   </div>
 
@@ -401,7 +401,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                       placeholder="Cole aqui o link do produto, se tiver"
                     />
                     {erros[`eletro_${index}_link`] && (
-                      <span className={styles.erro}>{erros[`eletro_${index}_link`]}</span>
+                      <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_link`]}</span>
                     )}
                   </div>
                 </div>
@@ -429,7 +429,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="9. Eletrônicos">
         <p className={styles.pergunta}>Possui ou pretende adquirir eletrônicos para este ambiente?</p>
         {simNao('eletronicos')}
-        {erros.eletronicos && <span className={styles.erro}>{erros.eletronicos}</span>}
+        {erros.eletronicos && <span className={`${styles.erro} erro-campo`}>{erros.eletronicos}</span>}
         {resp.eletronicos === false && (
           <p className={styles.aviso}>CC: {TEXTO_ELETRONICOS_NAO_DEFINIDOS}</p>
         )}
@@ -442,7 +442,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                 </button>
               ))}
             </div>
-            {erros.eletronicosList && <span className={styles.erro}>{erros.eletronicosList}</span>}
+            {erros.eletronicosList && <span className={`${styles.erro} erro-campo`}>{erros.eletronicosList}</span>}
 
             {(resp.eletronicosList || []).map((eletronico, index) => {
               const config = ELETRONICOS_CONFIG.find((item) => item.tipo === eletronico.tipo) || { subtipos: [] }
@@ -475,7 +475,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         {config.subtipos.map((subtipo) => <option key={subtipo}>{subtipo}</option>)}
                       </select>
                       {erros[`eletronico_${index}_subtipo`] && (
-                        <span className={styles.erro}>{erros[`eletronico_${index}_subtipo`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_subtipo`]}</span>
                       )}
                     </div>
                   )}
@@ -509,7 +509,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletronico_${index}_largura`] && (
-                        <span className={styles.erro}>{erros[`eletronico_${index}_largura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_largura`]}</span>
                       )}
                     </div>
                     <div className={styles.campo}>
@@ -526,7 +526,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                         })}
                       />
                       {erros[`eletronico_${index}_altura`] && (
-                        <span className={styles.erro}>{erros[`eletronico_${index}_altura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_altura`]}</span>
                       )}
                     </div>
                   </div>

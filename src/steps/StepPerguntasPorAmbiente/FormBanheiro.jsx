@@ -23,12 +23,12 @@ export function FormBanheiro({ instanceId, erros = {} }) {
       <FieldGroup titulo="Granito / Pia Existente">
         <p className={styles.pergunta}>Existe granito ou pia existente no local?</p>
         {simNao('granito')}
-        {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
+        {erros.granito && <span className={`${styles.erro} erro-campo`}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
             <p className={styles.subpergunta}>Os móveis serão adaptados?</p>
             {simNao('granitoadaptar')}
-            {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
+            {erros.granitoadaptar && <span className={`${styles.erro} erro-campo`}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
               <p className={styles.aviso}>CC: {TEXTO_GRANITO_RETIRAR}</p>
             )}
@@ -49,7 +49,7 @@ export function FormBanheiro({ instanceId, erros = {} }) {
             </button>
           ))}
         </div>
-        {erros.cuba && <span className={styles.erro}>{erros.cuba}</span>}
+        {erros.cuba && <span className={`${styles.erro} erro-campo`}>{erros.cuba}</span>}
       </FieldGroup>
 
       <FieldGroup titulo="Observações (opcional)">

@@ -60,12 +60,12 @@ export function FormCozinha({ instanceId, erros = {} }) {
       <FieldGroup titulo="Granito / Pia Existente">
         <p className={styles.pergunta}>Existe granito ou pia existente no local?</p>
         {simNao('granito')}
-        {erros.granito && <span className={styles.erro}>{erros.granito}</span>}
+        {erros.granito && <span className={`${styles.erro} erro-campo`}>{erros.granito}</span>}
         {resp.granito === true && (
           <>
             <p className={styles.subpergunta}>Os móveis serão adaptados para este granito/pia?</p>
             {simNao('granitoadaptar')}
-            {erros.granitoadaptar && <span className={styles.erro}>{erros.granitoadaptar}</span>}
+            {erros.granitoadaptar && <span className={`${styles.erro} erro-campo`}>{erros.granitoadaptar}</span>}
             {resp.granitoadaptar === false && (
               <p className={styles.aviso}>CC: {TEXTO_GRANITO_RETIRAR}</p>
             )}
@@ -76,12 +76,12 @@ export function FormCozinha({ instanceId, erros = {} }) {
       <FieldGroup titulo="Tanque">
         <p className={styles.pergunta}>Existe tanque no local?</p>
         {simNao('tanque')}
-        {erros.tanque && <span className={styles.erro}>{erros.tanque}</span>}
+        {erros.tanque && <span className={`${styles.erro} erro-campo`}>{erros.tanque}</span>}
         {resp.tanque === true && (
           <>
             <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
             {simNao('tanqueMoveis')}
-            {erros.tanqueMoveis && <span className={styles.erro}>{erros.tanqueMoveis}</span>}
+            {erros.tanqueMoveis && <span className={`${styles.erro} erro-campo`}>{erros.tanqueMoveis}</span>}
             {resp.tanqueMoveis === true && (
               <p className={styles.aviso}>CC: {TEXTO_TANQUE_RETIRAR}</p>
             )}
@@ -94,7 +94,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
           Já possui ou tem intenção de compra específica dos eletrodomésticos?
         </p>
         {simNao('eletrosDefined')}
-        {erros.eletrosDefined && <span className={styles.erro}>{erros.eletrosDefined}</span>}
+        {erros.eletrosDefined && <span className={`${styles.erro} erro-campo`}>{erros.eletrosDefined}</span>}
         {resp.eletrosDefined === false && (
           <p className={styles.aviso}>CC: {TEXTO_ELETROS_NAO_DEFINIDOS}</p>
         )}
@@ -111,7 +111,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                 </button>
               ))}
             </div>
-            {erros.eletros && <span className={styles.erro}>{erros.eletros}</span>}
+            {erros.eletros && <span className={`${styles.erro} erro-campo`}>{erros.eletros}</span>}
 
             {(resp.eletros || []).map((eletro, index) => {
               const config = ELETROS_CONFIG.find((item) => item.tipo === eletro.tipo) || { subtipos: [] }
@@ -134,7 +134,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                         {config.subtipos.map((subtipo) => <option key={subtipo}>{subtipo}</option>)}
                       </select>
                       {erros[`eletro_${index}_subtipo`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_subtipo`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_subtipo`]}</span>
                       )}
                     </div>
                   )}
@@ -147,7 +147,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                         onChange={(e) => updEletro(index, 'descricao', e.target.value)}
                       />
                       {erros[`eletro_${index}_descricao`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_descricao`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_descricao`]}</span>
                       )}
                     </div>
                   )}
@@ -161,7 +161,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                         onChange={(e) => updEletro(index, 'largura_cm', e.target.value)}
                       />
                       {erros[`eletro_${index}_largura`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_largura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_largura`]}</span>
                       )}
                     </div>
                     <div className={styles.campo}>
@@ -172,7 +172,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                         onChange={(e) => updEletro(index, 'altura_cm', e.target.value)}
                       />
                       {erros[`eletro_${index}_altura`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_altura`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_altura`]}</span>
                       )}
                     </div>
                     <div className={styles.campo}>
@@ -183,7 +183,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                         onChange={(e) => updEletro(index, 'profundidade_cm', e.target.value)}
                       />
                       {erros[`eletro_${index}_prof`] && (
-                        <span className={styles.erro}>{erros[`eletro_${index}_prof`]}</span>
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_prof`]}</span>
                       )}
                     </div>
                   </div>
@@ -192,7 +192,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                     <label>Modelo{depuradorEmbutido ? ' *' : ''}</label>
                     <input value={eletro.modelo} onChange={(e) => updEletro(index, 'modelo', e.target.value)} />
                     {erros[`eletro_${index}_modelo`] && (
-                      <span className={styles.erro}>{erros[`eletro_${index}_modelo`]}</span>
+                      <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_modelo`]}</span>
                     )}
                   </div>
 
@@ -204,7 +204,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
                       placeholder="Cole aqui o link do produto, se tiver"
                     />
                     {erros[`eletro_${index}_link`] && (
-                      <span className={styles.erro}>{erros[`eletro_${index}_link`]}</span>
+                      <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_link`]}</span>
                     )}
                   </div>
                 </div>

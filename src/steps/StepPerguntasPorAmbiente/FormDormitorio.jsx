@@ -46,7 +46,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
             </button>
           ))}
         </div>
-        {erros.tamanhoCama && <span className={styles.erro}>{erros.tamanhoCama}</span>}
+        {erros.tamanhoCama && <span className={`${styles.erro} erro-campo`}>{erros.tamanhoCama}</span>}
         {resp.tamanhoCama === 'outro' && (
           <div className={styles.linha2}>
             <div className={styles.campo}>
@@ -56,7 +56,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
                 value={resp.camaLargura_cm ?? ''}
                 onChange={(e) => set('camaLargura_cm', e.target.value)}
               />
-              {erros.camaLargura_cm && <span className={styles.erro}>{erros.camaLargura_cm}</span>}
+              {erros.camaLargura_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaLargura_cm}</span>}
             </div>
             <div className={styles.campo}>
               <label>Comprimento (cm) *</label>
@@ -65,7 +65,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
                 value={resp.camaComprimento_cm ?? ''}
                 onChange={(e) => set('camaComprimento_cm', e.target.value)}
               />
-              {erros.camaComprimento_cm && <span className={styles.erro}>{erros.camaComprimento_cm}</span>}
+              {erros.camaComprimento_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaComprimento_cm}</span>}
             </div>
           </div>
         )}
@@ -74,12 +74,12 @@ export function FormDormitorio({ instanceId, erros = {} }) {
       <FieldGroup titulo="TV">
         <p className={styles.pergunta}>Terá TV neste ambiente?</p>
         {simNao('tv')}
-        {erros.tv && <span className={styles.erro}>{erros.tv}</span>}
+        {erros.tv && <span className={`${styles.erro} erro-campo`}>{erros.tv}</span>}
         {resp.tv === true && (
           <>
             <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
             {simNao('tvPontoFinal')}
-            {erros.tvPontoFinal && <span className={styles.erro}>{erros.tvPontoFinal}</span>}
+            {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
             {resp.tvPontoFinal === false && (
               <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
             )}
@@ -91,7 +91,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
                   value={resp.tv_polegadas ?? ''}
                   onChange={(e) => set('tv_polegadas', e.target.value)}
                 />
-                {erros.tv_polegadas && <span className={styles.erro}>{erros.tv_polegadas}</span>}
+                {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
               </div>
               <div className={styles.campo}>
                 <label>Modelo (opcional)</label>
@@ -139,13 +139,13 @@ export function FormDormitorio({ instanceId, erros = {} }) {
       <FieldGroup titulo="Cortineiro">
         <p className={styles.pergunta}>Haverá cortineiro neste ambiente?</p>
         {simNao('cortineiro')}
-        {erros.cortineiro && <span className={styles.erro}>{erros.cortineiro}</span>}
+        {erros.cortineiro && <span className={`${styles.erro} erro-campo`}>{erros.cortineiro}</span>}
         {resp.cortineiro === true && (
           <>
             <p className={styles.subpergunta}>O cortineiro já está instalado?</p>
             {simNao('cortieneiroInstalado')}
             {erros.cortieneiroInstalado && (
-              <span className={styles.erro}>{erros.cortieneiroInstalado}</span>
+              <span className={`${styles.erro} erro-campo`}>{erros.cortieneiroInstalado}</span>
             )}
             {resp.cortieneiroInstalado === false && (
               <p className={styles.aviso}>{TEXTO_CORTINEIRO_NAO_INSTALADO}</p>
@@ -157,7 +157,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
       <FieldGroup titulo="Rodapé">
         <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
-        {erros.rodape && <span className={styles.erro}>{erros.rodape}</span>}
+        {erros.rodape && <span className={`${styles.erro} erro-campo`}>{erros.rodape}</span>}
         {resp.rodape === true && (
           <p className={styles.aviso}>AVISO: {TEXTO_RODAPE_EXISTENTE}</p>
         )}
