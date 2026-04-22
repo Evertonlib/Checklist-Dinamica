@@ -8,6 +8,15 @@ import styles from './StepIdentificacao.module.css'
 
 const REGEX_CONTRATO = /^(IT|SM|TA|PIN|STA)\d+$/
 
+function mascararTelefone(valor) {
+  const digitos = valor.replace(/\D/g, '').slice(0, 11)
+  if (digitos.length === 0) return ''
+  if (digitos.length <= 2) return `(${digitos}`
+  if (digitos.length <= 6) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`
+  if (digitos.length <= 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`
+  return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`
+}
+
 function mascararCep(valor) {
   const digitos = valor.replace(/\D/g, '').slice(0, 8)
   if (digitos.length <= 5) {
@@ -30,7 +39,8 @@ function obterErrosIdentificacao(identificacao) {
   if (!identificacao.bairro.trim()) erros.bairro = 'Campo obrigatório'
   if (!identificacao.cidade.trim()) erros.cidade = 'Campo obrigatório'
   if (identificacao.uf.trim().length !== 2) erros.uf = 'UF deve ter exatamente 2 caracteres'
-  if (!identificacao.telefone.trim()) erros.telefone = 'Campo obrigatório'
+  const telDigitos = identificacao.telefone.replace(/\D/g, '').length
+  if (telDigitos < 10) erros.telefone = telDigitos === 0 ? 'Campo obrigatório' : 'Telefone incompleto'
 
   return erros
 }
@@ -132,7 +142,16 @@ export function StepIdentificacao() {
             set('contrato', contrato, { ...id, contrato })
           },
         })}
-        {campo('Telefone / celular', 'telefone', { type: 'tel', autoComplete: 'tel' })}
+        {campo('Telefone / celular', 'telefone', {
+          type: 'tel',
+          autoComplete: 'tel',
+          placeholder: '(00) 00000-0000',
+          maxLength: 16,
+          onChange: (e) => {
+            const tel = mascararTelefone(e.target.value)
+            set('telefone', tel, { ...id, telefone: tel })
+          },
+        })}
       </FieldGroup>
 
       <FieldGroup titulo="Endereço da obra">

@@ -40,6 +40,11 @@ export function BlocoIluminacao() {
 
       {g1_temIluminacaoExterna === true && (
         <div className={styles.subbloco}>
+          <p className={styles.aviso}>
+            CC: CLIENTE CIENTE E DE ACORDO QUE FIAÇÃO ELÉTRICA, INSTALAÇÃO DE ILUMINAÇÕES E
+            SERVIÇOS DE ELETRICISTA É POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL
+            NO DIA DA MONTAGEM.
+          </p>
           <p className={styles.subpergunta}>Em quais ambientes?</p>
           <div className={styles.chipTodos}>
             <button onClick={() => setGlobal('g1_ambientes', ambientes.map((a) => a.instanceId))}>

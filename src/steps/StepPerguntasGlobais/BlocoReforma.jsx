@@ -51,11 +51,13 @@ export function BlocoReforma() {
       return
     }
 
+    if (campoBooleano === 'g2_2_temRevestimento') {
+      setGlobal(campoBooleano, false)
+      return
+    }
+
     setGlobal(campoBooleano, null)
-    abrirModalRisco(
-      campoBooleano === 'g2_1_temReboco' ? 'reboco' : 'revestimento',
-      selecionados
-    )
+    abrirModalRisco('reboco', selecionados)
   }
 
   const toggleSelecaoDependente = (listaAtual, campoSelecionados, campoBooleano, instanceId) => {
@@ -126,12 +128,6 @@ export function BlocoReforma() {
               }}>
                 Todos
               </button>
-              <button onClick={() => {
-                setGlobal('g2_ambientes', [])
-                resetarDependencias()
-              }}>
-                Nenhum
-              </button>
             </div>
             <div className={styles.chips}>
               {ambientes.map((ambiente) => (
@@ -180,6 +176,13 @@ export function BlocoReforma() {
                   G2.2 — Em quais ambientes em reforma o revestimento final das paredes já está
                   aplicado?
                 </p>
+                {g2_2_temRevestimento === false && (
+                  <p className={styles.aviso}>
+                    CC: CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA
+                    COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA
+                    CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.
+                  </p>
+                )}
                 <div className={styles.chipTodos}>
                   <button onClick={() => aplicarSelecaoCompleta('g2_2_ambientes', 'g2_2_temRevestimento', idsEmReforma)}>
                     Todos
