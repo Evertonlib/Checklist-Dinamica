@@ -196,7 +196,7 @@ export function StepIdentificacao() {
       <BottomBar
         semVoltar
         onAvancar={avancar}
-        avancarDisabled={!identificacaoValida}
+        avancarDisabled={false}
         avancarLabel={avancarLabel}
       />
     </div>
