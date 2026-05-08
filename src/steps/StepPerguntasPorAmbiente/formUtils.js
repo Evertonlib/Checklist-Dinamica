@@ -120,7 +120,7 @@ export function validarFormularioAmbiente(formType, resp) {
     }
   }
 
-  if (['dormitorio', 'outros'].includes(formType)) {
+  if (formType === 'dormitorio') {
     if (resp.tv === null) erros.tv = 'Selecione uma opção'
     if (resp.tv === true) {
       if (resp.tvPontoFinal === null) erros.tvPontoFinal = 'Selecione uma opção'
@@ -128,7 +128,7 @@ export function validarFormularioAmbiente(formType, resp) {
     }
   }
 
-  if (formType === 'home') {
+  if (['home', 'outros'].includes(formType)) {
     const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
     if (hasTv) {
       if (resp.tvPontoFinal === null) erros.tvPontoFinal = 'Selecione uma opção'

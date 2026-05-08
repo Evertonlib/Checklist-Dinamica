@@ -68,8 +68,8 @@ export function calcularScore(state) {
       }
     }
 
-    // TV ponto → Dormitório, Outros (baseado em resp.tv)
-    if (['dormitorio', 'outros'].includes(formType)) {
+    // TV ponto → Dormitório (baseado em resp.tv)
+    if (formType === 'dormitorio') {
       if (resp.tv === true && resp.tvPontoFinal === false) {
         gatilhosAtivados.push(`TV_PONTO_${instanceId}`)
         // DIV-07: contribui 0 pontos quando PONTOS_INDEFINIDOS ativo
@@ -77,8 +77,8 @@ export function calcularScore(state) {
         gatilhosAmbiente.push({ id: `TV_PONTO_${instanceId}`, nivel: 'Médio', pontos: pontosTv })
       }
     }
-    // TV ponto → Home (baseado em eletronicosList)
-    if (formType === 'home') {
+    // TV ponto → Home, Outros (baseado em eletronicosList)
+    if (['home', 'outros'].includes(formType)) {
       const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
       if (hasTv && resp.tvPontoFinal === false) {
         gatilhosAtivados.push(`TV_PONTO_${instanceId}`)

@@ -110,72 +110,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="3. TV">
-        <p className={styles.pergunta}>Terá TV neste ambiente?</p>
-        {simNao('tv')}
-        {erros.tv && <span className={`${styles.erro} erro-campo`}>{erros.tv}</span>}
-        {resp.tv === true && (
-          <>
-            <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
-            {simNao('tvPontoFinal')}
-            {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
-            {resp.tvPontoFinal === false && (
-              <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
-            )}
-            <div className={styles.tvCampos}>
-              <div className={styles.campo}>
-                <label>Polegadas *</label>
-                <input
-                  type="number"
-                  value={resp.tv_polegadas ?? ''}
-                  onChange={(e) => set('tv_polegadas', e.target.value)}
-                />
-                {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
-              </div>
-              <div className={styles.campo}>
-                <label>Modelo (opcional)</label>
-                <input value={resp.tv_modelo || ''} onChange={(e) => set('tv_modelo', e.target.value)} />
-              </div>
-              <div className={styles.linha3}>
-                <div className={styles.campo}>
-                  <label>Largura (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_largura_cm ?? ''}
-                    onChange={(e) => set('tv_largura_cm', e.target.value)}
-                  />
-                </div>
-                <div className={styles.campo}>
-                  <label>Altura (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_altura_cm ?? ''}
-                    onChange={(e) => set('tv_altura_cm', e.target.value)}
-                  />
-                </div>
-                <div className={styles.campo}>
-                  <label>Profundidade (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_profundidade_cm ?? ''}
-                    onChange={(e) => set('tv_profundidade_cm', e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className={styles.campo}>
-                <label>Link (opcional)</label>
-                <input
-                  value={resp.tv_link || ''}
-                  onChange={(e) => set('tv_link', e.target.value)}
-                  placeholder="Cole aqui o link do produto, se tiver"
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </FieldGroup>
-
-      <FieldGroup titulo="4. Cortineiro">
+      <FieldGroup titulo="3. Cortineiro">
         <p className={styles.pergunta}>Haverá cortineiro neste ambiente?</p>
         {simNao('cortineiro')}
         {erros.cortineiro && <span className={`${styles.erro} erro-campo`}>{erros.cortineiro}</span>}
@@ -193,7 +128,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="5. Rodapé">
+      <FieldGroup titulo="4. Rodapé">
         <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
         {erros.rodape && <span className={`${styles.erro} erro-campo`}>{erros.rodape}</span>}
@@ -202,7 +137,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="6. Tamanho de Cama">
+      <FieldGroup titulo="5. Tamanho de Cama">
         <p className={styles.pergunta}>Qual o tamanho da cama? (se aplicável)</p>
         <div className={styles.opcoesCama}>
           {TAMANHOS_CAMA_OUTROS.map((tamanho) => (
@@ -241,7 +176,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="7. Eletrodomésticos">
+      <FieldGroup titulo="6. Eletrodomésticos">
         <p className={styles.pergunta}>Já possui ou tem intenção de compra específica dos eletrodomésticos?</p>
         {simNao('eletrosDefined')}
         {erros.eletrosDefined && <span className={`${styles.erro} erro-campo`}>{erros.eletrosDefined}</span>}
@@ -407,7 +342,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="8. Cuba">
+      <FieldGroup titulo="7. Cuba">
         <p className={styles.pergunta}>Tipo de cuba: (se aplicável)</p>
         <div className={styles.chips}>
           {TIPOS_CUBA_OUTROS.map((tipo) => (
@@ -422,7 +357,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         </div>
       </FieldGroup>
 
-      <FieldGroup titulo="9. Eletrônicos">
+      <FieldGroup titulo="8. Eletrônicos">
         <p className={styles.pergunta}>Possui ou pretende adquirir eletrônicos para este ambiente?</p>
         {simNao('eletronicos')}
         {erros.eletronicos && <span className={`${styles.erro} erro-campo`}>{erros.eletronicos}</span>}
@@ -439,6 +374,7 @@ export function FormOutros({ instanceId, erros = {} }) {
 
             {(resp.eletronicosList || []).map((eletronico, index) => {
               const config = ELETRONICOS_CONFIG.find((item) => item.tipo === eletronico.tipo) || { subtipos: [] }
+              const isTV = eletronico.tipo === 'TV'
 
               return (
                 <div key={index} className={styles.eletroCard}>
@@ -451,6 +387,35 @@ export function FormOutros({ instanceId, erros = {} }) {
                       ✕
                     </button>
                   </div>
+
+                  {isTV && (
+                    <>
+                      <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
+                      <div className={styles.botoesSimNao}>
+                        <button
+                          className={resp.tvPontoFinal === true ? styles.ativo : ''}
+                          onClick={() => set('tvPontoFinal', true)}
+                        >Sim</button>
+                        <button
+                          className={resp.tvPontoFinal === false ? styles.ativo : ''}
+                          onClick={() => set('tvPontoFinal', false)}
+                        >Não</button>
+                      </div>
+                      {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
+                      {resp.tvPontoFinal === false && (
+                        <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
+                      )}
+                      <div className={styles.campo}>
+                        <label>Polegadas *</label>
+                        <input
+                          type="number"
+                          value={resp.tv_polegadas ?? ''}
+                          onChange={(e) => set('tv_polegadas', e.target.value)}
+                        />
+                        {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
+                      </div>
+                    </>
+                  )}
 
                   {config.subtipos.length > 0 && (
                     <div className={styles.campo}>
@@ -562,7 +527,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         )}
       </FieldGroup>
 
-      <FieldGroup titulo="10. Observações (opcional)">
+      <FieldGroup titulo="9. Observações (opcional)">
         <textarea
           className={styles.textarea}
           value={resp.observacoes || ''}
