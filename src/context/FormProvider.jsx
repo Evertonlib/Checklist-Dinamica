@@ -82,7 +82,7 @@ function reducer(state, action) {
           tipo: ambienteId,
           formType: def.formType,
           label: def.label,
-          nome: quantidade === 1 ? '' : (existentes[i]?.nome ?? ''),
+          nome: (quantidade === 1 && ambienteId !== 'outros') ? '' : (existentes[i]?.nome ?? ''),
         })
       }
 

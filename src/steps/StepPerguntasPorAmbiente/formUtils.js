@@ -93,6 +93,9 @@ function validarEletronicos(resp, erros) {
     if (!preenchido(eletronico.altura_cm)) {
       erros[`eletronico_${index}_altura`] = 'Obrigatório'
     }
+    if (!preenchido(eletronico.profundidade_cm)) {
+      erros[`eletronico_${index}_prof`] = 'Obrigatório'
+    }
   })
 }
 
@@ -117,13 +120,23 @@ export function validarFormularioAmbiente(formType, resp) {
     }
   }
 
-  if (['dormitorio', 'home', 'outros'].includes(formType)) {
+  if (['dormitorio', 'outros'].includes(formType)) {
     if (resp.tv === null) erros.tv = 'Selecione uma opção'
     if (resp.tv === true) {
       if (resp.tvPontoFinal === null) erros.tvPontoFinal = 'Selecione uma opção'
       if (!preenchido(resp.tv_polegadas)) erros.tv_polegadas = 'Obrigatório'
     }
+  }
 
+  if (formType === 'home') {
+    const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
+    if (hasTv) {
+      if (resp.tvPontoFinal === null) erros.tvPontoFinal = 'Selecione uma opção'
+      if (!preenchido(resp.tv_polegadas)) erros.tv_polegadas = 'Obrigatório'
+    }
+  }
+
+  if (['dormitorio', 'home', 'outros'].includes(formType)) {
     if (resp.cortineiro === null) erros.cortineiro = 'Selecione uma opção'
     if (resp.cortineiro === true && resp.cortieneiroInstalado === null) {
       erros.cortieneiroInstalado = 'Selecione uma opção'

@@ -149,9 +149,6 @@ export function BlocoReforma() {
               <button onClick={() => aplicarSelecaoCompleta('g2_1_ambientes', 'g2_1_temReboco', idsEmReforma)}>
                 Todos
               </button>
-              <button onClick={() => aplicarSelecaoCompleta('g2_1_ambientes', 'g2_1_temReboco', [])}>
-                Nenhum
-              </button>
             </div>
             <div className={styles.chips}>
               {ambientesEmReforma.map((ambiente) => (
@@ -186,9 +183,6 @@ export function BlocoReforma() {
                 <div className={styles.chipTodos}>
                   <button onClick={() => aplicarSelecaoCompleta('g2_2_ambientes', 'g2_2_temRevestimento', idsEmReforma)}>
                     Todos
-                  </button>
-                  <button onClick={() => aplicarSelecaoCompleta('g2_2_ambientes', 'g2_2_temRevestimento', [])}>
-                    Nenhum
                   </button>
                 </div>
                 <div className={styles.chips}>

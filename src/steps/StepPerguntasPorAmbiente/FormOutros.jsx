@@ -1,11 +1,8 @@
 import { useFormContext } from '../../context/FormContext.js'
 import {
   TEXTO_CORTINEIRO_NAO_INSTALADO,
-  TEXTO_ELETRONICOS_NAO_DEFINIDOS,
-  TEXTO_ELETROS_NAO_DEFINIDOS,
   TEXTO_GRANITO_RETIRAR,
   TEXTO_RODAPE_AUSENTE,
-  TEXTO_RODAPE_EXISTENTE,
   TEXTO_TANQUE_RETIRAR,
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
@@ -16,7 +13,11 @@ import {
   TAMANHOS_CAMA,
   TIPOS_CUBA,
 } from './formUtils.js'
+
 import styles from './StepPerguntasPorAmbiente.module.css'
+
+const TAMANHOS_CAMA_OUTROS = [...TAMANHOS_CAMA, { value: 'nao_aplica', label: 'Não se aplica' }]
+const TIPOS_CUBA_OUTROS = [...TIPOS_CUBA, 'Não se aplica']
 
 export function FormOutros({ instanceId, erros = {} }) {
   const { state, dispatch } = useFormContext()
@@ -69,6 +70,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         modelo: '',
         largura_cm: '',
         altura_cm: '',
+        profundidade_cm: '',
         link: '',
       },
     })
@@ -195,9 +197,6 @@ export function FormOutros({ instanceId, erros = {} }) {
         <p className={styles.pergunta}>Existe rodapé na região dos móveis?</p>
         {simNao('rodape')}
         {erros.rodape && <span className={`${styles.erro} erro-campo`}>{erros.rodape}</span>}
-        {resp.rodape === true && (
-          <p className={styles.aviso}>AVISO: {TEXTO_RODAPE_EXISTENTE}</p>
-        )}
         {resp.rodape === false && (
           <p className={styles.aviso}>CC: {TEXTO_RODAPE_AUSENTE}</p>
         )}
@@ -206,7 +205,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="6. Tamanho de Cama">
         <p className={styles.pergunta}>Qual o tamanho da cama? (se aplicável)</p>
         <div className={styles.opcoesCama}>
-          {TAMANHOS_CAMA.map((tamanho) => (
+          {TAMANHOS_CAMA_OUTROS.map((tamanho) => (
             <button
               key={tamanho.value}
               className={`${styles.opcaoCama} ${resp.tamanhoCama === tamanho.value ? styles.ativo : ''}`}
@@ -246,9 +245,6 @@ export function FormOutros({ instanceId, erros = {} }) {
         <p className={styles.pergunta}>Já possui ou tem intenção de compra específica dos eletrodomésticos?</p>
         {simNao('eletrosDefined')}
         {erros.eletrosDefined && <span className={`${styles.erro} erro-campo`}>{erros.eletrosDefined}</span>}
-        {resp.eletrosDefined === false && (
-          <p className={styles.aviso}>CC: {TEXTO_ELETROS_NAO_DEFINIDOS}</p>
-        )}
         {resp.eletrosDefined === true && (
           <div className={styles.eletroArea}>
             <div className={styles.eletroGrid}>
@@ -414,7 +410,7 @@ export function FormOutros({ instanceId, erros = {} }) {
       <FieldGroup titulo="8. Cuba">
         <p className={styles.pergunta}>Tipo de cuba: (se aplicável)</p>
         <div className={styles.chips}>
-          {TIPOS_CUBA.map((tipo) => (
+          {TIPOS_CUBA_OUTROS.map((tipo) => (
             <button
               key={tipo}
               className={resp.cuba === tipo ? styles.chipAtivo : styles.chip}
@@ -430,9 +426,6 @@ export function FormOutros({ instanceId, erros = {} }) {
         <p className={styles.pergunta}>Possui ou pretende adquirir eletrônicos para este ambiente?</p>
         {simNao('eletronicos')}
         {erros.eletronicos && <span className={`${styles.erro} erro-campo`}>{erros.eletronicos}</span>}
-        {resp.eletronicos === false && (
-          <p className={styles.aviso}>CC: {TEXTO_ELETRONICOS_NAO_DEFINIDOS}</p>
-        )}
         {resp.eletronicos === true && (
           <div className={styles.eletroArea}>
             <div className={styles.eletroGrid}>
@@ -494,7 +487,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                     />
                   </div>
 
-                  <div className={styles.linha2}>
+                  <div className={styles.linha3}>
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
@@ -527,6 +520,23 @@ export function FormOutros({ instanceId, erros = {} }) {
                       />
                       {erros[`eletronico_${index}_altura`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_altura`]}</span>
+                      )}
+                    </div>
+                    <div className={styles.campo}>
+                      <label>Profundidade (cm) *</label>
+                      <input
+                        type="number"
+                        value={eletronico.profundidade_cm}
+                        onChange={(e) => dispatch({
+                          type: 'UPDATE_ELETRONICO',
+                          instanceId,
+                          index,
+                          campo: 'profundidade_cm',
+                          valor: e.target.value,
+                        })}
+                      />
+                      {erros[`eletronico_${index}_prof`] && (
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_prof`]}</span>
                       )}
                     </div>
                   </div>

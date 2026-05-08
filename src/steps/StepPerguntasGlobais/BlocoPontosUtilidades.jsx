@@ -39,6 +39,10 @@ export function BlocoPontosUtilidades() {
 
       {g3_pontosNaPosicaoFinal === false && (
         <div className={styles.subbloco}>
+          <p className={styles.aviso}>
+            CC: CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS
+            ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO.
+          </p>
           <p className={styles.subpergunta}>Em quais ambientes ainda não estão?</p>
           <div className={styles.chipTodos}>
             <button onClick={() => setGlobal('g3_ambientesPendentes', ambientes.map((a) => a.instanceId))}>

@@ -68,8 +68,8 @@ export function calcularScore(state) {
       }
     }
 
-    // TV ponto → Dormitório, Home, Outros
-    if (['dormitorio', 'home', 'outros'].includes(formType)) {
+    // TV ponto → Dormitório, Outros (baseado em resp.tv)
+    if (['dormitorio', 'outros'].includes(formType)) {
       if (resp.tv === true && resp.tvPontoFinal === false) {
         gatilhosAtivados.push(`TV_PONTO_${instanceId}`)
         // DIV-07: contribui 0 pontos quando PONTOS_INDEFINIDOS ativo
@@ -77,17 +77,27 @@ export function calcularScore(state) {
         gatilhosAmbiente.push({ id: `TV_PONTO_${instanceId}`, nivel: 'Médio', pontos: pontosTv })
       }
     }
+    // TV ponto → Home (baseado em eletronicosList)
+    if (formType === 'home') {
+      const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
+      if (hasTv && resp.tvPontoFinal === false) {
+        gatilhosAtivados.push(`TV_PONTO_${instanceId}`)
+        // DIV-07: contribui 0 pontos quando PONTOS_INDEFINIDOS ativo
+        const pontosTv = pontosIndefinidosAtivo ? 0 : 2
+        gatilhosAmbiente.push({ id: `TV_PONTO_${instanceId}`, nivel: 'Médio', pontos: pontosTv })
+      }
+    }
 
-    // Eletros não definidos → Cozinha, Outros
-    if (['cozinha', 'outros'].includes(formType)) {
+    // Eletros não definidos → Cozinha
+    if (formType === 'cozinha') {
       if (resp.eletrosDefined === false) {
         gatilhosAtivados.push(`ELETROS_NAODEF_${instanceId}`)
         gatilhosAmbiente.push({ id: `ELETROS_NAODEF_${instanceId}`, nivel: 'Baixo', pontos: 1 })
       }
     }
 
-    // Eletrônicos não definidos → Home, Outros
-    if (['home', 'outros'].includes(formType)) {
+    // Eletrônicos não definidos → Home
+    if (formType === 'home') {
       if (resp.eletronicos === false) {
         gatilhosAtivados.push(`ELETRONICOS_NAODEF_${instanceId}`)
         gatilhosAmbiente.push({ id: `ELETRONICOS_NAODEF_${instanceId}`, nivel: 'Baixo', pontos: 1 })

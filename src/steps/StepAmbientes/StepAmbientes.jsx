@@ -64,13 +64,13 @@ export function StepAmbientes() {
               </div>
             </div>
 
-            {qtd > 1 && instancias.map((inst) => (
+            {(qtd > 1 || (qtd === 1 && amb.id === 'outros')) && instancias.map((inst) => (
               <div key={inst.instanceId} className={styles.nomeField}>
-                <label>Nome para identificar ({inst.label} {inst.instanceId.split('-')[1] * 1 + 1})</label>
+                <label>Nome para identificar ({inst.label}{qtd > 1 ? ` ${inst.instanceId.split('-')[1] * 1 + 1}` : ''})</label>
                 <input
                   value={inst.nome}
                   onChange={(e) => setNome(inst.instanceId, e.target.value)}
-                  placeholder="Ex: Quarto da Joana"
+                  placeholder="Ex: Bar, Corredor..."
                 />
               </div>
             ))}

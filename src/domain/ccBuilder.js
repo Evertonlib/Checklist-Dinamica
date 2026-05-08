@@ -153,7 +153,7 @@ export function construirCCs(state, gatilhosAtivados) {
       })
     }
 
-    if (['dormitorio', 'home', 'outros'].includes(formType) && resp.rodape === true) {
+    if (formType === 'dormitorio' && resp.rodape === true) {
       resultado.push({
         id: `RODAPE_EXISTENTE_${instanceId}`,
         tipo: 'AVISO',

@@ -406,6 +406,7 @@ export async function gerarPdf(state) {
           escreverPergunta(`Eletrônico ${index + 1}`, descreverEletronico(eletronico))
           if (eletronico.largura_cm) escreverPergunta('Largura (cm)', eletronico.largura_cm)
           if (eletronico.altura_cm) escreverPergunta('Altura (cm)', eletronico.altura_cm)
+          if (eletronico.profundidade_cm) escreverPergunta('Profundidade (cm)', eletronico.profundidade_cm)
           if (eletronico.link) escreverPergunta('Link', eletronico.link)
         })
       }

@@ -27,6 +27,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
         modelo: '',
         largura_cm: '',
         altura_cm: '',
+        profundidade_cm: '',
         link: '',
       },
     })
@@ -77,6 +78,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
 
             {(resp.eletronicosList || []).map((eletronico, index) => {
               const config = ELETRONICOS_CONFIG.find((item) => item.tipo === eletronico.tipo) || { subtipos: [] }
+              const isTV = eletronico.tipo === 'TV'
 
               return (
                 <div key={index} className={styles.eletroCard}>
@@ -84,6 +86,35 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                     <strong>{eletronico.tipo}</strong>
                     <button onClick={() => remEletronico(index)} className={styles.btnRemover}>✕</button>
                   </div>
+
+                  {isTV && (
+                    <>
+                      <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
+                      <div className={styles.botoesSimNao}>
+                        <button
+                          className={resp.tvPontoFinal === true ? styles.ativo : ''}
+                          onClick={() => set('tvPontoFinal', true)}
+                        >Sim</button>
+                        <button
+                          className={resp.tvPontoFinal === false ? styles.ativo : ''}
+                          onClick={() => set('tvPontoFinal', false)}
+                        >Não</button>
+                      </div>
+                      {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
+                      {resp.tvPontoFinal === false && (
+                        <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
+                      )}
+                      <div className={styles.campo}>
+                        <label>Polegadas *</label>
+                        <input
+                          type="number"
+                          value={resp.tv_polegadas ?? ''}
+                          onChange={(e) => set('tv_polegadas', e.target.value)}
+                        />
+                        {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
+                      </div>
+                    </>
+                  )}
 
                   {config.subtipos.length > 0 && (
                     <div className={styles.campo}>
@@ -105,7 +136,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                     <input value={eletronico.modelo} onChange={(e) => updEletronico(index, 'modelo', e.target.value)} />
                   </div>
 
-                  <div className={styles.linha2}>
+                  <div className={styles.linha3}>
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
@@ -128,6 +159,17 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_altura`]}</span>
                       )}
                     </div>
+                    <div className={styles.campo}>
+                      <label>Profundidade (cm) *</label>
+                      <input
+                        type="number"
+                        value={eletronico.profundidade_cm}
+                        onChange={(e) => updEletronico(index, 'profundidade_cm', e.target.value)}
+                      />
+                      {erros[`eletronico_${index}_prof`] && (
+                        <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_prof`]}</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className={styles.campo}>
@@ -142,71 +184,6 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
               )
             })}
           </div>
-        )}
-      </FieldGroup>
-
-      <FieldGroup titulo="TV">
-        <p className={styles.pergunta}>Terá TV neste ambiente?</p>
-        {simNao('tv')}
-        {erros.tv && <span className={`${styles.erro} erro-campo`}>{erros.tv}</span>}
-        {resp.tv === true && (
-          <>
-            <p className={styles.subpergunta}>O ponto elétrico da TV já está na posição final?</p>
-            {simNao('tvPontoFinal')}
-            {erros.tvPontoFinal && <span className={`${styles.erro} erro-campo`}>{erros.tvPontoFinal}</span>}
-            {resp.tvPontoFinal === false && (
-              <p className={styles.aviso}>CC: {TEXTO_TV_PONTO_FORA}</p>
-            )}
-            <div className={styles.tvCampos}>
-              <div className={styles.campo}>
-                <label>Polegadas *</label>
-                <input
-                  type="number"
-                  value={resp.tv_polegadas ?? ''}
-                  onChange={(e) => set('tv_polegadas', e.target.value)}
-                />
-                {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
-              </div>
-              <div className={styles.campo}>
-                <label>Modelo (opcional)</label>
-                <input value={resp.tv_modelo || ''} onChange={(e) => set('tv_modelo', e.target.value)} />
-              </div>
-              <div className={styles.linha3}>
-                <div className={styles.campo}>
-                  <label>Largura (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_largura_cm ?? ''}
-                    onChange={(e) => set('tv_largura_cm', e.target.value)}
-                  />
-                </div>
-                <div className={styles.campo}>
-                  <label>Altura (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_altura_cm ?? ''}
-                    onChange={(e) => set('tv_altura_cm', e.target.value)}
-                  />
-                </div>
-                <div className={styles.campo}>
-                  <label>Profundidade (cm)</label>
-                  <input
-                    type="number"
-                    value={resp.tv_profundidade_cm ?? ''}
-                    onChange={(e) => set('tv_profundidade_cm', e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className={styles.campo}>
-                <label>Link (opcional)</label>
-                <input
-                  value={resp.tv_link || ''}
-                  onChange={(e) => set('tv_link', e.target.value)}
-                  placeholder="Cole aqui o link do produto, se tiver"
-                />
-              </div>
-            </div>
-          </>
         )}
       </FieldGroup>
 
