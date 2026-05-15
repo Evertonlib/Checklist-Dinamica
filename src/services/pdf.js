@@ -225,7 +225,6 @@ export async function gerarPdf(state) {
   escreverTituloSecao('Checklist Completa')
 
   const { global } = state
-  const idsEmReforma = global.g2_ambientes || []
 
   escreverPergunta(
     'G1 — O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi? (fitas de LED, spots, etc.)',
@@ -236,30 +235,23 @@ export async function gerarPdf(state) {
   )
 
   escreverPergunta(
-    'G2 — Algum ambiente está em reforma?',
-    global.g2_temReforma === true
-      ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientes)}`
-      : 'Não'
-  )
-
-  escreverPergunta(
-    'G2.1 — Em quais ambientes em reforma as paredes já possuem reboco (argamassa) finalizado?',
-    global.g2_temReforma === true
-      ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_1_ambientes)
-      : 'Não se aplica',
+    'G2 — Todos os ambientes já possuem reboco (argamassa) finalizado nas paredes?',
+    global.g2_temReboco === false
+      ? `Não — Sem reboco: ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientesSemReboco)}`
+      : global.g2_temReboco === true ? 'Sim' : '—',
     [ccPorId.get('REFORM_SEM_REBOCO')]
   )
 
   escreverPergunta(
-    'G2.2 — Em quais ambientes em reforma o revestimento final das paredes já está aplicado?',
-    global.g2_temReforma === true && global.g2_1_temReboco === true
-      ? formatarListaAmbientes(state.ambientesSelecionados, global.g2_2_ambientes)
-      : 'Não se aplica',
+    'G3 — Todos os ambientes já possuem revestimento final (azulejo, porcelanato etc.) aplicado nas paredes?',
+    global.g3_temRevestimento === false
+      ? `Não — Sem revestimento: ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesSemRevestimento)}`
+      : global.g3_temRevestimento === true ? 'Sim' : '—',
     [ccPorId.get('REFORM_SEM_REVESTIMENTO')]
   )
 
   escreverPergunta(
-    'G3 — Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?',
+    'G4 — Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?',
     global.g3_pontosNaPosicaoFinal === false
       ? `Não — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
       : 'Sim',
@@ -267,7 +259,7 @@ export async function gerarPdf(state) {
   )
 
   escreverPergunta(
-    'G4 — Algum ambiente terá rebaixo de teto?',
+    'G5 — Algum ambiente terá rebaixo de teto?',
     global.g4_temRebaixo === true
       ? `Sim — ${formatarListaRebaixo(state.ambientesSelecionados, global.g4_ambientes)}`
       : 'Não',

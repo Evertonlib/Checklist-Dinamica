@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd '/c/Users/Windows 10/AUTOMACOES/Checklist-Dinamica' && find src -type d | sort)",
+      "Read(//c/c/Users/Windows 10/AUTOMACOES/Checklist-Dinamica/**)"
+    ]
+  }
+}

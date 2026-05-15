@@ -277,7 +277,13 @@ export function FormProvider({ children }) {
     const salvo = localStorage.getItem(STORAGE_KEY)
     if (salvo) {
       try {
-        setRascunho(JSON.parse(salvo))
+        const parsed = JSON.parse(salvo)
+        if (parsed?.global?.g2_temReforma !== undefined) {
+          localStorage.removeItem(STORAGE_KEY)
+          setReady(true)
+        } else {
+          setRascunho(parsed)
+        }
       } catch {
         setReady(true)
       }

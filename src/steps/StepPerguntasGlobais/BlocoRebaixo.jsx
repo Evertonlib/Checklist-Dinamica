@@ -28,7 +28,7 @@ export function BlocoRebaixo() {
   const selecionado = (instanceId) => g4_ambientes.some((ambiente) => ambiente.instanceId === instanceId)
 
   return (
-    <FieldGroup titulo="G4 — Rebaixo de Teto">
+    <FieldGroup titulo="G5 — Rebaixo de Teto">
       <p className={styles.pergunta}>Algum ambiente terá rebaixo de teto?</p>
       <div className={styles.botoesSimNao}>
         <button

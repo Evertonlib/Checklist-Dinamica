@@ -140,9 +140,9 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 2. **A seleção em G2 e G3 é de múltipla escolha**, podendo incluir nenhum, alguns ou todos os ambientes (embora selecionar todos contradiga a resposta "Não" e deva ser tratado como erro de validação — ver Riscos).
 
-3. **G2 e G3 são perguntas independentes entre si.** Um ambiente pode não ter reboco e outro não ter revestimento. A resposta de G2 não bloqueia nem pré-seleciona G3.
+3. **G2 e G3 são perguntas independentes entre si e ambas sempre exibidas.** G3 não depende da resposta de G2 para aparecer. Um ambiente pode não ter reboco e outro não ter revestimento, e o vendedor preenche as duas perguntas em sequência, sem bloqueio.
 
-4. **A supressão de CC atual** (quando reboco ausente, CC de revestimento é suprimido) deve ser mantida. Ambientes selecionados em G2 como "sem reboco" logicamente também não têm revestimento, então exibir os dois CCs seria redundante. Essa supressão continua em `ccBuilder.js`, mas agora aplicada de forma global (não por ambiente).
+4. **A supressão de CC é por ambiente.** Para cada ambiente marcado em G2 (sem reboco), o CC de revestimento desse mesmo ambiente é suprimido em G3. Para ambientes marcados apenas em G3, o CC de revestimento é gerado normalmente. Essa granularidade por ambiente é a correta dado que os dois CCs agora têm textos distintos.
 
 5. **Os rótulos G4 e G5** nos blocos de pontos e rebaixo serão atualizados nos textos visíveis ao usuário. Se houver impacto em analytics ou logs externos rastreando os rótulos "G3"/"G4", isso está fora do escopo desta reestruturação.
 
@@ -160,11 +160,11 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 ---
 
-### Risco 2 — Supressão de CC em contexto de perguntas independentes (MÉDIO)
+### Risco 2 — Refatoração da lógica de supressão de CC (MÉDIO)
 
-**Descrição:** A supressão atual é binária e global: se `REFORM_SEM_REBOCO` está ativo, `REFORM_SEM_REVESTIMENTO` é completamente ignorado, independentemente dos ambientes envolvidos. Na nova arquitetura, como os dois gatilhos geram CCs com textos diferentes e referem-se a condições distintas, a supressão cega descartaria o CC de revestimento mesmo que ele se refira a ambientes completamente diferentes dos de reboco — o que seria uma perda de informação relevante.
+**Descrição:** A supressão atual em `ccBuilder.js` é binária e global: se `REFORM_SEM_REBOCO` está ativo, `REFORM_SEM_REVESTIMENTO` é completamente ignorado. Na nova arquitetura, a supressão deve ser por ambiente — o CC de revestimento só é suprimido para os ambientes que também aparecem em G2. A decisão de produto confirmou esse comportamento, mas a implementação exige alterar a lógica de supressão em `ccBuilder.js` de uma verificação de gatilho global para uma comparação de listas de ambientes.
 
-**Mitigação:** Revisar a lógica de supressão em `ccBuilder.js` para ser por ambiente: o CC de revestimento é suprimido apenas para os ambientes que já aparecem na lista de "sem reboco". Para ambientes que estão em G3 mas não em G2, o CC de revestimento deve ser gerado normalmente. Como os textos agora são distintos, não há risco de CC duplicado — apenas o de redundância lógica para o mesmo ambiente.
+**Mitigação:** Em `ccBuilder.js`, substituir a verificação `suprimirRevestimento = tem('REFORM_SEM_REBOCO')` por uma comparação entre `g2_ambientesSemReboco` e `g3_ambientesSemRevestimento`. Somente os ambientes presentes em ambas as listas têm o CC de revestimento suprimido.
 
 ---
 
@@ -298,13 +298,19 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 ---
 
-## 12. Questões Abertas (para confirmação antes da implementação)
+## 12. Decisões de Produto (confirmadas)
 
-1. **Renumeração para G4 e G5:** Confirmar se os blocos de pontos (atual G3) e rebaixo (atual G4) devem, de fato, ser renumerados para G4 e G5 no rótulo visual e no PDF. Alternativamente, manter os rótulos internos G3 e G4 sem renumerar publicamente.
+### Decisão 1 — Renumeração: sim, G4 e G5
 
-2. **Supressão de CC por ambiente vs. global:** A lógica de supressão deve ser aplicada ambiente a ambiente (ambientes com reboco ausente têm seu CC de revestimento suprimido individualmente) ou de forma global (se qualquer ambiente não tem reboco, o CC de revestimento de todos os ambientes é suprimido)?
+Os blocos de pontos elétricos e rebaixo de teto serão renumerados visualmente e no PDF: o atual G3 passa a G4, e o atual G4 passa a G5. Essa renumeração é obrigatória para manter a coerência da sequência após a inserção do novo G3.
 
-3. **Ordem das perguntas G2 e G3:** G3 (revestimento) deve aparecer somente quando G2 (reboco) for respondido, ou as duas perguntas são exibidas simultaneamente e preenchidas em paralelo?
+### Decisão 2 — Supressão de CC: por ambiente, não global
+
+A supressão do CC de revestimento se aplica apenas aos ambientes que também estão marcados como "sem reboco" em G2. Se um ambiente aparece em G2 (sem reboco) e também em G3 (sem revestimento), apenas o CC de reboco é gerado para ele — o de revestimento é suprimido por ser redundante. Para ambientes que aparecem somente em G3, o CC de revestimento é gerado normalmente.
+
+### Decisão 3 — G3 aparece sempre, independente de G2
+
+G3 (revestimento) é sempre exibido ao vendedor, sem nenhuma condição sobre a resposta de G2. O vendedor responde G2 e G3 de forma sequencial e independente. A resposta de G2 não oculta, pré-preenche, nem bloqueia G3.
 
 ---
 

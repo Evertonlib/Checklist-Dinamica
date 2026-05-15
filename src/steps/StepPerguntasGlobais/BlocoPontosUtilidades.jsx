@@ -19,7 +19,7 @@ export function BlocoPontosUtilidades() {
   }
 
   return (
-    <FieldGroup titulo="G3 — Pontos Elétricos / Hidráulicos / Gás">
+    <FieldGroup titulo="G4 — Pontos Elétricos / Hidráulicos / Gás">
       <p className={styles.pergunta}>
         Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?
       </p>

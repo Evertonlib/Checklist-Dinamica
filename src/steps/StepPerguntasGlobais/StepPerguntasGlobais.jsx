@@ -19,26 +19,24 @@ export function StepPerguntasGlobais() {
     (g.g1_temIluminacaoExterna === false || g.g1_ambientes.length > 0)
 
   const g2Ok =
-    respondido(g.g2_temReforma) &&
-    (g.g2_temReforma === false || g.g2_ambientes.length > 0)
-
-  const g2_1Ok = g.g2_temReforma !== true || respondido(g.g2_1_temReboco)
-  const g2_2Ok =
-    g.g2_temReforma !== true ||
-    g.g2_1_temReboco !== true ||
-    respondido(g.g2_2_temRevestimento)
+    respondido(g.g2_temReboco) &&
+    (g.g2_temReboco === true || g.g2_ambientesSemReboco.length > 0)
 
   const g3Ok =
+    respondido(g.g3_temRevestimento) &&
+    (g.g3_temRevestimento === true || g.g3_ambientesSemRevestimento.length > 0)
+
+  const g4Ok =
     respondido(g.g3_pontosNaPosicaoFinal) &&
     (g.g3_pontosNaPosicaoFinal === true || g.g3_ambientesPendentes.length > 0)
 
-  const g4Ok =
+  const g5Ok =
     respondido(g.g4_temRebaixo) &&
     (g.g4_temRebaixo === false ||
       (g.g4_ambientes.length > 0 &&
         g.g4_ambientes.every((ambiente) => String(ambiente.cm ?? '').trim() !== '')))
 
-  const tudoOk = g1Ok && g2Ok && g2_1Ok && g2_2Ok && g3Ok && g4Ok
+  const tudoOk = g1Ok && g2Ok && g3Ok && g4Ok && g5Ok
 
   const voltar = () => {
     dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'ambientes' })
@@ -48,9 +46,10 @@ export function StepPerguntasGlobais() {
   const avancar = () => {
     if (!tudoOk) {
       const primeiroIncompleto = !g1Ok ? 'bloco-g1'
-        : !g2Ok || !g2_1Ok || !g2_2Ok ? 'bloco-g2'
+        : !g2Ok ? 'bloco-g2'
         : !g3Ok ? 'bloco-g3'
-        : 'bloco-g4'
+        : !g4Ok ? 'bloco-g4'
+        : 'bloco-g5'
       document.getElementById(primeiroIncompleto)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
@@ -78,9 +77,9 @@ export function StepPerguntasGlobais() {
   return (
     <div className={styles.pagina}>
       <div id="bloco-g1"><BlocoIluminacao /></div>
-      <div id="bloco-g2"><BlocoReforma /></div>
-      <div id="bloco-g3"><BlocoPontosUtilidades /></div>
-      <div id="bloco-g4"><BlocoRebaixo /></div>
+      <BlocoReforma />
+      <div id="bloco-g4"><BlocoPontosUtilidades /></div>
+      <div id="bloco-g5"><BlocoRebaixo /></div>
       <div className={styles.espacoBar} />
       <BottomBar
         onVoltar={voltar}

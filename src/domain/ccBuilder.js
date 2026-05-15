@@ -3,6 +3,7 @@ import {
   TEXTO_ELETRONICOS_NAO_DEFINIDOS,
   TEXTO_ELETROS_NAO_DEFINIDOS,
   TEXTO_GRANITO_RETIRAR,
+  TEXTO_REVESTIMENTO_AUSENTE,
   TEXTO_RODAPE_AUSENTE,
   TEXTO_RODAPE_EXISTENTE,
   TEXTO_TANQUE_RETIRAR,
@@ -20,7 +21,12 @@ export function construirCCs(state, gatilhosAtivados) {
   const resultado = []
 
   const tem = (id) => gatilhosAtivados.includes(id)
-  const suprimirRevestimento = tem('REFORM_SEM_REBOCO')
+
+  const ambientesSemReboco = state.global.g2_ambientesSemReboco || []
+  const ambientesSemRevestimento = state.global.g3_ambientesSemRevestimento || []
+  const ambientesSemRevestimentoNaoSuprimidos = ambientesSemRevestimento.filter(
+    (id) => !ambientesSemReboco.includes(id)
+  )
 
   if (tem('REFORM_SEM_REBOCO')) {
     resultado.push({
@@ -30,19 +36,18 @@ export function construirCCs(state, gatilhosAtivados) {
       escopo: 'Global',
       textoCompleto:
         'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
-      perguntaOrigem: 'G2.1',
+      perguntaOrigem: 'G2',
     })
   }
 
-  if (!suprimirRevestimento && tem('REFORM_SEM_REVESTIMENTO')) {
+  if (tem('REFORM_SEM_REVESTIMENTO') && ambientesSemRevestimentoNaoSuprimidos.length > 0) {
     resultado.push({
       id: 'REFORM_SEM_REVESTIMENTO',
       tipo: 'CC',
       nivel: 'ALTO',
       escopo: 'Global',
-      textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
-      perguntaOrigem: 'G2.2',
+      textoCompleto: TEXTO_REVESTIMENTO_AUSENTE,
+      perguntaOrigem: 'G3',
     })
   }
 
@@ -66,7 +71,7 @@ export function construirCCs(state, gatilhosAtivados) {
       escopo: 'Global',
       textoCompleto:
         'CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO.',
-      perguntaOrigem: 'G3',
+      perguntaOrigem: 'G4',
     })
   }
 
@@ -83,7 +88,7 @@ export function construirCCs(state, gatilhosAtivados) {
         nivel: 'BAIXO',
         escopo: instanceId,
         textoCompleto: `CLIENTE CIENTE E DE ACORDO QUE DEVERÁ FINALIZAR O REBAIXO DE TETO EM ${cm}CM ATÉ O DIA DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO.`,
-        perguntaOrigem: 'G4',
+        perguntaOrigem: 'G5',
       })
     }
 

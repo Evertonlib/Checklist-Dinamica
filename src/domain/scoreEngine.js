@@ -16,14 +16,10 @@ export function calcularScore(state) {
   const gatilhosAtivados = []
 
   // --- Gatilhos globais ---
-  if (global.g2_temReforma === true && global.g2_1_temReboco === false) {
+  if (global.g2_temReboco === false) {
     gatilhosAtivados.push('REFORM_SEM_REBOCO')
   }
-  if (
-    global.g2_temReforma === true &&
-    global.g2_1_temReboco === true &&
-    global.g2_2_temRevestimento === false
-  ) {
+  if (global.g3_temRevestimento === false) {
     gatilhosAtivados.push('REFORM_SEM_REVESTIMENTO')
   }
   if (global.g1_temIluminacaoExterna === true) {
