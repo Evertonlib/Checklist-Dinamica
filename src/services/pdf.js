@@ -219,9 +219,6 @@ export async function gerarPdf(state) {
   escreverTituloSecao('Resumo Executivo')
   ;[...ccsAlto, ...ccsMedio, ...ccsBaixo].forEach((cc) => escreverResumoItem(cc))
 
-  doc.addPage()
-  y = margemSuperior
-
   escreverTituloSecao('Checklist Completa')
 
   const { global } = state
