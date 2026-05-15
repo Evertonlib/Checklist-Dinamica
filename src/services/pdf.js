@@ -138,9 +138,7 @@ export async function gerarPdf(state) {
   doc.setFont('helvetica', 'normal')
   doc.text(`(${scoreGlobal.pontos} pontos)`, margemEsquerda + 44, yEndereco + 12)
 
-  doc.addPage()
-
-  let y = margemSuperior
+  let y = yEndereco + 26
 
   const garantirEspaco = (alturaNecessaria = 8) => {
     if (y + alturaNecessaria <= pageHeight - margemInferior) return
