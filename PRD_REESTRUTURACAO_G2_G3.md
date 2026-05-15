@@ -1,6 +1,6 @@
 # PRD — Reestruturação das Perguntas G2 e G3 (Reboco e Revestimento)
 
-**Versão:** 1.0  
+**Versão:** 1.1  
 **Data:** 2026-05-15  
 **Status:** Aguardando aprovação
 
@@ -11,6 +11,8 @@
 Simplificar o bloco de perguntas sobre condições das paredes, eliminando a pergunta prévia de "reforma" e tornando as perguntas de reboco e revestimento universais — aplicáveis a todos os ambientes do projeto, independentemente de haver ou não obra em andamento.
 
 A lógica atual exige que o vendedor primeiro confirme se há reforma, para então qualificar reboco e revestimento apenas nos ambientes em reforma. Na prática, isso cria uma barreira desnecessária: ambientes sem reforma declarada podem ter paredes incompletas, e a pergunta de porta de entrada ("há reforma?") mascara esse risco. Com a reestruturação, o sistema pergunta diretamente sobre o estado das paredes em todos os ambientes.
+
+Além disso, hoje os dois problemas (reboco ausente e revestimento ausente) compartilham o mesmo texto de CC, o que gera ambiguidade jurídica e operacional. Com a reestruturação, cada situação terá um CC próprio e preciso.
 
 ---
 
@@ -40,7 +42,9 @@ O fluxo atual para o bloco de reforma funciona assim:
 2. O vendedor pode voltar ou assumir o risco.
 3. Após assumir, abre a seleção de quais ambientes **não possuem** reboco (lista de todos os ambientes do projeto).
 4. Os ambientes selecionados recebem classificação de risco ALTO.
-5. O gatilho `REFORM_SEM_REBOCO` é ativado, gerando o CC de texto já existente: *"CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA."*
+5. O gatilho `REFORM_SEM_REBOCO` é ativado, gerando o CC de texto já existente:
+
+> *CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.*
 
 ### G3 — Nova pergunta (substitui G2.2)
 
@@ -52,7 +56,10 @@ O fluxo atual para o bloco de reforma funciona assim:
 **Fluxo quando a resposta é Não:**
 1. **Não há pop-up de assumir risco** para revestimento. A seleção abre diretamente.
 2. O vendedor seleciona quais ambientes **não possuem** revestimento final.
-3. O gatilho `REFORM_SEM_REVESTIMENTO` é ativado, gerando o mesmo CC de texto acima.
+3. O gatilho `REFORM_SEM_REVESTIMENTO` é ativado, gerando um **novo CC específico para revestimento** (texto diferente do CC de reboco):
+
+> *CLIENTE CIENTE E DE ACORDO QUE A MEDIÇÃO TÉCNICA FOI REALIZADA SEM O REVESTIMENTO FINAL DAS PAREDES, E QUE A FINALIZAÇÃO DA OBRA APÓS A ELABORAÇÃO DO PROJETO PODERÁ GERAR INTERFERÊNCIAS E NECESSIDADE DE AJUSTES NA MONTAGEM.*
+
 4. Sem classificação de risco ALTO adicional para esta pergunta isolada (comportamento idêntico ao atual de G2.2).
 
 ### G4 e G5 — Renumeração dos blocos existentes
@@ -73,7 +80,8 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 | `src/steps/StepPerguntasGlobais/BlocoReforma.jsx` | É o componente principal do bloco. Precisa ser reescrito para remover a pergunta G2, inverter a lógica de seleção (quem NÃO tem, não quem tem) e ajustar o fluxo do modal. |
 | `src/domain/schema.js` | Deve remover os campos `g2_temReforma` e `g2_ambientes`. Os campos de G2.1 e G2.2 permanecem, mas com semântica invertida (passam a guardar "quem não tem" em vez de "quem tem"). |
 | `src/domain/scoreEngine.js` | As condições que ativam `REFORM_SEM_REBOCO` e `REFORM_SEM_REVESTIMENTO` precisam ser simplificadas: a verificação de `g2_temReforma` é removida de ambas. |
-| `src/domain/ccBuilder.js` | A supressão de G2.2 quando G2.1 está ativo precisa ser revisada — ver seção de Riscos. Os rótulos `perguntaOrigem` devem ser atualizados de 'G2.1'/'G2.2' para 'G2'/'G3'. |
+| `src/domain/ccBuilder.js` | A supressão de G2.2 quando G2.1 está ativo precisa ser revisada — ver seção de Riscos. Os rótulos `perguntaOrigem` devem ser atualizados de 'G2.1'/'G2.2' para 'G2'/'G3'. O texto do CC de G3 deve ser trocado para o novo texto de revestimento. |
+| `src/domain/checklistTextos.js` | Adicionar o novo texto de CC de revestimento (G3). O texto de reboco permanece. |
 | `src/services/pdf.js` | Os textos das perguntas no PDF precisam ser atualizados para as novas formulações e novos rótulos. G3 e G4 precisam ter seus rótulos atualizados também. |
 | `src/context/FormProvider.jsx` | Os cases do reducer que manipulam `g2_temReforma` e `g2_ambientes` devem ser removidos. Os cases de G2.1 e G2.2 continuam, possivelmente renomeados. |
 | `src/steps/StepPerguntasGlobais/BlocoPontosUtilidades.jsx` | Apenas renumeração do rótulo visual: G3 → G4. Sem mudança de lógica. |
@@ -94,6 +102,9 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 - **Nova pergunta G3** com formulação universal.
 - **Fluxo de seleção invertida:** em vez de selecionar quais ambientes têm a condição, o vendedor seleciona quais ambientes **não têm**. Isso muda a semântica da lista de checkboxes na tela.
 - **Modal de risco exclusivo para reboco (G2):** o pop-up "Assumir Risco Alto" permanece apenas para a pergunta de reboco. Já para revestimento (G3), o acesso à seleção é direto, sem barreira de confirmação.
+- **Novo CC exclusivo para G3 (revestimento ausente):** texto diferente e mais preciso do que o CC de reboco, eliminando a ambiguidade atual de usar o mesmo texto para dois problemas distintos. O novo texto deve ser adicionado em `checklistTextos.js`:
+
+> *CLIENTE CIENTE E DE ACORDO QUE A MEDIÇÃO TÉCNICA FOI REALIZADA SEM O REVESTIMENTO FINAL DAS PAREDES, E QUE A FINALIZAÇÃO DA OBRA APÓS A ELABORAÇÃO DO PROJETO PODERÁ GERAR INTERFERÊNCIAS E NECESSIDADE DE AJUSTES NA MONTAGEM.*
 
 ---
 
@@ -113,7 +124,7 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 - **Componente Modal genérico** (`src/components/Modal/Modal.jsx`) — é reaproveitado como está.
 - **Bloco G1 — Iluminação** (`BlocoIluminacao.jsx`) — sem alterações.
 - **Lógica interna de G4/G5** (pontos e rebaixo) — apenas renumeração de rótulos, sem mudança de comportamento.
-- **Textos de CC** em `checklistTextos.js` — o texto do CC de reboco/revestimento permanece o mesmo.
+- **Texto de CC de reboco** em `checklistTextos.js` — o texto do CC de reboco (G2) permanece o mesmo, sem alteração.
 - **Lógica de score por ambiente** — os gatilhos de ambiente (granito, tanque, TV, cortineiro etc.) não são afetados.
 - **Função de geração de PDF** (`pdf.js`) — apenas os textos de rótulo das perguntas globais são atualizados; a estrutura do PDF permanece.
 - **Toda a camada de perguntas por ambiente** (`StepPerguntasPorAmbiente/`) — sem alterações.
@@ -151,9 +162,9 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 ### Risco 2 — Supressão de CC em contexto de perguntas independentes (MÉDIO)
 
-**Descrição:** A supressão atual é binária: se `REFORM_SEM_REBOCO` está ativo, `REFORM_SEM_REVESTIMENTO` é completamente ignorado. Na nova arquitetura, um ambiente pode não ter reboco (G2) enquanto outro ambiente diferente não tem revestimento (G3). A supressão cega descartaria o CC de revestimento mesmo que ele se refira a ambientes distintos.
+**Descrição:** A supressão atual é binária e global: se `REFORM_SEM_REBOCO` está ativo, `REFORM_SEM_REVESTIMENTO` é completamente ignorado, independentemente dos ambientes envolvidos. Na nova arquitetura, como os dois gatilhos geram CCs com textos diferentes e referem-se a condições distintas, a supressão cega descartaria o CC de revestimento mesmo que ele se refira a ambientes completamente diferentes dos de reboco — o que seria uma perda de informação relevante.
 
-**Mitigação:** Revisar a lógica de supressão para aplicar apenas quando os ambientes selecionados em G2 e G3 se sobrepõem. Se houver ambientes diferentes nos dois conjuntos, os dois CCs devem ser gerados.
+**Mitigação:** Revisar a lógica de supressão em `ccBuilder.js` para ser por ambiente: o CC de revestimento é suprimido apenas para os ambientes que já aparecem na lista de "sem reboco". Para ambientes que estão em G3 mas não em G2, o CC de revestimento deve ser gerado normalmente. Como os textos agora são distintos, não há risco de CC duplicado — apenas o de redundância lógica para o mesmo ambiente.
 
 ---
 
@@ -222,7 +233,8 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 **Resultado esperado:**
 - Nenhum modal de risco é exibido (diferente do G2).
 - O gatilho `REFORM_SEM_REVESTIMENTO` é ativado.
-- O CC de reforma aparece no relatório final.
+- O CC de **revestimento** aparece no relatório final com o novo texto específico: *"CLIENTE CIENTE E DE ACORDO QUE A MEDIÇÃO TÉCNICA FOI REALIZADA SEM O REVESTIMENTO FINAL DAS PAREDES..."*
+- O CC de reboco (texto do G2) **não aparece** — são CCs distintos, e apenas o de revestimento foi ativado.
 - No PDF, a pergunta G3 aparece como "Não", com a Cozinha listada.
 - Score: o gatilho contribui com seus pontos (nível Alto), mas não necessariamente classifica como ALTO a menos que o total atinja o limiar.
 
@@ -232,8 +244,8 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 **Entrada:** G2 = Não, risco assumido, Dormitório 1 selecionado. G3 = Não, Cozinha selecionada.  
 **Resultado esperado:**
-- Dois CCs são gerados (um para reboco/Dormitório 1, outro para revestimento/Cozinha), porque os ambientes são distintos.
-- A supressão de CC **não ocorre** neste caso (ambientes diferentes).
+- Dois CCs são gerados, com textos distintos: o CC de reboco (texto existente) referente ao Dormitório 1, e o CC de revestimento (texto novo) referente à Cozinha.
+- A supressão de CC **não ocorre** neste caso, pois os ambientes são diferentes.
 - Score global é ALTO (gatilho de reboco é AltoDireto).
 
 ---
@@ -242,8 +254,8 @@ Como G2.2 ocupa agora o lugar de G3, os blocos existentes sobem uma posição:
 
 **Entrada:** G2 = Não, risco assumido, Sala selecionada. G3 = Não, Sala selecionada também.  
 **Resultado esperado:**
-- Apenas um CC é gerado (o de reboco/G2), porque o mesmo ambiente aparece nos dois.
-- A supressão de CC **ocorre** para esse ambiente específico (reboco implica revestimento ausente — não há redundância).
+- Apenas um CC é gerado: o **CC de reboco** (G2), que é o mais grave.
+- O CC de revestimento (G3) é suprimido para esse ambiente, pois sem reboco é óbvio que o revestimento também está ausente — o CC de revestimento seria redundante e menos informativo.
 - Score global é ALTO.
 
 ---
