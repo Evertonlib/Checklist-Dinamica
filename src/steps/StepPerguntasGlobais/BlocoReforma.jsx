@@ -18,6 +18,11 @@ export function BlocoReforma() {
 
   const setGlobal = (campo, valor) => dispatch({ type: 'SET_GLOBAL', campo, valor })
 
+  const ambientesG3 =
+    g2_temReboco === false && g2_ambientesSemReboco.length > 0
+      ? ambientes.filter((a) => !g2_ambientesSemReboco.includes(a.instanceId))
+      : ambientes
+
   const handleRebocoSim = () => {
     setGlobal('g2_temReboco', true)
     setGlobal('g2_ambientesSemReboco', [])
@@ -122,12 +127,12 @@ export function BlocoReforma() {
             <div className={styles.subbloco}>
               <p className={styles.subpergunta}>Quais ambientes não possuem revestimento?</p>
               <div className={styles.chipTodos}>
-                <button onClick={() => setGlobal('g3_ambientesSemRevestimento', ambientes.map((a) => a.instanceId))}>
+                <button onClick={() => setGlobal('g3_ambientesSemRevestimento', ambientesG3.map((a) => a.instanceId))}>
                   Todos
                 </button>
               </div>
               <div className={styles.chips}>
-                {ambientes.map((ambiente) => (
+                {ambientesG3.map((ambiente) => (
                   <button
                     key={ambiente.instanceId}
                     className={g3_ambientesSemRevestimento.includes(ambiente.instanceId) ? styles.chipAtivo : styles.chip}
