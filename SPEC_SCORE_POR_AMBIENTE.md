@@ -8,14 +8,14 @@
 
 ## 1. Escopo
 
-Dois arquivos são modificados:
+Quatro arquivos são modificados:
 
 | Arquivo | Papel |
 |---|---|
 | `src/domain/scoreEngine.js` | Principal — lógica de cálculo |
 | `src/domain/ccBuilder.js` | Secundário — geração de CCs |
-
-Dois arquivos foram verificados. As ressalvas encontradas estão documentadas na seção 5.
+| `src/services/pdf.js` | Terciário — lookups G1–G4 na Checklist Completa e remoção de pontos na capa |
+| `src/steps/StepRevisao/StepRevisao.jsx` | Terciário — remoção da prop `pontos` no ScoreBadge global |
 
 ---
 
@@ -29,7 +29,7 @@ O PRD foi escrito com precisão, mas há quatro pontos onde a leitura do código
 
 Após a mudança, esses IDs não existirão mais — serão `ILUMINACAO_EXTERNA_cozinha-0`, etc. O `ccPorId.get(...)` retornará `undefined`, que é silenciosamente removido pelo `.filter(Boolean)` (linha 208). Resultado: sem crash, mas os CCs de G1-G4 desaparecem da seção "Checklist Completa" do PDF. Continuam aparecendo no Resumo Executivo.
 
-O PRD diz que `pdf.js` "continua funcionando" — de fato não quebra, mas há perda de conteúdo nessa seção. Ver DP-01 para decisão.
+O PRD diz que `pdf.js` "continua funcionando" — de fato não quebra, mas há perda de conteúdo nessa seção. **Decisão: opção (b) adotada** — pdf.js entra na lista de arquivos afetados; os lookups serão atualizados para iterar os novos IDs per-ambiente (detalhado na seção 5).
 
 ### D-02 — Exibição dos pontos do score global: item 5 do PRD conflita com a restrição de não tocar nos consumidores
 
@@ -40,7 +40,7 @@ O item 5 do PRD diz: "O número de pontos não é mais exibido para o score glob
 
 O mesmo PRD coloca ambos os arquivos como "não precisarão de mudança". Não há como ocultar o número de pontos nos dois consumidores sem alterar pelo menos essas duas linhas. Retornar `null` de `scoreGlobal.pontos` faria o pdf.js imprimir `"(null pontos)"`.
 
-Ver DP-02 para decisão.
+**Decisão: opção (a) adotada** — StepRevisao.jsx e pdf.js entram na lista de arquivos afetados com as mudanças mínimas descritas na seção 5.
 
 ### D-03 — Supressão G2/G3 hoje existe apenas no ccBuilder, não no scoreEngine
 
@@ -217,49 +217,33 @@ Os textos de G1, G2 e G4 estavam inline no código atual (não importados de `ch
 
 ---
 
-## 5. Arquivos de Verificação — Observações
+## 5. Arquivos Adicionais Afetados
 
 ### `StepRevisao.jsx`
 
 - `calcularScore` e `construirCCs` continuam sendo chamadas da mesma forma — sem mudança na assinatura.
 - A função `nomeAmbiente(escopo)` (linha 47–51) trata `'Global'` como caso especial e faz fallback para `instanceId`. Após a mudança, os CCs de G1–G4 terão `escopo: instanceId`, que será resolvido corretamente para o nome do ambiente.
 - As seções de risco Alto/Médio/Baixo iteram todos os CCs por `cc.nivel` — continuarão funcionando com os novos CCs per-ambiente.
-- **Ressalva D-02:** Linha 58 passa `pontos={scoreGlobal.pontos}` ao `ScoreBadge` global. Se o item 5 do PRD for implementado (DP-02), esta linha precisará ser alterada para não passar o `pontos`.
+- **Mudança — DP-02:** Linha 58 — remover a prop `pontos={scoreGlobal.pontos}` do `<ScoreBadge>` que exibe o score global, deixando apenas `classificacao`. O `<ScoreBadge>` dos ambientes individuais (linha 76) não é alterado — continua passando `pontos`.
 
 ### `pdf.js`
 
 - `calcularScore` e `construirCCs` continuam sendo chamadas da mesma forma.
 - O Resumo Executivo (iteração de `ccsAlto`, `ccsMedio`, `ccsBaixo`) funcionará corretamente com os novos CCs per-ambiente, exibindo o nome do ambiente.
-- **Ressalva D-01:** Linhas 229, 237, 245 e 253 fazem `ccPorId.get('ILUMINACAO_EXTERNA')` etc. — retornarão `undefined` após a mudança. Nenhum crash ocorre (`.filter(Boolean)`), mas os CCs deixam de aparecer inline nas perguntas G1–G4 da seção Checklist Completa. Ver DP-01.
-- **Ressalva D-02:** Linha 139 imprime `(${scoreGlobal.pontos} pontos)` na capa. Se o item 5 do PRD for implementado (DP-02), esta linha deve ser removida.
+
+**Mudança — DP-01:** As quatro chamadas de `escreverPergunta` para G1–G4 na seção Checklist Completa passam atualmente um array de um único CC global. Após a mudança, cada uma deve iterar a lista de ambientes afetados e mapear os novos IDs per-ambiente. A substituição por pergunta:
+
+- **G1** (linha 229): substituir `[ccPorId.get('ILUMINACAO_EXTERNA')]` por `(global.g1_ambientes || []).map(id => ccPorId.get(\`ILUMINACAO_EXTERNA_${id}\`))`
+- **G2** (linha 237): substituir `[ccPorId.get('REFORM_SEM_REBOCO')]` por `(global.g2_ambientesSemReboco || []).map(id => ccPorId.get(\`REFORM_SEM_REBOCO_${id}\`))`
+- **G3** (linha 245): substituir `[ccPorId.get('REFORM_SEM_REVESTIMENTO')]` por `(global.g3_ambientesSemRevestimento || []).map(id => ccPorId.get(\`REFORM_SEM_REVESTIMENTO_${id}\`))`
+- **G4** (linha 253): substituir `[ccPorId.get('PONTOS_INDEFINIDOS')]` por `(global.g3_ambientesPendentes || []).map(id => ccPorId.get(\`PONTOS_INDEFINIDOS_${id}\`))`
+
+O `.filter(Boolean)` existente na linha 208 de `escreverPergunta` continuará filtrando `undefined` para ambientes cujo CC foi suprimido (ex.: G3 suprimido por G2).
+
+**Mudança — DP-02:** Linha 139 — remover `doc.text(\`(${scoreGlobal.pontos} pontos)\`, margemEsquerda + 44, yEndereco + 12)`. A linha anterior (138) que imprime `RISCO ${scoreGlobal.classificacao}` permanece intacta.
 
 ---
 
-## 6. Decisões Pendentes
-
-Dois pontos do PRD geram conflito interno e requerem confirmação antes da implementação.
-
-### DP-01 — CCs de G1–G4 na seção Checklist Completa do PDF
-
-Após a mudança, os CCs de G1–G4 não aparecerão inline com as perguntas G1–G4 na Checklist Completa do PDF.
-
-Opções:
-- **(a) Aceitar o comportamento atual do pdf.js** — CCs de G1–G4 aparecem apenas no Resumo Executivo. A Checklist Completa exibe as perguntas sem CC inline. Nenhuma mudança no pdf.js.
-- **(b) Atualizar pdf.js para iterar os novos IDs** — Para cada pergunta G1–G4, construir a lista de CCs per-ambiente e passá-los para `escreverPergunta`. Requer adicionar pdf.js à lista de arquivos afetados (mudança pequena).
-
-### DP-02 — Exibição do número de pontos do score global (item 5 do PRD)
-
-Para implementar "não exibir pontos do score global", dois arquivos precisam de mudança mínima:
-
-- `StepRevisao.jsx` linha 58: substituir `pontos={scoreGlobal.pontos}` por nada (ou `pontos={null}` se `ScoreBadge` tratar null sem exibir)
-- `pdf.js` linha 139: remover a linha que imprime `(${scoreGlobal.pontos} pontos)`
-
-Opções:
-- **(a) Implementar o item 5** — Adicionar StepRevisao.jsx e pdf.js à lista de arquivos afetados com essas duas mudanças mínimas.
-- **(b) Adiar o item 5** — Manter a exibição de pontos do score global sem alteração por ora. O PRD aprovado inclui o item 5, mas sua implementação conflita com a restrição de "não tocar" nesses arquivos.
-
----
-
-## 7. Critérios de Aceitação
+## 6. Critérios de Aceitação
 
 AC-01 a AC-13 e os dois cenários de erro do PRD aplicam-se integralmente. Nenhuma alteração nos critérios.
