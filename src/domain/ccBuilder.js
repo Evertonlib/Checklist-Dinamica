@@ -22,62 +22,64 @@ export function construirCCs(state, gatilhosAtivados) {
 
   const tem = (id) => gatilhosAtivados.includes(id)
 
-  const ambientesSemReboco = state.global.g2_ambientesSemReboco || []
+  const g1_ambientes          = state.global.g1_ambientes || []
+  const ambientesSemReboco    = state.global.g2_ambientesSemReboco || []
   const ambientesSemRevestimento = state.global.g3_ambientesSemRevestimento || []
+  const g3_ambientesPendentes = state.global.g3_ambientesPendentes || []
   const ambientesSemRevestimentoNaoSuprimidos = ambientesSemRevestimento.filter(
     (id) => !ambientesSemReboco.includes(id)
   )
 
-  if (tem('REFORM_SEM_REBOCO')) {
-    resultado.push({
-      id: 'REFORM_SEM_REBOCO',
-      tipo: 'CC',
-      nivel: 'ALTO',
-      escopo: 'Global',
-      textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
-      perguntaOrigem: 'G2',
-    })
-  }
-
-  if (tem('REFORM_SEM_REVESTIMENTO') && ambientesSemRevestimentoNaoSuprimidos.length > 0) {
-    resultado.push({
-      id: 'REFORM_SEM_REVESTIMENTO',
-      tipo: 'CC',
-      nivel: 'ALTO',
-      escopo: 'Global',
-      textoCompleto: TEXTO_REVESTIMENTO_AUSENTE,
-      perguntaOrigem: 'G3',
-    })
-  }
-
-  if (tem('ILUMINACAO_EXTERNA')) {
-    resultado.push({
-      id: 'ILUMINACAO_EXTERNA',
-      tipo: 'CC',
-      nivel: 'MÉDIO',
-      escopo: 'Global',
-      textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE FIAÇÃO ELÉTRICA, INSTALAÇÃO DE ILUMINAÇÕES E SERVIÇOS DE ELETRICISTA É POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL NO DIA DA MONTAGEM.',
-      perguntaOrigem: 'G1',
-    })
-  }
-
-  if (tem('PONTOS_INDEFINIDOS')) {
-    resultado.push({
-      id: 'PONTOS_INDEFINIDOS',
-      tipo: 'CC',
-      nivel: 'MÉDIO',
-      escopo: 'Global',
-      textoCompleto:
-        'CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO.',
-      perguntaOrigem: 'G4',
-    })
-  }
-
   for (const instancia of ambientesSelecionados) {
     const { instanceId, formType } = instancia
     const resp = state.respostasPorAmbiente[instanceId] || {}
+
+    if (tem(`ILUMINACAO_EXTERNA_${instanceId}`) && g1_ambientes.includes(instanceId)) {
+      resultado.push({
+        id: `ILUMINACAO_EXTERNA_${instanceId}`,
+        tipo: 'CC',
+        nivel: 'MÉDIO',
+        escopo: instanceId,
+        textoCompleto:
+          'CLIENTE CIENTE E DE ACORDO QUE FIAÇÃO ELÉTRICA, INSTALAÇÃO DE ILUMINAÇÕES E SERVIÇOS DE ELETRICISTA É POR SUA RESPONSABILIDADE, PROFISSIONAL DEVE ESTAR LOCAL NO DIA DA MONTAGEM.',
+        perguntaOrigem: 'G1',
+      })
+    }
+
+    if (tem(`REFORM_SEM_REBOCO_${instanceId}`) && ambientesSemReboco.includes(instanceId)) {
+      resultado.push({
+        id: `REFORM_SEM_REBOCO_${instanceId}`,
+        tipo: 'CC',
+        nivel: 'ALTO',
+        escopo: instanceId,
+        textoCompleto:
+          'CLIENTE CIENTE E DE ACORDO QUE MEDIÇÃO TÉCNICA DE AMBIENTE FOI REALIZADA COM AMBIENTE EM REFORMA INACABADA E QUE DEVERÁ RESPEITAR A ALÍNEA (I) DA CLÁUSULA TERCEIRA DO CONTRATO DE COMPRA E VENDA.',
+        perguntaOrigem: 'G2',
+      })
+    }
+
+    if (tem(`REFORM_SEM_REVESTIMENTO_${instanceId}`) && ambientesSemRevestimentoNaoSuprimidos.includes(instanceId)) {
+      resultado.push({
+        id: `REFORM_SEM_REVESTIMENTO_${instanceId}`,
+        tipo: 'CC',
+        nivel: 'ALTO',
+        escopo: instanceId,
+        textoCompleto: TEXTO_REVESTIMENTO_AUSENTE,
+        perguntaOrigem: 'G3',
+      })
+    }
+
+    if (tem(`PONTOS_INDEFINIDOS_${instanceId}`) && g3_ambientesPendentes.includes(instanceId)) {
+      resultado.push({
+        id: `PONTOS_INDEFINIDOS_${instanceId}`,
+        tipo: 'CC',
+        nivel: 'MÉDIO',
+        escopo: instanceId,
+        textoCompleto:
+          'CLIENTE CIENTE E DE ACORDO QUE DEVERÁ ALTERAR E/OU PROVIDENCIAR PONTOS ELÉTRICOS/HIDRÁULICOS/GÁS ATÉ O DIA DA MONTAGEM, PARA CORRETA ADEQUAÇÃO DO PROJETO.',
+        perguntaOrigem: 'G4',
+      })
+    }
 
     if (tem(`REBAIXO_${instanceId}`)) {
       const ambienteRebaixo = global.g4_ambientes.find((ambiente) => ambiente.instanceId === instanceId)

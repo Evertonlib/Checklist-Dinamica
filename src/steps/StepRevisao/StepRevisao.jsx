@@ -55,7 +55,7 @@ export function StepRevisao() {
       <h2 className={styles.titulo}>Revisão do Preenchimento</h2>
 
       <div className={styles.scoreBox}>
-        <ScoreBadge classificacao={scoreGlobal.classificacao} pontos={scoreGlobal.pontos} />
+        <ScoreBadge classificacao={scoreGlobal.classificacao} />
         {scoreGlobal.isAlto && Object.values(scorePorAmbiente).some((score) => score.isAlto) && (
           <p className={styles.explicacaoAlto}>
             Risco global classificado como ALTO porque um ou mais ambientes apresentam condição de risco alto.

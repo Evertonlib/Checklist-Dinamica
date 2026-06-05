@@ -136,7 +136,6 @@ export async function gerarPdf(state) {
   doc.text(`RISCO ${scoreGlobal.classificacao}`, margemEsquerda, yEndereco + 12)
   doc.setTextColor(0, 0, 0)
   doc.setFont('helvetica', 'normal')
-  doc.text(`(${scoreGlobal.pontos} pontos)`, margemEsquerda + 44, yEndereco + 12)
 
   let y = yEndereco + 26
 
@@ -226,7 +225,7 @@ export async function gerarPdf(state) {
     global.g1_temIluminacaoExterna === true
       ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g1_ambientes)}`
       : 'Não',
-    [ccPorId.get('ILUMINACAO_EXTERNA')]
+    (global.g1_ambientes || []).map((id) => ccPorId.get(`ILUMINACAO_EXTERNA_${id}`))
   )
 
   escreverPergunta(
@@ -234,7 +233,7 @@ export async function gerarPdf(state) {
     global.g2_temReboco === false
       ? `Não — Sem reboco: ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientesSemReboco)}`
       : global.g2_temReboco === true ? 'Sim' : '—',
-    [ccPorId.get('REFORM_SEM_REBOCO')]
+    (global.g2_ambientesSemReboco || []).map((id) => ccPorId.get(`REFORM_SEM_REBOCO_${id}`))
   )
 
   escreverPergunta(
@@ -242,7 +241,7 @@ export async function gerarPdf(state) {
     global.g3_temRevestimento === false
       ? `Não — Sem revestimento: ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesSemRevestimento)}`
       : global.g3_temRevestimento === true ? 'Sim' : '—',
-    [ccPorId.get('REFORM_SEM_REVESTIMENTO')]
+    (global.g3_ambientesSemRevestimento || []).map((id) => ccPorId.get(`REFORM_SEM_REVESTIMENTO_${id}`))
   )
 
   escreverPergunta(
@@ -250,7 +249,7 @@ export async function gerarPdf(state) {
     global.g3_pontosNaPosicaoFinal === false
       ? `Não — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
       : 'Sim',
-    [ccPorId.get('PONTOS_INDEFINIDOS')]
+    (global.g3_ambientesPendentes || []).map((id) => ccPorId.get(`PONTOS_INDEFINIDOS_${id}`))
   )
 
   escreverPergunta(

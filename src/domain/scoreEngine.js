@@ -6,30 +6,12 @@
 export function calcularScore(state) {
   const { global, ambientesSelecionados, respostasPorAmbiente } = state
 
-  const GATILHOS_DEF = {
-    REFORM_SEM_REBOCO:     { nivel: 'AltoDireto', pontos: 0,  escopo: 'global' },
-    REFORM_SEM_REVESTIMENTO: { nivel: 'Alto',     pontos: 3,  escopo: 'global' },
-    ILUMINACAO_EXTERNA:    { nivel: 'Médio',       pontos: 2,  escopo: 'global' },
-    PONTOS_INDEFINIDOS:    { nivel: 'Médio',       pontos: 2,  escopo: 'global' },
-  }
-
   const gatilhosAtivados = []
 
-  // --- Gatilhos globais ---
-  if (global.g2_temReboco === false) {
-    gatilhosAtivados.push('REFORM_SEM_REBOCO')
-  }
-  if (global.g3_temRevestimento === false) {
-    gatilhosAtivados.push('REFORM_SEM_REVESTIMENTO')
-  }
-  if (global.g1_temIluminacaoExterna === true) {
-    gatilhosAtivados.push('ILUMINACAO_EXTERNA')
-  }
-  if (global.g3_pontosNaPosicaoFinal === false) {
-    gatilhosAtivados.push('PONTOS_INDEFINIDOS')
-  }
-
-  const pontosIndefinidosAtivo = gatilhosAtivados.includes('PONTOS_INDEFINIDOS')
+  const g1_ambientes                = global.g1_ambientes || []
+  const g2_ambientesSemReboco       = global.g2_ambientesSemReboco || []
+  const g3_ambientesSemRevestimento = global.g3_ambientesSemRevestimento || []
+  const g3_ambientesPendentes       = global.g3_ambientesPendentes || []
 
   // --- Gatilhos por ambiente ---
   const scorePorAmbiente = {}
@@ -38,6 +20,30 @@ export function calcularScore(state) {
     const { instanceId, formType } = instancia
     const resp = respostasPorAmbiente[instanceId] || {}
     const gatilhosAmbiente = []
+
+    // G1 — Iluminação externa
+    if (g1_ambientes.includes(instanceId)) {
+      gatilhosAtivados.push(`ILUMINACAO_EXTERNA_${instanceId}`)
+      gatilhosAmbiente.push({ id: `ILUMINACAO_EXTERNA_${instanceId}`, nivel: 'Médio', pontos: 2 })
+    }
+
+    // G2 — Sem reboco
+    if (g2_ambientesSemReboco.includes(instanceId)) {
+      gatilhosAtivados.push(`REFORM_SEM_REBOCO_${instanceId}`)
+      gatilhosAmbiente.push({ id: `REFORM_SEM_REBOCO_${instanceId}`, nivel: 'AltoDireto', pontos: 0 })
+    }
+
+    // G3 — Sem revestimento (com supressão G2)
+    if (g3_ambientesSemRevestimento.includes(instanceId) && !g2_ambientesSemReboco.includes(instanceId)) {
+      gatilhosAtivados.push(`REFORM_SEM_REVESTIMENTO_${instanceId}`)
+      gatilhosAmbiente.push({ id: `REFORM_SEM_REVESTIMENTO_${instanceId}`, nivel: 'Alto', pontos: 3 })
+    }
+
+    // G4 — Pontos indefinidos
+    if (g3_ambientesPendentes.includes(instanceId)) {
+      gatilhosAtivados.push(`PONTOS_INDEFINIDOS_${instanceId}`)
+      gatilhosAmbiente.push({ id: `PONTOS_INDEFINIDOS_${instanceId}`, nivel: 'Médio', pontos: 2 })
+    }
 
     // REBAIXO
     if (
@@ -64,12 +70,14 @@ export function calcularScore(state) {
       }
     }
 
+    // DIV-07: suprime o ponto de TV somente se este ambiente está em g3_ambientesPendentes
+    const div07Ativo = g3_ambientesPendentes.includes(instanceId)
+
     // TV ponto → Dormitório (baseado em resp.tv)
     if (formType === 'dormitorio') {
       if (resp.tv === true && resp.tvPontoFinal === false) {
         gatilhosAtivados.push(`TV_PONTO_${instanceId}`)
-        // DIV-07: contribui 0 pontos quando PONTOS_INDEFINIDOS ativo
-        const pontosTv = pontosIndefinidosAtivo ? 0 : 2
+        const pontosTv = div07Ativo ? 0 : 2
         gatilhosAmbiente.push({ id: `TV_PONTO_${instanceId}`, nivel: 'Médio', pontos: pontosTv })
       }
     }
@@ -78,8 +86,7 @@ export function calcularScore(state) {
       const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
       if (hasTv && resp.tvPontoFinal === false) {
         gatilhosAtivados.push(`TV_PONTO_${instanceId}`)
-        // DIV-07: contribui 0 pontos quando PONTOS_INDEFINIDOS ativo
-        const pontosTv = pontosIndefinidosAtivo ? 0 : 2
+        const pontosTv = div07Ativo ? 0 : 2
         gatilhosAmbiente.push({ id: `TV_PONTO_${instanceId}`, nivel: 'Médio', pontos: pontosTv })
       }
     }
@@ -128,24 +135,27 @@ export function calcularScore(state) {
     }
   }
 
-  // --- Score global ---
-  const gatilhosGlobaisAtivados = gatilhosAtivados.filter((g) =>
-    ['REFORM_SEM_REBOCO', 'REFORM_SEM_REVESTIMENTO', 'ILUMINACAO_EXTERNA', 'PONTOS_INDEFINIDOS'].includes(g)
-  )
+  // --- Score global (pior ambiente) ---
+  const ambientesValues = Object.values(scorePorAmbiente)
 
-  const globalIsAlto =
-    gatilhosGlobaisAtivados.some((g) =>
-      GATILHOS_DEF[g]?.nivel === 'Alto' || GATILHOS_DEF[g]?.nivel === 'AltoDireto'
-    ) || Object.values(scorePorAmbiente).some((s) => s.isAlto)
-
-  const globalPontos =
-    gatilhosGlobaisAtivados.reduce((s, g) => s + (GATILHOS_DEF[g]?.pontos ?? 0), 0) +
-    Object.values(scorePorAmbiente).reduce((s, a) => s + a.pontos, 0)
-
-  const scoreGlobal = {
-    pontos: globalPontos,
-    isAlto: globalIsAlto,
-    classificacao: classificar(globalPontos, globalIsAlto),
+  let scoreGlobal
+  if (ambientesValues.length === 0) {
+    scoreGlobal = { pontos: 0, isAlto: false, classificacao: 'BAIXO' }
+  } else {
+    const altos = ambientesValues.filter((s) => s.isAlto)
+    if (altos.length > 0) {
+      const pontos = Math.max(...altos.map((s) => s.pontos))
+      scoreGlobal = { pontos, isAlto: true, classificacao: classificar(pontos, true) }
+    } else {
+      const medios = ambientesValues.filter((s) => s.classificacao === 'MÉDIO')
+      if (medios.length > 0) {
+        const pontos = Math.max(...medios.map((s) => s.pontos))
+        scoreGlobal = { pontos, isAlto: false, classificacao: classificar(pontos, false) }
+      } else {
+        const pontos = Math.max(...ambientesValues.map((s) => s.pontos))
+        scoreGlobal = { pontos, isAlto: false, classificacao: classificar(pontos, false) }
+      }
+    }
   }
 
   return { scoreGlobal, scorePorAmbiente, gatilhosAtivados }
