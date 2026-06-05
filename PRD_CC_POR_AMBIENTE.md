@@ -83,7 +83,7 @@ Os CCs de G1-G4 ainda nao aparecem dentro desses blocos de ambiente, apesar de j
 
 ### Observacao sobre G5
 
-O pedido descreve explicitamente G1-G4. G5/Rebaixo ja e gerado por ambiente em `ccBuilder.js`, mas hoje aparece na Checklist Completa dentro da pergunta G5, antes dos blocos de ambiente. Este PRD assume que G5 nao faz parte desta melhoria e deve permanecer como esta, a menos que haja aprovacao explicita para inclui-lo na redistribuicao.
+O pedido descreve explicitamente G1-G4. G5/Rebaixo ja e gerado por ambiente em `ccBuilder.js`, mas hoje aparece na Checklist Completa dentro da pergunta G5, antes dos blocos de ambiente. G5 foi aprovado para fazer parte desta melhoria. A pergunta G5 tambem sera removida da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
 
 ---
 
@@ -251,7 +251,7 @@ Nao deve ser alterado:
 
 1. G1-G4 continuam sendo as unicas perguntas globais afetadas por esta melhoria.
 
-2. G5/Rebaixo nao sera redistribuido neste momento. Embora ja tenha CC por ambiente, o pedido nao inclui G5 explicitamente.
+2. G5/Rebaixo tambem faz parte desta melhoria. A pergunta G5 sera removida da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
 
 3. A lista `ccs` gerada por `construirCCs` e a fonte de verdade. O PDF nao deve reconstruir regras de negocio a partir de `state.global`.
 
@@ -271,7 +271,7 @@ Nao deve ser alterado:
 
 ### Risco 1 - Remover demais da Checklist Completa
 
-Ha uma ambiguidade no termo "perguntas Gs". O pedido detalha G1-G4, mas o PDF tambem mostra G5. Este PRD assume que somente G1-G4 serao removidas. Se G5 tambem deve sair da Checklist Completa, isso precisa ser aprovado explicitamente antes da implementacao.
+Ha uma ambiguidade no termo "perguntas Gs". O pedido detalha G1-G4, mas o PDF tambem mostra G5. A decisao foi tomada: G5 tambem saira da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4. Este risco esta resolvido.
 
 ### Risco 2 - Duplicidade de CCs
 
@@ -301,43 +301,43 @@ Se os CCs forem exibidos na ordem bruta da lista sem criterio claro, a leitura p
 
 Entrada: formulario com Cozinha e Dormitorio; G1 = Sim; somente Cozinha selecionada em G1.
 
-Resultado esperado: na Checklist Completa do PDF, nao aparece a pergunta G1 no bloco inicial. Dentro do bloco da Cozinha aparece o CC de iluminacao externa. Dentro do bloco do Dormitorio nao aparece esse CC. O Resumo Executivo continua exibindo o CC da Cozinha.
+Resultado esperado: na Checklist Completa do PDF, nao aparece a pergunta G1 no bloco inicial. Dentro do bloco da Cozinha aparecem, nesta ordem: o texto da pergunta G1, a resposta registrada e o CC de iluminacao externa — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente. Dentro do bloco do Dormitorio nao aparece esse CC. O Resumo Executivo continua exibindo o CC da Cozinha.
 
 ### CA-02 - G1 com multiplos ambientes
 
 Entrada: formulario com Cozinha e Dormitorio; G1 = Sim; Cozinha e Dormitorio selecionados em G1.
 
-Resultado esperado: a pergunta G1 nao aparece na Checklist Completa. O CC de iluminacao externa aparece uma vez dentro do bloco da Cozinha e uma vez dentro do bloco do Dormitorio.
+Resultado esperado: a pergunta G1 nao aparece na Checklist Completa. Dentro do bloco da Cozinha e dentro do bloco do Dormitorio aparecem, cada um, nesta ordem: o texto da pergunta G1, a resposta registrada e o CC de iluminacao externa — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente.
 
 ### CA-03 - G2 sem reboco em um ambiente
 
 Entrada: G2 = Nao; risco assumido; Banheiro selecionado como ambiente sem reboco.
 
-Resultado esperado: a pergunta G2 nao aparece na Checklist Completa. O CC de reboco aparece dentro do bloco do Banheiro. Nenhum outro ambiente recebe esse CC. O score e o Resumo Executivo permanecem iguais ao comportamento atual.
+Resultado esperado: a pergunta G2 nao aparece na Checklist Completa. Dentro do bloco do Banheiro aparecem, nesta ordem: o texto da pergunta G2, a resposta registrada e o CC de reboco — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente. Nenhum outro ambiente recebe esse CC. O score e o Resumo Executivo permanecem iguais ao comportamento atual.
 
 ### CA-04 - G3 sem revestimento em ambiente diferente de G2
 
 Entrada: G2 = Nao com Cozinha sem reboco; G3 = Nao com Dormitorio sem revestimento.
 
-Resultado esperado: a pergunta G2 nao aparece e a pergunta G3 nao aparece na Checklist Completa. O CC de reboco aparece no bloco da Cozinha. O CC de revestimento aparece no bloco do Dormitorio.
+Resultado esperado: a pergunta G2 nao aparece e a pergunta G3 nao aparece na Checklist Completa. Dentro do bloco da Cozinha aparecem, nesta ordem: o texto da pergunta G2, a resposta registrada e o CC de reboco. Dentro do bloco do Dormitorio aparecem, nesta ordem: o texto da pergunta G3, a resposta registrada e o CC de revestimento. Em ambos os casos o formato e o mesmo das perguntas especificas do ambiente — pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente.
 
 ### CA-05 - Supressao G2/G3 no mesmo ambiente
 
 Entrada: G2 = Nao com Cozinha sem reboco; G3 = Nao com Cozinha tambem marcada sem revestimento.
 
-Resultado esperado: a pergunta G2 nao aparece e a pergunta G3 nao aparece na Checklist Completa. Dentro do bloco da Cozinha aparece apenas o CC de reboco. O CC de revestimento nao aparece, respeitando a supressao ja feita por `ccBuilder.js`.
+Resultado esperado: a pergunta G2 nao aparece e a pergunta G3 nao aparece na Checklist Completa. Dentro do bloco da Cozinha aparecem, nesta ordem: o texto da pergunta G2, a resposta registrada e o CC de reboco — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente. O CC de revestimento nao aparece, respeitando a supressao ja feita por `ccBuilder.js`.
 
 ### CA-06 - G4 pontos pendentes em um ambiente
 
 Entrada: G4 = Nao; Home selecionado como ambiente com pontos eletricos/hidraulicos/gas pendentes.
 
-Resultado esperado: a pergunta G4 nao aparece na Checklist Completa. O CC de pontos indefinidos aparece dentro do bloco do Home. Outros ambientes nao recebem esse CC.
+Resultado esperado: a pergunta G4 nao aparece na Checklist Completa. Dentro do bloco do Home aparecem, nesta ordem: o texto da pergunta G4, a resposta registrada e o CC de pontos indefinidos — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente. Outros ambientes nao recebem esse CC.
 
 ### CA-07 - Ambiente com varios CCs de G1-G4
 
 Entrada: Cozinha selecionada em G1, G2 e G4.
 
-Resultado esperado: dentro do bloco da Cozinha aparecem todos os CCs gerados por essas perguntas, cada um uma unica vez, em ordem previsivel. As perguntas G1, G2 e G4 nao aparecem no bloco inicial da Checklist Completa.
+Resultado esperado: dentro do bloco da Cozinha aparecem todos os grupos gerados por essas perguntas, cada um uma unica vez, em ordem previsivel (G1, G2, G4). Para cada pergunta G com CC gerado, o bloco exibe, nesta sequencia: o texto da pergunta G correspondente, a resposta registrada e o CC — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente. As perguntas G1, G2 e G4 nao aparecem no bloco inicial da Checklist Completa.
 
 ### CA-08 - CCs existentes por ambiente continuam aparecendo
 
@@ -357,11 +357,11 @@ Entrada: qualquer formulario com CCs de G1-G4.
 
 Resultado esperado: a tela de Revisao continua exibindo os CCs de G1-G4 por nivel. Nenhuma mudanca visual ou funcional ocorre fora do PDF.
 
-### CA-11 - G5 permanece como hoje
+### CA-11 - G5 redistribuido para o bloco do ambiente
 
-Entrada: G5 = Sim; Dormitorio com rebaixo de 12 cm.
+Entrada: G5 = Sim; Home/Sala com rebaixo de 15 cm.
 
-Resultado esperado: o comportamento de G5 no PDF permanece igual ao atual, pois este PRD nao inclui G5 na redistribuicao.
+Resultado esperado: a pergunta G5 nao aparece na Checklist Completa. Dentro do bloco do Home/Sala aparecem, nesta ordem: o texto da pergunta G5, a resposta registrada e o CC de rebaixo — no mesmo formato das perguntas especificas do ambiente, ou seja, pergunta, resposta e CC em sequencia. Apenas o CC sozinho nao e suficiente.
 
 ### CA-12 - Nenhum CC de G1-G4
 

@@ -289,8 +289,10 @@ export async function gerarPdf(state) {
     }
 
     doc.setTextColor(0, 0, 0)
-    doc.setLineWidth(0.3)
-    doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+    if (index === 0) {
+      doc.setLineWidth(0.3)
+      doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+    }
     y += 7
 
     if (['cozinha', 'banheiro', 'outros'].includes(formType)) {
