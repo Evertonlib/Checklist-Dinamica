@@ -96,7 +96,11 @@ Após calcular o score de todos os ambientes (incluindo os pontos redistribuído
 
 O objeto `scoreGlobal` retornado pela função `calcularScore` continua com a mesma forma: `{ pontos, isAlto, classificacao }`. Apenas os valores mudam — agora refletem o pior ambiente em vez da soma.
 
-### 5. Os CCs das perguntas gerais passam a ter escopo por ambiente
+### 5. A exibição do número de pontos do score global é removida
+
+Na tela de revisão e na capa do PDF, o score global passa a exibir apenas a classificação (BAIXO, MÉDIO ou ALTO). O número de pontos não é mais exibido para o score global — somente a categoria. Os scores por ambiente continuam exibindo seus pontos normalmente.
+
+### 6. Os CCs das perguntas gerais passam a ter escopo por ambiente
 
 No `ccBuilder.js`, os CCs de G1, G2, G3 e G4 deixam de ter `escopo: 'Global'`. Em vez disso, são criadas entradas individuais por ambiente afetado, cada uma com `escopo: instanceId`.
 
@@ -146,13 +150,11 @@ A regra de supressão G2/G3 (se um ambiente já tem CC de falta de reboco, o CC 
 
 2. **A identificação do "pior ambiente" usa a ordem de prioridade:** ALTO > MÉDIO > BAIXO. Dentro do mesmo nível de classificação, o ambiente com mais pontos é considerado o pior. Em caso de empate exato de pontos e classificação, o primeiro ambiente encontrado na lista dita o global — o resultado para o liberador é idêntico nos dois casos.
 
-3. **A exibição de `pontos` no score global** passará a mostrar os pontos do pior ambiente, não a soma total de todos os pontos. Isso é intencionalmente diferente do comportamento atual e está alinhado com a nova lógica.
+3. **A regra de supressão G2/G3** no `ccBuilder.js` continua funcionando: se um ambiente está em `g2_ambientesSemReboco` E em `g3_ambientesSemRevestimento`, somente o CC de G2 é gerado para aquele ambiente — o CC de G3 é suprimido.
 
-4. **A regra de supressão G2/G3** no `ccBuilder.js` continua funcionando: se um ambiente está em `g2_ambientesSemReboco` E em `g3_ambientesSemRevestimento`, somente o CC de G2 é gerado para aquele ambiente — o CC de G3 é suprimido.
+4. **G5 (rebaixo) não muda.** Já funciona com `REBAIXO_{instanceId}` por ambiente e não precisa ser alterado.
 
-5. **G5 (rebaixo) não muda.** Já funciona com `REBAIXO_{instanceId}` por ambiente e não precisa ser alterado.
-
-6. **Os nomes dos IDs dos gatilhos de G1–G4 serão modificados** para seguir o padrão `{NOME_GATILHO}_{instanceId}` (ex: `REFORM_SEM_REBOCO_cozinha-0`), mantendo consistência com o padrão já usado pelos gatilhos por ambiente (GRANITO_RETIRAR, REBAIXO, etc.).
+5. **Os nomes dos IDs dos gatilhos de G1–G4 serão modificados** para seguir o padrão `{NOME_GATILHO}_{instanceId}` (ex: `REFORM_SEM_REBOCO_cozinha-0`), mantendo consistência com o padrão já usado pelos gatilhos por ambiente (GRANITO_RETIRAR, REBAIXO, etc.).
 
 ---
 
@@ -164,10 +166,7 @@ Se o usuário respondeu à pergunta (ex.: "há iluminação externa" = Sim) mas 
 **Risco 2 — Regra DIV-07 por ambiente**  
 A mudança da regra DIV-07 de global para por-ambiente é mais precisa, mas é uma mudança de comportamento observável. Antes, qualquer TV em qualquer ambiente tinha 0 pontos quando G4 estava ativo. Depois, somente os ambientes especificamente listados em `g3_ambientesPendentes` têm seus pontos de TV zerados. Isso pode resultar em scores ligeiramente mais altos em alguns cenários. O novo comportamento é mais correto semanticamente, mas precisa ser validado.
 
-**Risco 3 — Exibição de pontos no score global**  
-A tela de revisão e a capa do PDF exibem `scoreGlobal.pontos`. Antes esse número era a soma de tudo (poderia ser 10, 15 pontos). Depois será o total do pior ambiente (provavelmente 2–8 pontos). Visualmente o número pode parecer menor. Isso é correto semanticamente, mas pode causar estranhamento inicial.
-
-**Risco 4 — Formulários preenchidos em versão anterior**  
+**Risco 3 — Formulários preenchidos em versão anterior**  
 Se houver formulários salvos em `localStorage` que foram preenchidos com a lógica antiga, o recálculo automático usará a nova lógica ao abrir a revisão. O resultado pode ser diferente. Não há risco de dados corrompidos, mas o score exibido pode mudar.
 
 ---
@@ -186,7 +185,7 @@ Esperado: score global = ALTO, correspondendo ao score da Cozinha. O score do Do
 
 **AC-02 — Score global reflete o pior ambiente (MÉDIO)**  
 Entrada: formulário com dois ambientes — Dormitório sem rodapé (1 ponto) e Home com TV sem ponto final (2 pontos), nenhum ambiente com risco ALTO.  
-Esperado: score global = MÉDIO (4+ pontos) somente se o pior ambiente atingir 4 pontos. Se o pior tiver 2 pontos, o global é BAIXO. O global nunca é a soma dos dois ambientes juntos.
+Esperado: o pior ambiente é o Home com 2 pontos. Como 2 pontos está abaixo do threshold de 4 pontos para MÉDIO, o score global é BAIXO. O global nunca é a soma dos dois ambientes (que seria 3 pontos, ainda BAIXO nesse caso, mas o princípio é que a soma não ocorre). Para o global ser MÉDIO, seria necessário que um único ambiente atingisse pelo menos 4 pontos por conta própria.
 
 ---
 
