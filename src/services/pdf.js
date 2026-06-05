@@ -260,12 +260,20 @@ export async function gerarPdf(state) {
     (global.g4_ambientes || []).map((item) => ccPorId.get(`REBAIXO_${item.instanceId}`))
   )
 
-  state.ambientesSelecionados.forEach((instancia) => {
+  state.ambientesSelecionados.forEach((instancia, index) => {
     const { instanceId, formType } = instancia
     const resp = state.respostasPorAmbiente[instanceId] || {}
     const score = scorePorAmbiente[instanceId]
 
     garantirEspaco(18)
+
+    if (index > 0) {
+      doc.setDrawColor(180, 150, 80)
+      doc.setLineWidth(0.5)
+      doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+      y += 5
+    }
+
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(13)
     doc.setTextColor(0, 0, 0)
