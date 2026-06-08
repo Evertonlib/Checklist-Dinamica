@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import { formatarNomeAmbiente } from '../domain/ambientes.js'
 import { calcularScore } from '../domain/scoreEngine.js'
 import { construirCCs } from '../domain/ccBuilder.js'
@@ -371,14 +372,43 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletrosDefined === true && resp.eletros?.length > 0) {
-        resp.eletros.forEach((eletro, index) => {
-          escreverPergunta(`Eletro ${index + 1}`, descreverEletro(eletro))
-          if (eletro.modelo) escreverPergunta('Modelo', eletro.modelo)
-          if (eletro.largura_cm) escreverPergunta('Largura (cm)', eletro.largura_cm)
-          if (eletro.altura_cm) escreverPergunta('Altura (cm)', eletro.altura_cm)
-          if (eletro.profundidade_cm) escreverPergunta('Profundidade (cm)', eletro.profundidade_cm)
-          if (eletro.link) escreverPergunta('Link', eletro.link)
+        escreverPergunta('Eletrodomésticos', null)
+        garantirEspaco(20)
+        const eletrosBody = resp.eletros.map((eletro) => [
+          descreverEletro(eletro) || '—',
+          eletro.modelo || '—',
+          eletro.largura_cm || '—',
+          eletro.altura_cm || '—',
+          eletro.profundidade_cm || '—',
+          eletro.link ? 'Ver link' : '—',
+        ])
+        const eletrosUrls = resp.eletros.map((eletro) => eletro.link || null)
+        autoTable(doc, {
+          startY: y,
+          margin: { left: margemEsquerda, right: margemDireita },
+          tableWidth: larguraConteudo,
+          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Profundidade (cm)', 'Link']],
+          body: eletrosBody,
+          columnStyles: {
+            0: { cellWidth: 55 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 22 },
+            5: { cellWidth: 13 },
+          },
+          styles: { cellPadding: 2, lineColor: [200, 200, 200], lineWidth: 0.2 },
+          headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 },
+          bodyStyles: { fontSize: 9, textColor: [0, 0, 0] },
+          alternateRowStyles: { fillColor: [245, 245, 245] },
+          didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 5 && data.cell.raw === 'Ver link') {
+              const url = eletrosUrls[data.row.index]
+              if (url) doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url })
+            }
+          },
         })
+        y = doc.lastAutoTable.finalY + 4
       }
     }
 
@@ -390,13 +420,43 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
-        resp.eletronicosList.forEach((eletronico, index) => {
-          escreverPergunta(`Eletrônico ${index + 1}`, descreverEletronico(eletronico))
-          if (eletronico.largura_cm) escreverPergunta('Largura (cm)', eletronico.largura_cm)
-          if (eletronico.altura_cm) escreverPergunta('Altura (cm)', eletronico.altura_cm)
-          if (eletronico.profundidade_cm) escreverPergunta('Profundidade (cm)', eletronico.profundidade_cm)
-          if (eletronico.link) escreverPergunta('Link', eletronico.link)
+        escreverPergunta('Eletrônicos', null)
+        garantirEspaco(20)
+        const eletronicoBody = resp.eletronicosList.map((eletronico) => [
+          descreverEletronico(eletronico) || '—',
+          '—',
+          eletronico.largura_cm || '—',
+          eletronico.altura_cm || '—',
+          eletronico.profundidade_cm || '—',
+          eletronico.link ? 'Ver link' : '—',
+        ])
+        const eletronicoUrls = resp.eletronicosList.map((eletronico) => eletronico.link || null)
+        autoTable(doc, {
+          startY: y,
+          margin: { left: margemEsquerda, right: margemDireita },
+          tableWidth: larguraConteudo,
+          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Profundidade (cm)', 'Link']],
+          body: eletronicoBody,
+          columnStyles: {
+            0: { cellWidth: 55 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 22 },
+            5: { cellWidth: 13 },
+          },
+          styles: { cellPadding: 2, lineColor: [200, 200, 200], lineWidth: 0.2 },
+          headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 },
+          bodyStyles: { fontSize: 9, textColor: [0, 0, 0] },
+          alternateRowStyles: { fillColor: [245, 245, 245] },
+          didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 5 && data.cell.raw === 'Ver link') {
+              const url = eletronicoUrls[data.row.index]
+              if (url) doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url })
+            }
+          },
         })
+        y = doc.lastAutoTable.finalY + 4
       }
     }
 
