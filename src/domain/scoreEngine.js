@@ -142,7 +142,7 @@ export function calcularScore(state) {
   if (ambientesValues.length === 0) {
     scoreGlobal = { pontos: 0, isAlto: false, classificacao: 'BAIXO' }
   } else {
-    const altos = ambientesValues.filter((s) => s.isAlto)
+    const altos = ambientesValues.filter((s) => s.classificacao === 'ALTO')
     if (altos.length > 0) {
       const pontos = Math.max(...altos.map((s) => s.pontos))
       scoreGlobal = { pontos, isAlto: true, classificacao: classificar(pontos, true) }
