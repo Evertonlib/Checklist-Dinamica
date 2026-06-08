@@ -97,6 +97,7 @@ A biblioteca `jspdf-autotable` (versão 3.8.2) já está instalada como dependê
 5. Se a tabela ultrapassar o rodapé da página, o `autoTable` cuida automaticamente da quebra e da continuação na página seguinte — esse é o comportamento padrão da biblioteca.
 6. Os estilos visuais da tabela (tamanho de fonte, cor de cabeçalho, bordas) devem ser consistentes com a paleta já usada no PDF (sem introduzir cores ou fontes novas).
 7. A URL só recebe anotação de link se o valor do campo `link` for uma string não vazia. Não há validação de formato de URL na camada do PDF.
+8. Campos com texto longo (ex: Modelo, Tipo) têm a quebra de linha gerenciada automaticamente pelo autoTable, que aumenta a altura da linha para exibir o conteúdo completo. Não há truncamento em nenhuma coluna.
 
 ---
 
