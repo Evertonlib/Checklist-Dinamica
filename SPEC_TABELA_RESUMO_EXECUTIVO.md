@@ -100,6 +100,9 @@ const linhasTabela = state.ambientesSelecionados
     const textos = score.gatilhos
       .map((id) => textoCurtoGatilho(id, instanceId))
       .filter(Boolean)
+    if (ccs.some((c) => c.id === `RODAPE_EXISTENTE_${instanceId}`)) {
+      textos.push('Roupeiro sobre rodapé')
+    }
     const acoes = textos.join(' — ')
     return [formatarNomeAmbiente(instancia), acoes, score.classificacao]
   })
@@ -110,7 +113,7 @@ const linhasTabela = state.ambientesSelecionados
 - **Coluna Ações:** gatilhos de `scorePorAmbiente[instanceId].gatilhos`, convertidos via `textoCurtoGatilho`, unidos por `' — '`.
 - **Coluna Risco:** `scorePorAmbiente[instanceId].classificacao` — retorna `'ALTO'`, `'MÉDIO'` ou `'BAIXO'`.
 
-> **Nota sobre `RODAPE_EXISTENTE`:** esse gatilho não existe em `scorePorAmbiente.gatilhos` (ver Observações). Para incluí-lo, filtrar `ccs` como fonte adicional: para cada `instancia`, buscar `ccs.find(c => c.id === \`RODAPE_EXISTENTE_${instanceId}\`)` e incluir o texto curto `'Roupeiro sobre rodapé'` se encontrado. Ver Observação 1 para decisão a tomar antes da implementação.
+> **Nota sobre `RODAPE_EXISTENTE`:** esse gatilho não existe em `scorePorAmbiente.gatilhos` (ver Observação 1). **Decisão tomada: incluir via `ccs`.** Após mapear os textos de `score.gatilhos`, verificar se existe um item em `ccs` com `id === \`RODAPE_EXISTENTE_${instanceId}\`` e, se sim, concatenar `'Roupeiro sobre rodapé'` ao array de textos antes de unir com `' — '`.
 
 ### Passo 4 — Chamada ao autoTable substituindo o loop
 
@@ -165,9 +168,7 @@ if (linhasTabela.length > 0) {
 
 **Impacto:** Se a implementação usar apenas `scorePorAmbiente[instanceId].gatilhos` como fonte, `RODAPE_EXISTENTE` **nunca aparecerá** na tabela nova.
 
-**Decisão a tomar antes de implementar:** Incluir ou não `RODAPE_EXISTENTE` na tabela nova? Opções:
-- **A) Incluir via `ccs`:** Após montar `linhasTabela`, complementar os textos de cada linha com `ccs.find(c => c.id === \`RODAPE_EXISTENTE_${instanceId}\`)` e adicionar `'Roupeiro sobre rodapé'` se encontrado.
-- **B) Omitir:** Aceitar que `RODAPE_EXISTENTE` não aparece na tabela. Ele continuará aparecendo inline na Checklist Completa (`escreverInline`).
+**Decisão tomada (A):** Incluir via `ccs`. No `.map` de construção das linhas, após resolver os textos de `score.gatilhos`, verificar `ccs.some(c => c.id === \`RODAPE_EXISTENTE_${instanceId}\`)` e, se verdadeiro, adicionar `'Roupeiro sobre rodapé'` ao array antes de unir com `' — '`.
 
 ### Observação 2 — Nível de `REFORM_SEM_REVESTIMENTO`: MÉDIO no score vs ALTO no ccBuilder
 
@@ -209,12 +210,3 @@ Herdados do PRD. Nenhuma alteração necessária, exceto AC-07:
 
 **AC-07 (ajuste):** Se `linhasTabela.length === 0`, o PDF exibe o título "Resumo Executivo" sem tabela abaixo. O `if (linhasTabela.length > 0)` garante isso — nenhum `autoTable` é chamado, nenhum erro é gerado.
 
----
-
-## Ponto de Decisão Pendente
-
-Antes de iniciar a implementação, confirmar a **Observação 1**:
-
-> `RODAPE_EXISTENTE` não está em `scorePorAmbiente.gatilhos`. Deve aparecer na tabela nova?
-> - Sim → implementar via `ccs` como fonte adicional.
-> - Não → omitir do mapeamento; ele permanece apenas na Checklist Completa.
