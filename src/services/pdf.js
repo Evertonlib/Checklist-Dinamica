@@ -64,8 +64,8 @@ function descreverEletronico(eletronico) {
   if (eletronico.subtipo) {
     partes.push(eletronico.subtipo)
   }
-  if (eletronico.modelo) {
-    partes.push(eletronico.modelo)
+  if (eletronico.tipo === 'TV' && eletronico.polegadas) {
+    partes.push(`${eletronico.polegadas}"`)
   }
 
   return partes.join(' — ')
@@ -463,7 +463,7 @@ export async function gerarPdf(state) {
         garantirEspaco(20)
         const eletronicoBody = resp.eletronicosList.map((eletronico) => [
           descreverEletronico(eletronico) || '—',
-          '—',
+          eletronico.modelo || '—',
           eletronico.largura_cm || '—',
           eletronico.altura_cm || '—',
           eletronico.profundidade_cm || '—',

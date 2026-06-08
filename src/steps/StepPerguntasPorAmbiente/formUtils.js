@@ -96,6 +96,9 @@ function validarEletronicos(resp, erros) {
     if (!preenchido(eletronico.profundidade_cm)) {
       erros[`eletronico_${index}_prof`] = 'Obrigatório'
     }
+    if (eletronico.tipo === 'TV' && !preenchido(eletronico.polegadas)) {
+      erros[`eletronico_${index}_polegadas`] = 'Obrigatório'
+    }
   })
 }
 
@@ -132,7 +135,6 @@ export function validarFormularioAmbiente(formType, resp) {
     const hasTv = (resp.eletronicosList || []).some((e) => e.tipo === 'TV')
     if (hasTv) {
       if (resp.tvPontoFinal === null) erros.tvPontoFinal = 'Selecione uma opção'
-      if (!preenchido(resp.tv_polegadas)) erros.tv_polegadas = 'Obrigatório'
     }
   }
 

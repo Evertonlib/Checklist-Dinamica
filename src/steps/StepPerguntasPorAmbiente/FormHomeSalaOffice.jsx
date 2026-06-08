@@ -24,6 +24,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
       eletronico: {
         tipo,
         subtipo: config?.subtipos?.[0] ?? '',
+        ...(tipo === 'TV' ? { polegadas: '' } : {}),
         modelo: '',
         largura_cm: '',
         altura_cm: '',
@@ -108,10 +109,12 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                         <label>Polegadas *</label>
                         <input
                           type="number"
-                          value={resp.tv_polegadas ?? ''}
-                          onChange={(e) => set('tv_polegadas', e.target.value)}
+                          value={eletronico.polegadas ?? ''}
+                          onChange={(e) => updEletronico(index, 'polegadas', e.target.value)}
                         />
-                        {erros.tv_polegadas && <span className={`${styles.erro} erro-campo`}>{erros.tv_polegadas}</span>}
+                        {erros[`eletronico_${index}_polegadas`] && (
+                          <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_polegadas`]}</span>
+                        )}
                       </div>
                     </>
                   )}
