@@ -92,16 +92,7 @@ export async function gerarPdf(state) {
   const pageHeight = doc.internal.pageSize.getHeight()
   const larguraConteudo = pageWidth - margemEsquerda - margemDireita
 
-  const ambientePorId = new Map(
-    state.ambientesSelecionados.map((ambiente) => [ambiente.instanceId, ambiente])
-  )
   const ccPorId = new Map(ccs.map((cc) => [cc.id, cc]))
-
-  const nomeAmbiente = (escopo) => {
-    if (escopo === 'Global') return 'Global'
-    const ambiente = ambientePorId.get(escopo)
-    return ambiente ? formatarNomeAmbiente(ambiente) : escopo
-  }
 
   doc.setFont('times', 'bold')
   doc.setFontSize(22)
@@ -166,21 +157,6 @@ export async function gerarPdf(state) {
     y += 8
   }
 
-  const escreverResumoItem = (cc) => {
-    garantirEspaco(16)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(10)
-    doc.setTextColor(...COR_NIVEL[cc.nivel])
-    const titulo = `RISCO ${cc.nivel} — ${nomeAmbiente(cc.escopo)}`
-    escreverLinhas(doc.splitTextToSize(titulo, larguraConteudo), margemEsquerda, 5)
-
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
-    doc.setTextColor(0, 0, 0)
-    escreverLinhas(doc.splitTextToSize(`CC: ${cc.textoCompleto}`, larguraConteudo), margemEsquerda, 4.5)
-    y += 3
-  }
-
   const escreverInline = (item) => {
     const cor = item.nivel ? COR_NIVEL[item.nivel] : [90, 90, 90]
     const texto = item.tipo === 'CC' ? `CC: ${item.textoCompleto}` : item.textoCompleto
@@ -209,13 +185,76 @@ export async function gerarPdf(state) {
     y += 2
   }
 
-  const ccsResumo = ccs.filter((cc) => cc.tipo === 'CC')
-  const ccsAlto = ccsResumo.filter((cc) => cc.nivel === 'ALTO')
-  const ccsMedio = ccsResumo.filter((cc) => cc.nivel === NIVEL_MEDIO)
-  const ccsBaixo = ccsResumo.filter((cc) => cc.nivel === 'BAIXO')
+  const GATILHO_TEXTO = {
+    GRANITO_RETIRAR:         'Remover granito',
+    TANQUE_RETIRAR:          'Remover tanque',
+    ELETROS_NAODEF:          'Eletros indefinidos',
+    ELETRONICOS_NAODEF:      'Eletrônicos indefinidos',
+    TV_PONTO:                'Ponto fora do painel',
+    CORTINEIRO_NAOINSTALADO: 'Cortineiro 150mm',
+    RODAPE_AUSENTE:          'Instalar rodapé pós-montagem',
+    RODAPE_EXISTENTE:        'Roupeiro sobre rodapé',
+    REFORM_SEM_REVESTIMENTO: 'Sem revestimento',
+    ILUMINACAO_EXTERNA:      'Iluminação por conta do cliente',
+    REFORM_SEM_REBOCO:       'Reboco inacabado',
+    PONTOS_INDEFINIDOS:      'Pontos pendentes',
+    REBAIXO:                 null, // texto gerado dinamicamente por ambiente
+  }
+
+  const textoCurtoGatilho = (gatilhoId, instanceId) => {
+    const prefixo = gatilhoId.replace(`_${instanceId}`, '')
+    if (prefixo === 'REBAIXO') {
+      const cm = (state.global.g4_ambientes ?? []).find((a) => a.instanceId === instanceId)?.cm ?? '?'
+      return `Rebaixo de ${cm}cm`
+    }
+    return GATILHO_TEXTO[prefixo] ?? null
+  }
+
+  const linhasTabela = state.ambientesSelecionados
+    .filter((instancia) => {
+      const score = scorePorAmbiente[instancia.instanceId]
+      return score && score.gatilhos.length > 0
+    })
+    .map((instancia) => {
+      const { instanceId } = instancia
+      const score = scorePorAmbiente[instanceId]
+      const textos = score.gatilhos
+        .map((id) => textoCurtoGatilho(id, instanceId))
+        .filter(Boolean)
+      if (ccs.some((c) => c.id === `RODAPE_EXISTENTE_${instanceId}`)) {
+        textos.push('Roupeiro sobre rodapé')
+      }
+      const acoes = textos.join(' — ')
+      return [formatarNomeAmbiente(instancia), acoes, score.classificacao]
+    })
 
   escreverTituloSecao('Resumo Executivo')
-  ;[...ccsAlto, ...ccsMedio, ...ccsBaixo].forEach((cc) => escreverResumoItem(cc))
+
+  if (linhasTabela.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margemEsquerda, right: margemDireita },
+      tableWidth: larguraConteudo,
+      head: [['Ambiente', 'Ações e pontos de atenção', 'Risco']],
+      body: linhasTabela,
+      columnStyles: {
+        0: { cellWidth: 55 },
+        1: { cellWidth: 100 },
+        2: { cellWidth: 15 },
+      },
+      styles: { cellPadding: 2, lineColor: [200, 200, 200], lineWidth: 0.2, overflow: 'linebreak' },
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 },
+      bodyStyles: { fontSize: 9, textColor: [0, 0, 0] },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 2) {
+          const cor = COR_NIVEL[data.cell.raw]
+          if (cor) data.cell.styles.textColor = cor
+        }
+      },
+    })
+    y = doc.lastAutoTable.finalY + 10
+  }
 
   escreverTituloSecao('Checklist Completa')
 
