@@ -8,9 +8,9 @@
 
 ## Objetivo da melhoria
 
-Reorganizar a secao **Checklist Completa** do PDF para que os CCs gerados pelas perguntas globais G1, G2, G3 e G4 deixem de aparecer agrupados no inicio da checklist e passem a aparecer dentro do bloco de cada ambiente afetado.
+Reorganizar a secao **Checklist Completa** do PDF para que o conjunto pergunta + resposta + CC gerado pelas perguntas globais G1, G2, G3 e G4 deixe de aparecer agrupado no inicio da checklist e passe a aparecer dentro do bloco de cada ambiente afetado.
 
-Hoje, o PDF abre a Checklist Completa com as perguntas G1 a G5. As perguntas G1 a G4 exibem a resposta geral e, logo abaixo, os CCs relacionados aos ambientes selecionados. A melhoria remove da Checklist Completa a exibicao das perguntas G1 a G4 e redistribui seus CCs para os blocos dos ambientes aos quais eles ja pertencem.
+Hoje, o PDF abre a Checklist Completa com as perguntas G1 a G5. As perguntas G1 a G4 exibem a resposta geral e, logo abaixo, os CCs relacionados aos ambientes selecionados. A melhoria remove da Checklist Completa a exibicao das perguntas G1 a G4 e redistribui o conjunto pergunta + resposta + CC para os blocos dos ambientes aos quais ele ja pertence.
 
 O comportamento do restante do sistema nao deve mudar. As perguntas G1 a G4 continuam existindo no formulario, continuam pontuando, continuam gerando CCs e continuam aparecendo no Resumo Executivo do PDF e na tela de Revisao.
 
@@ -83,7 +83,7 @@ Os CCs de G1-G4 ainda nao aparecem dentro desses blocos de ambiente, apesar de j
 
 ### Observacao sobre G5
 
-O pedido descreve explicitamente G1-G4. G5/Rebaixo ja e gerado por ambiente em `ccBuilder.js`, mas hoje aparece na Checklist Completa dentro da pergunta G5, antes dos blocos de ambiente. G5 foi aprovado para fazer parte desta melhoria. A pergunta G5 tambem sera removida da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
+O pedido descreve explicitamente G1-G4. G5/Rebaixo ja e gerado por ambiente em `ccBuilder.js`, mas hoje aparece na Checklist Completa dentro da pergunta G5, antes dos blocos de ambiente. G5 foi aprovado para fazer parte desta melhoria. A pergunta G5 tambem sera removida da Checklist Completa e o conjunto pergunta + resposta + CC sera redistribuido para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
 
 ---
 
@@ -101,7 +101,7 @@ Conclusao da pesquisa:
 
 - jsPDF ja oferece o fluxo usado pelo projeto: criar documento, escrever texto, controlar paginas e salvar arquivo.
 - O projeto ja possui helpers locais para espaco, quebra de linhas e escrita inline de CCs.
-- Para redistribuir CCs, basta filtrar a lista ja gerada por `construirCCs` usando `escopo` e `perguntaOrigem`.
+- Para redistribuir o conjunto pergunta + resposta + CC, basta filtrar a lista ja gerada por `construirCCs` usando `escopo` e `perguntaOrigem`.
 - Nao ha necessidade de `jspdf-autotable`, componente React novo, mudanca no schema, nem novo builder.
 
 ---
@@ -124,7 +124,7 @@ Ele hoje:
 A mudanca futura deve acontecer aqui:
 
 - Remover a exibicao de G1-G4 da Checklist Completa.
-- Inserir os CCs de G1-G4 dentro do bloco de cada ambiente afetado.
+- Inserir o conjunto pergunta + resposta + CC de G1-G4 dentro do bloco de cada ambiente afetado.
 - Reaproveitar a lista `ccs` ja criada por `construirCCs`.
 
 ### `src/domain/ccBuilder.js`
@@ -165,7 +165,7 @@ O estado necessario para a melhoria ja existe. Nao ha necessidade de campo novo 
 
 | Arquivo | Tipo de alteracao |
 |---|---|
-| `src/services/pdf.js` | Remover exibicao das perguntas G1-G4 da Checklist Completa e inserir seus CCs nos blocos dos ambientes afetados |
+| `src/services/pdf.js` | Remover exibicao das perguntas G1-G5 da Checklist Completa e inserir seus CCs nos blocos dos ambientes afetados |
 
 ### Arquivo criado nesta etapa
 
@@ -194,8 +194,8 @@ Na implementacao futura, dentro de `src/services/pdf.js`, sera adicionada uma fo
 Regra desejada:
 
 - Para cada ambiente em `state.ambientesSelecionados`, listar dentro do bloco daquele ambiente todos os itens de `ccs` cujo `escopo` seja o `instanceId` do ambiente e cuja `perguntaOrigem` seja `G1`, `G2`, `G3` ou `G4`.
-- Esses CCs devem aparecer uma vez por ambiente afetado.
-- Se um CC de G1-G4 afetar dois ambientes, devem existir duas entradas no PDF, uma dentro de cada bloco de ambiente.
+- Cada conjunto pergunta + resposta + CC deve aparecer uma vez por ambiente afetado.
+- Se um CC de G1-G4 afetar dois ambientes, deve existir o conjunto pergunta + resposta + CC duas vezes no PDF, uma dentro de cada bloco de ambiente.
 - A ordem recomendada dentro do bloco e G1, G2, G3, G4, preservando a ordem logica das perguntas globais.
 - A exibicao deve reutilizar o estilo inline ja existente para CCs no PDF, para manter consistencia visual.
 
@@ -204,7 +204,7 @@ Local recomendado de exibicao:
 - Dentro do bloco do ambiente, logo apos o nome, score e linha divisoria do ambiente.
 - Antes das perguntas especificas daquele ambiente.
 
-Essa posicao garante que os CCs pertencem visualmente ao ambiente sem exigir a criacao de perguntas artificiais no PDF.
+Essa posicao garante que o conjunto pergunta + resposta + CC pertence visualmente ao ambiente.
 
 ---
 
@@ -212,15 +212,15 @@ Essa posicao garante que os CCs pertencem visualmente ao ambiente sem exigir a c
 
 Na implementacao futura, da Checklist Completa do PDF, devem ser removidas as chamadas que imprimem:
 
-- A pergunta G1 e sua resposta.
-- A pergunta G2 e sua resposta.
-- A pergunta G3 e sua resposta.
-- A pergunta G4 e sua resposta.
-- Os CCs inline atualmente exibidos dentro dessas quatro perguntas.
+- A pergunta G1 e sua resposta, e os CCs inline atualmente exibidos dentro dessa pergunta.
+- A pergunta G2 e sua resposta, e os CCs inline atualmente exibidos dentro dessa pergunta.
+- A pergunta G3 e sua resposta, e os CCs inline atualmente exibidos dentro dessa pergunta.
+- A pergunta G4 e sua resposta, e os CCs inline atualmente exibidos dentro dessa pergunta.
+- A pergunta G5 e sua resposta, e o CC inline atualmente exibido dentro dessa pergunta.
 
 O titulo **Checklist Completa** permanece.
 
-O bloco G5/Rebaixo permanece conforme comportamento atual, seguindo a premissa deste PRD.
+
 
 ---
 
@@ -251,11 +251,11 @@ Nao deve ser alterado:
 
 1. G1-G4 continuam sendo as unicas perguntas globais afetadas por esta melhoria.
 
-2. G5/Rebaixo tambem faz parte desta melhoria. A pergunta G5 sera removida da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
+2. G5/Rebaixo tambem faz parte desta melhoria. A pergunta G5 sera removida da Checklist Completa e o conjunto pergunta + resposta + CC sera redistribuido para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4.
 
 3. A lista `ccs` gerada por `construirCCs` e a fonte de verdade. O PDF nao deve reconstruir regras de negocio a partir de `state.global`.
 
-4. Os CCs de G1-G4 devem aparecer dentro do bloco do ambiente mesmo sem a pergunta global correspondente no PDF.
+4. O conjunto pergunta + resposta + CC de G1-G4 deve aparecer dentro do bloco do ambiente, com o texto da pergunta global incluido.
 
 5. Quando uma pergunta G1-G4 nao gerar CC para um ambiente, nada deve aparecer naquele bloco.
 
@@ -271,11 +271,11 @@ Nao deve ser alterado:
 
 ### Risco 1 - Remover demais da Checklist Completa
 
-Ha uma ambiguidade no termo "perguntas Gs". O pedido detalha G1-G4, mas o PDF tambem mostra G5. A decisao foi tomada: G5 tambem saira da Checklist Completa e seus CCs serao redistribuidos para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4. Este risco esta resolvido.
+Ha uma ambiguidade no termo "perguntas Gs". O pedido detalha G1-G4, mas o PDF tambem mostra G5. A decisao foi tomada: G5 tambem saira da Checklist Completa e o conjunto pergunta + resposta + CC sera redistribuido para os blocos dos ambientes afetados, seguindo o mesmo padrao de G1-G4. Este risco esta resolvido.
 
 ### Risco 2 - Duplicidade de CCs
 
-Se os CCs de G1-G4 forem adicionados aos blocos de ambiente sem remover as perguntas G1-G4 do topo da Checklist Completa, o PDF passara a exibir os mesmos CCs duas vezes. A remocao e a insercao precisam acontecer juntas.
+Se o conjunto pergunta + resposta + CC de G1-G4 for adicionado aos blocos de ambiente sem remover G1-G4 do topo da Checklist Completa, o PDF passara a exibir o mesmo conjunto duas vezes. A remocao e a insercao precisam acontecer juntas.
 
 ### Risco 3 - Perda de CCs por filtro errado
 
@@ -402,9 +402,3 @@ Resultado esperado: o PDF e gerado sem sobreposicao de textos. Os CCs aparecem d
 - Migrar para outra biblioteca de PDF.
 
 ---
-
-## Decisao aguardada
-
-Implementacao nao deve iniciar sem aprovacao explicita deste PRD.
-
-Ponto especifico para confirmacao: G5/Rebaixo deve permanecer como esta, conforme assumido neste documento, ou tambem deve ser redistribuido para os blocos de ambiente em uma versao ampliada da melhoria?
