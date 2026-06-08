@@ -355,7 +355,7 @@ export async function gerarPdf(state) {
       }
     }
 
-    if (['dormitorio', 'home', 'outros'].includes(formType)) {
+    if (formType === 'dormitorio') {
       escreverPergunta(
         'Terá TV neste ambiente?',
         resp.tv === true ? 'Sim' : resp.tv === false ? 'Não' : '—'
