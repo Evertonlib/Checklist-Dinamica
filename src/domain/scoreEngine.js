@@ -36,7 +36,7 @@ export function calcularScore(state) {
     // G3 — Sem revestimento (com supressão G2)
     if (g3_ambientesSemRevestimento.includes(instanceId) && !g2_ambientesSemReboco.includes(instanceId)) {
       gatilhosAtivados.push(`REFORM_SEM_REVESTIMENTO_${instanceId}`)
-      gatilhosAmbiente.push({ id: `REFORM_SEM_REVESTIMENTO_${instanceId}`, nivel: 'Alto', pontos: 3 })
+      gatilhosAmbiente.push({ id: `REFORM_SEM_REVESTIMENTO_${instanceId}`, nivel: 'Médio', pontos: 4 })
     }
 
     // G4 — Pontos indefinidos
