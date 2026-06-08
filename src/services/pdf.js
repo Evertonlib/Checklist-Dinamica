@@ -220,45 +220,27 @@ export async function gerarPdf(state) {
 
   const { global } = state
 
-  escreverPergunta(
-    'G1 — O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi? (fitas de LED, spots, etc.)',
-    global.g1_temIluminacaoExterna === true
-      ? `Sim — ${formatarListaAmbientes(state.ambientesSelecionados, global.g1_ambientes)}`
-      : 'Não',
-    (global.g1_ambientes || []).map((id) => ccPorId.get(`ILUMINACAO_EXTERNA_${id}`))
-  )
+  const PERGUNTAS_GLOBAIS = ['G1', 'G2', 'G3', 'G4', 'G5']
 
-  escreverPergunta(
-    'G2 — Todos os ambientes já possuem reboco (argamassa) finalizado nas paredes?',
-    global.g2_temReboco === false
-      ? `Não — Sem reboco: ${formatarListaAmbientes(state.ambientesSelecionados, global.g2_ambientesSemReboco)}`
-      : global.g2_temReboco === true ? 'Sim' : '—',
-    (global.g2_ambientesSemReboco || []).map((id) => ccPorId.get(`REFORM_SEM_REBOCO_${id}`))
-  )
+  const textoPerguntaGlobal = (origem) => {
+    const textos = {
+      G1: 'G1 — O projeto terá alguma iluminação embutida na marcenaria adquirida externamente à By Arabi? (fitas de LED, spots, etc.)',
+      G2: 'G2 — Todos os ambientes já possuem reboco (argamassa) finalizado nas paredes?',
+      G3: 'G3 — Todos os ambientes já possuem revestimento final (azulejo, porcelanato etc.) aplicado nas paredes?',
+      G4: 'G4 — Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?',
+      G5: 'G5 — Algum ambiente terá rebaixo de teto?',
+    }
+    return textos[origem]
+  }
 
-  escreverPergunta(
-    'G3 — Todos os ambientes já possuem revestimento final (azulejo, porcelanato etc.) aplicado nas paredes?',
-    global.g3_temRevestimento === false
-      ? `Não — Sem revestimento: ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesSemRevestimento)}`
-      : global.g3_temRevestimento === true ? 'Sim' : '—',
-    (global.g3_ambientesSemRevestimento || []).map((id) => ccPorId.get(`REFORM_SEM_REVESTIMENTO_${id}`))
-  )
-
-  escreverPergunta(
-    'G4 — Os pontos elétricos/hidráulicos/gás já estão nas posições finais em todos os ambientes?',
-    global.g3_pontosNaPosicaoFinal === false
-      ? `Não — ${formatarListaAmbientes(state.ambientesSelecionados, global.g3_ambientesPendentes)}`
-      : 'Sim',
-    (global.g3_ambientesPendentes || []).map((id) => ccPorId.get(`PONTOS_INDEFINIDOS_${id}`))
-  )
-
-  escreverPergunta(
-    'G5 — Algum ambiente terá rebaixo de teto?',
-    global.g4_temRebaixo === true
-      ? `Sim — ${formatarListaRebaixo(state.ambientesSelecionados, global.g4_ambientes)}`
-      : 'Não',
-    (global.g4_ambientes || []).map((item) => ccPorId.get(`REBAIXO_${item.instanceId}`))
-  )
+  const respostaGlobalPorAmbiente = (origem, instanceId) => {
+    if (origem === 'G5') {
+      const cm = (global.g4_ambientes ?? []).find((item) => item.instanceId === instanceId)?.cm ?? '?'
+      return `Sim — ${cm} cm`
+    }
+    const respostas = { G1: 'Sim', G2: 'Não', G3: 'Não', G4: 'Não' }
+    return respostas[origem]
+  }
 
   state.ambientesSelecionados.forEach((instancia, index) => {
     const { instanceId, formType } = instancia
@@ -294,6 +276,16 @@ export async function gerarPdf(state) {
       doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
     }
     y += 7
+
+    for (const origem of PERGUNTAS_GLOBAIS) {
+      const cc = ccs.find((c) => c.perguntaOrigem === origem && c.escopo === instanceId)
+      if (!cc) continue
+      escreverPergunta(
+        textoPerguntaGlobal(origem),
+        respostaGlobalPorAmbiente(origem, instanceId),
+        [cc]
+      )
+    }
 
     if (['cozinha', 'banheiro', 'outros'].includes(formType)) {
       escreverPergunta(
