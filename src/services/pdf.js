@@ -372,7 +372,7 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletrosDefined === true && resp.eletros?.length > 0) {
-        escreverPergunta('Eletrodomésticos', null)
+        escreverTituloSecao('Eletrodomésticos')
         garantirEspaco(20)
         const eletrosBody = resp.eletros.map((eletro) => [
           descreverEletro(eletro) || '—',
@@ -387,7 +387,7 @@ export async function gerarPdf(state) {
           startY: y,
           margin: { left: margemEsquerda, right: margemDireita },
           tableWidth: larguraConteudo,
-          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Profundidade (cm)', 'Link']],
+          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Prof. (cm)', 'Link']],
           body: eletrosBody,
           columnStyles: {
             0: { cellWidth: 55 },
@@ -420,7 +420,7 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
-        escreverPergunta('Eletrônicos', null)
+        escreverTituloSecao('Eletrônicos')
         garantirEspaco(20)
         const eletronicoBody = resp.eletronicosList.map((eletronico) => [
           descreverEletronico(eletronico) || '—',
@@ -435,7 +435,7 @@ export async function gerarPdf(state) {
           startY: y,
           margin: { left: margemEsquerda, right: margemDireita },
           tableWidth: larguraConteudo,
-          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Profundidade (cm)', 'Link']],
+          head: [['Tipo', 'Modelo', 'Largura (cm)', 'Altura (cm)', 'Prof. (cm)', 'Link']],
           body: eletronicoBody,
           columnStyles: {
             0: { cellWidth: 55 },
