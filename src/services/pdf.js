@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatarNomeAmbiente } from '../domain/ambientes.js'
+import { TAMANHOS_CAMA } from '../steps/StepPerguntasPorAmbiente/formUtils.js'
 import { calcularScore } from '../domain/scoreEngine.js'
 import { construirCCs } from '../domain/ccBuilder.js'
 
@@ -383,12 +384,16 @@ export async function gerarPdf(state) {
         if (resp.tv_largura_cm) escreverPergunta('Largura (cm)', resp.tv_largura_cm)
         if (resp.tv_altura_cm) escreverPergunta('Altura (cm)', resp.tv_altura_cm)
         if (resp.tv_profundidade_cm) escreverPergunta('Profundidade (cm)', resp.tv_profundidade_cm)
-        if (resp.tv_link) escreverPergunta('Link', resp.tv_link)
+        if (resp.tv_link) {
+          const yAntes = y
+          escreverPergunta('Link', 'Ver link')
+          doc.link(margemEsquerda, yAntes + 1, larguraConteudo, 4.5, { url: resp.tv_link })
+        }
       }
     }
 
     if (['dormitorio', 'outros'].includes(formType)) {
-      escreverPergunta('Qual o tamanho da cama neste ambiente?', resp.tamanhoCama ?? '—')
+      escreverPergunta('Qual o tamanho da cama neste ambiente?', TAMANHOS_CAMA.find((t) => t.value === resp.tamanhoCama)?.label ?? resp.tamanhoCama ?? '—')
       if (resp.tamanhoCama === 'outro') {
         escreverPergunta('Largura (cm)', resp.camaLargura_cm ?? '—')
         escreverPergunta('Comprimento (cm)', resp.camaComprimento_cm ?? '—')
