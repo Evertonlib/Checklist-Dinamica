@@ -157,6 +157,18 @@ export async function gerarPdf(state) {
     y += 8
   }
 
+  const escreverSubtituloSecao = (titulo) => {
+    garantirEspaco(12)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(13)
+    doc.setTextColor(0, 0, 0)
+    doc.text(titulo, margemEsquerda, y)
+    y += 4
+    doc.setLineWidth(0.3)
+    doc.line(margemEsquerda, y, pageWidth - margemDireita, y)
+    y += 8
+  }
+
   const escreverInline = (item) => {
     const cor = item.nivel ? COR_NIVEL[item.nivel] : [90, 90, 90]
     const texto = item.tipo === 'CC' ? `CC: ${item.textoCompleto}` : item.textoCompleto
@@ -173,12 +185,12 @@ export async function gerarPdf(state) {
   const escreverPergunta = (pergunta, resposta, itensRelacionados = []) => {
     garantirEspaco(14)
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(10)
+    doc.setFontSize(11)
     doc.setTextColor(0, 0, 0)
     escreverLinhas(doc.splitTextToSize(pergunta, larguraConteudo), margemEsquerda, 5)
 
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
+    doc.setFontSize(12)
     escreverLinhas(doc.splitTextToSize(`Resposta: ${resposta ?? '—'}`, larguraConteudo), margemEsquerda, 4.5)
 
     itensRelacionados.filter(Boolean).forEach((item) => escreverInline(item))
@@ -297,7 +309,7 @@ export async function gerarPdf(state) {
     }
 
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(13)
+    doc.setFontSize(14)
     doc.setTextColor(0, 0, 0)
     doc.text(formatarNomeAmbiente(instancia), margemEsquerda, y)
     y += 6
@@ -411,7 +423,7 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletrosDefined === true && resp.eletros?.length > 0) {
-        escreverTituloSecao('Eletrodomésticos')
+        escreverSubtituloSecao('Eletrodomésticos')
         garantirEspaco(20)
         const eletrosBody = resp.eletros.map((eletro) => [
           descreverEletro(eletro) || '—',
@@ -459,7 +471,7 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
-        escreverTituloSecao('Eletrônicos')
+        escreverSubtituloSecao('Eletrônicos')
         garantirEspaco(20)
         const eletronicoBody = resp.eletronicosList.map((eletronico) => [
           descreverEletronico(eletronico) || '—',
