@@ -3,6 +3,7 @@ import { useFormContext } from '../../context/FormContext.js'
 import { formatarNomeAmbiente } from '../../domain/ambientes.js'
 import { Modal } from '../../components/Modal/Modal.jsx'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
+import { TEXTO_REVESTIMENTO_AUSENTE } from '../../domain/checklistTextos.js'
 import styles from './StepPerguntasGlobais.module.css'
 
 export function BlocoReforma() {
@@ -125,6 +126,7 @@ export function BlocoReforma() {
 
           {g3_temRevestimento === false && (
             <div className={styles.subbloco}>
+              <p className={styles.aviso}>CC: {TEXTO_REVESTIMENTO_AUSENTE}</p>
               <p className={styles.subpergunta}>Quais ambientes não possuem revestimento?</p>
               <div className={styles.chipTodos}>
                 <button onClick={() => setGlobal('g3_ambientesSemRevestimento', ambientesG3.map((a) => a.instanceId))}>
