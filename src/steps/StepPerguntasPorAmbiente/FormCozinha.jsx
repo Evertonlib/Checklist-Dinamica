@@ -5,7 +5,7 @@ import {
   TEXTO_TANQUE_RETIRAR,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { ELETROS_CONFIG } from './formUtils.js'
+import { ELETROS_CONFIG, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormCozinha({ instanceId, erros = {} }) {
@@ -156,9 +156,10 @@ export function FormCozinha({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.largura_cm}
-                        onChange={(e) => updEletro(index, 'largura_cm', e.target.value)}
+                        onChange={(e) => updEletro(index, 'largura_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletro_${index}_largura`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_largura`]}</span>
@@ -167,9 +168,10 @@ export function FormCozinha({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Altura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.altura_cm}
-                        onChange={(e) => updEletro(index, 'altura_cm', e.target.value)}
+                        onChange={(e) => updEletro(index, 'altura_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletro_${index}_altura`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_altura`]}</span>
@@ -178,9 +180,10 @@ export function FormCozinha({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Profundidade (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.profundidade_cm}
-                        onChange={(e) => updEletro(index, 'profundidade_cm', e.target.value)}
+                        onChange={(e) => updEletro(index, 'profundidade_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletro_${index}_prof`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_prof`]}</span>

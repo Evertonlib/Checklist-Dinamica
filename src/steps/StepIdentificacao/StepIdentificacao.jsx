@@ -163,6 +163,7 @@ export function StepIdentificacao() {
         <div className={styles.campo}>
           <label>CEP</label>
           <input
+            inputMode="numeric"
             value={id.cep}
             onChange={(e) => {
               const cep = mascararCep(e.target.value)

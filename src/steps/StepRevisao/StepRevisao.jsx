@@ -75,7 +75,7 @@ export function StepRevisao() {
                 <span>{formatarNomeAmbiente(ambiente)}</span>
                 <ScoreBadge classificacao={score.classificacao} pontos={score.pontos} />
                 <button className={styles.btnEditar} onClick={() => irParaEtapa(`/ambiente/${ambiente.instanceId}`)}>
-                  Editar
+                  ✏️ Editar
                 </button>
               </div>
             )

@@ -1,6 +1,7 @@
 import { useFormContext } from '../../context/FormContext.js'
 import { formatarNomeAmbiente } from '../../domain/ambientes.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
+import { limitarCm } from '../StepPerguntasPorAmbiente/formUtils.js'
 import styles from './StepPerguntasGlobais.module.css'
 
 export function BlocoRebaixo() {
@@ -67,10 +68,10 @@ export function BlocoRebaixo() {
               <div key={ambienteRebaixo.instanceId} className={styles.campoRebaixo}>
                 <label>{formatarNomeAmbiente(ambiente)} — Quantos cm será rebaixado?</label>
                 <input
-                  type="number"
-                  min="1"
+                  type="text"
+                  inputMode="decimal"
                   value={ambienteRebaixo.cm ?? ''}
-                  onChange={(e) => setCm(ambienteRebaixo.instanceId, e.target.value)}
+                  onChange={(e) => setCm(ambienteRebaixo.instanceId, limitarCm(e.target.value))}
                   placeholder="cm"
                 />
               </div>

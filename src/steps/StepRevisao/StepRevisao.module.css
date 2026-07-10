@@ -52,13 +52,20 @@
 }
 
 .btnEditar {
-  background: transparent;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
+  background: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
-  color: #555;
+  color: #c8a84b;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnEditar:hover {
+  background: #000;
 }
 
 .ccCard {

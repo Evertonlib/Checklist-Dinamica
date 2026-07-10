@@ -29,9 +29,13 @@ export function StepAmbientes() {
     if (semAmbientes) return
 
     if (state._meta.origemNavegacao === 'revisao') {
-      dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'revisao' })
+      // Vindo do resumo por "Editar Ambientes": percorrer os ambientes já cadastrados
+      // (e qualquer novo adicionado) em vez de voltar direto ao resumo. Limpa a origem
+      // para que a navegação encadeie ambiente a ambiente e termine no resumo.
+      const primeiro = state.ambientesSelecionados[0]
       dispatch({ type: 'SET_META', campo: 'origemNavegacao', valor: null })
-      navigate('/revisao')
+      dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: `ambiente/${primeiro.instanceId}` })
+      navigate(`/ambiente/${primeiro.instanceId}`)
       return
     }
 
@@ -40,7 +44,7 @@ export function StepAmbientes() {
   }
 
   const avancarLabel = state._meta.origemNavegacao === 'revisao'
-    ? 'Salvar e voltar ao resumo'
+    ? 'Preencher ambientes'
     : 'Avançar'
 
   return (

@@ -1,3 +1,15 @@
+// Limita campos de medida em cm: até 3 algarismos inteiros + 1 casa decimal (ex.: 138,5).
+// Aceita vírgula ou ponto na digitação; devolve string com vírgula como separador (padrão BR).
+export function limitarCm(valor) {
+  if (valor == null) return ''
+  let v = String(valor).replace(/\./g, ',').replace(/[^\d,]/g, '')
+  const temVirgula = v.includes(',')
+  const [inteiro = '', ...resto] = v.split(',')
+  let saida = inteiro.slice(0, 3)
+  if (temVirgula) saida += ',' + resto.join('').slice(0, 1)
+  return saida
+}
+
 export const TIPOS_CUBA = ['Embutir', 'Semi-encaixe', 'Sobrepor', 'Apoio', 'Esculpida']
 
 export const TAMANHOS_CAMA = [

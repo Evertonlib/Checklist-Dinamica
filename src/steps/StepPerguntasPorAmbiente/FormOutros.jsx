@@ -12,6 +12,7 @@ import {
   ELETROS_CONFIG,
   TAMANHOS_CAMA,
   TIPOS_CUBA,
+  limitarCm,
 } from './formUtils.js'
 
 import styles from './StepPerguntasPorAmbiente.module.css'
@@ -156,18 +157,20 @@ export function FormOutros({ instanceId, erros = {} }) {
             <div className={styles.campo}>
               <label>Largura (cm) *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={resp.camaLargura_cm ?? ''}
-                onChange={(e) => set('camaLargura_cm', e.target.value)}
+                onChange={(e) => set('camaLargura_cm', limitarCm(e.target.value))}
               />
               {erros.camaLargura_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaLargura_cm}</span>}
             </div>
             <div className={styles.campo}>
               <label>Comprimento (cm) *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={resp.camaComprimento_cm ?? ''}
-                onChange={(e) => set('camaComprimento_cm', e.target.value)}
+                onChange={(e) => set('camaComprimento_cm', limitarCm(e.target.value))}
               />
               {erros.camaComprimento_cm && (
                 <span className={`${styles.erro} erro-campo`}>{erros.camaComprimento_cm}</span>
@@ -252,14 +255,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.largura_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRO',
                           instanceId,
                           index,
                           campo: 'largura_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletro_${index}_largura`] && (
@@ -269,14 +273,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Altura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.altura_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRO',
                           instanceId,
                           index,
                           campo: 'altura_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletro_${index}_altura`] && (
@@ -286,14 +291,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Profundidade (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletro.profundidade_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRO',
                           instanceId,
                           index,
                           campo: 'profundidade_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletro_${index}_prof`] && (
@@ -465,14 +471,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.largura_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRONICO',
                           instanceId,
                           index,
                           campo: 'largura_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletronico_${index}_largura`] && (
@@ -482,14 +489,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Altura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.altura_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRONICO',
                           instanceId,
                           index,
                           campo: 'altura_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletronico_${index}_altura`] && (
@@ -499,14 +507,15 @@ export function FormOutros({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Profundidade (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.profundidade_cm}
                         onChange={(e) => dispatch({
                           type: 'UPDATE_ELETRONICO',
                           instanceId,
                           index,
                           campo: 'profundidade_cm',
-                          valor: e.target.value,
+                          valor: limitarCm(e.target.value),
                         })}
                       />
                       {erros[`eletronico_${index}_prof`] && (

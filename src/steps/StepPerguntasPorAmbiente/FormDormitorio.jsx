@@ -6,7 +6,7 @@ import {
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { TAMANHOS_CAMA } from './formUtils.js'
+import { TAMANHOS_CAMA, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormDormitorio({ instanceId, erros = {} }) {
@@ -52,18 +52,20 @@ export function FormDormitorio({ instanceId, erros = {} }) {
             <div className={styles.campo}>
               <label>Largura (cm) *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={resp.camaLargura_cm ?? ''}
-                onChange={(e) => set('camaLargura_cm', e.target.value)}
+                onChange={(e) => set('camaLargura_cm', limitarCm(e.target.value))}
               />
               {erros.camaLargura_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaLargura_cm}</span>}
             </div>
             <div className={styles.campo}>
               <label>Comprimento (cm) *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={resp.camaComprimento_cm ?? ''}
-                onChange={(e) => set('camaComprimento_cm', e.target.value)}
+                onChange={(e) => set('camaComprimento_cm', limitarCm(e.target.value))}
               />
               {erros.camaComprimento_cm && <span className={`${styles.erro} erro-campo`}>{erros.camaComprimento_cm}</span>}
             </div>
@@ -101,25 +103,28 @@ export function FormDormitorio({ instanceId, erros = {} }) {
                 <div className={styles.campo}>
                   <label>Largura (cm)</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={resp.tv_largura_cm ?? ''}
-                    onChange={(e) => set('tv_largura_cm', e.target.value)}
+                    onChange={(e) => set('tv_largura_cm', limitarCm(e.target.value))}
                   />
                 </div>
                 <div className={styles.campo}>
                   <label>Altura (cm)</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={resp.tv_altura_cm ?? ''}
-                    onChange={(e) => set('tv_altura_cm', e.target.value)}
+                    onChange={(e) => set('tv_altura_cm', limitarCm(e.target.value))}
                   />
                 </div>
                 <div className={styles.campo}>
                   <label>Profundidade (cm)</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={resp.tv_profundidade_cm ?? ''}
-                    onChange={(e) => set('tv_profundidade_cm', e.target.value)}
+                    onChange={(e) => set('tv_profundidade_cm', limitarCm(e.target.value))}
                   />
                 </div>
               </div>

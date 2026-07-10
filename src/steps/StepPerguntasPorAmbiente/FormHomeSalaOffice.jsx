@@ -6,7 +6,7 @@ import {
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { ELETRONICOS_CONFIG } from './formUtils.js'
+import { ELETRONICOS_CONFIG, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormHomeSalaOffice({ instanceId, erros = {} }) {
@@ -143,9 +143,10 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Largura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.largura_cm}
-                        onChange={(e) => updEletronico(index, 'largura_cm', e.target.value)}
+                        onChange={(e) => updEletronico(index, 'largura_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletronico_${index}_largura`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_largura`]}</span>
@@ -154,9 +155,10 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Altura (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.altura_cm}
-                        onChange={(e) => updEletronico(index, 'altura_cm', e.target.value)}
+                        onChange={(e) => updEletronico(index, 'altura_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletronico_${index}_altura`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_altura`]}</span>
@@ -165,9 +167,10 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
                     <div className={styles.campo}>
                       <label>Profundidade (cm) *</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={eletronico.profundidade_cm}
-                        onChange={(e) => updEletronico(index, 'profundidade_cm', e.target.value)}
+                        onChange={(e) => updEletronico(index, 'profundidade_cm', limitarCm(e.target.value))}
                       />
                       {erros[`eletronico_${index}_prof`] && (
                         <span className={`${styles.erro} erro-campo`}>{erros[`eletronico_${index}_prof`]}</span>

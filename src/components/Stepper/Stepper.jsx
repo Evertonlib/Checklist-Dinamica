@@ -4,7 +4,8 @@ export function Stepper({ etapaNumero, totalEtapas, nomeEtapa }) {
   if (!etapaNumero) return null
   return (
     <div className={styles.stepper}>
-      Etapa {etapaNumero} de {totalEtapas} — <strong>{nomeEtapa}</strong>
+      <span className={styles.etapaInfo}>Etapa {etapaNumero} de {totalEtapas}</span>
+      <span className={styles.nomeEtapa}>{nomeEtapa}</span>
     </div>
   )
 }

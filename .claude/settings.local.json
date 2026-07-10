@@ -6,7 +6,8 @@
       "Bash(Get-ChildItem -Recurse -Path \"c:\\\\Users\\\\Windows 10\\\\AUTOMACOES\\\\Checklist-Dinamica\")",
       "Bash(Select-Object FullName)",
       "PowerShell(head -150)",
-      "PowerShell(tree \"c:\\\\Users\\\\Windows 10\\\\AUTOMACOES\\\\Checklist-Dinamica\" -L 3 -I \"node_modules|dist\" 2>$null)"
+      "PowerShell(tree \"c:\\\\Users\\\\Windows 10\\\\AUTOMACOES\\\\Checklist-Dinamica\" -L 3 -I \"node_modules|dist\" 2>$null)",
+      "Bash(npm run *)"
     ]
   }
 }
