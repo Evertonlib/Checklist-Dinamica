@@ -476,6 +476,14 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
+        if (formType === 'home' && resp.eletronicosList.some((e) => e.tipo === 'TV')) {
+          escreverPergunta(
+            'O ponto elétrico da TV já está na posição final?',
+            resp.tvPontoFinal === true ? 'Sim' : resp.tvPontoFinal === false ? 'Não' : '—',
+            [ccPorId.get(`TV_PONTO_${instanceId}`)]
+          )
+        }
+
         escreverSubtituloSecao('Eletrônicos')
         garantirEspaco(20)
         const eletronicoBody = resp.eletronicosList.map((eletronico) => [
