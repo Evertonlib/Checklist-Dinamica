@@ -83,7 +83,7 @@ export async function gerarPdf(state) {
   const agora = new Date()
   const dataCapa = formatarDataLocal(agora)
   const dataArquivo = formatarDataArquivo(agora)
-  const { nome, contrato, logradouro, numero, complemento, bairro, cidade, uf, telefone } = state.identificacao
+  const { nome, contrato, cep, logradouro, numero, complemento, bairro, cidade, uf, telefone } = state.identificacao
 
   const margemEsquerda = 20
   const margemDireita = 20
@@ -116,6 +116,7 @@ export async function gerarPdf(state) {
   let yEndereco = 92
   if (linhaEndereco1) { doc.text(linhaEndereco1, margemEsquerda, yEndereco); yEndereco += 10 }
   if (linhaEndereco2) { doc.text(linhaEndereco2, margemEsquerda, yEndereco); yEndereco += 10 }
+  if (cep) { doc.text(`CEP: ${cep}`, margemEsquerda, yEndereco); yEndereco += 10 }
   if (telefone) { doc.text(`Telefone: ${telefone}`, margemEsquerda, yEndereco); yEndereco += 10 }
 
   doc.text(`Data: ${dataCapa}`, margemEsquerda, yEndereco)
