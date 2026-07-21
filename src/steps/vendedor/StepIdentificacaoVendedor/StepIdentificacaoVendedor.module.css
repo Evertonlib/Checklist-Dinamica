@@ -1,0 +1,73 @@
+.pagina {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.campo label {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.campo input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+.campo input:focus {
+  outline: 2px solid #c8a84b;
+  border-color: #c8a84b;
+}
+
+.erro {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.linhaContrato {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.btnRemoverContrato {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #f5f0e8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 22px;
+}
+
+.btnAdicionarContrato {
+  background: transparent;
+  color: #555;
+  border: 1px solid #ccc;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-height: 40px;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+
+.espacoBar {
+  height: 80px;
+}

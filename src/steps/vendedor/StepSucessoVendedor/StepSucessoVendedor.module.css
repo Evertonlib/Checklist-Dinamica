@@ -1,0 +1,39 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 32px 16px;
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.icone {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.titulo {
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.texto {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.btnNovo {
+  background: #1a1a1a;
+  color: #c8a84b;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  min-height: 48px;
+}

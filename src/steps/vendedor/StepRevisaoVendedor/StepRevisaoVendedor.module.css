@@ -1,0 +1,44 @@
+.pagina {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+.titulo {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.secao {
+  margin-bottom: 20px;
+}
+
+.secao h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.linhaResumo {
+  font-size: 0.92rem;
+  color: #333;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.erro {
+  color: #c0392b;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.erroPdf {
+  color: #c0392b;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.espacoBar { height: 20px; }

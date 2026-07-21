@@ -630,21 +630,52 @@ Divergências ou pontos de atenção identificados ao comparar o PRD com o códi
 
 ## Plano de Execução
 
-- [ ] Task 1 — Criar `domain/gruposPerguntasVendedor.js` (mapa de grupos A/B/C + `obterGrupo`) e `domain/schemaVendedor.js` (`estadoInicialVendedor` + `defaultsPorGrupo`), sem tocar em `domain/ambientes.js` nem `domain/schema.js`.
-- [ ] Task 2 — Criar `context/FormContextVendedor.js` e `context/FormProviderVendedor.jsx` (reducer com as ações da Seção 7.3, chave `byarabi_checklist_vendedor`, diálogo "continuar de onde parou" isolado).
-- [ ] Task 3 — Criar `screens/SelecaoPerfil/SelecaoPerfil.jsx` com os dois botões, sem depender de nenhum `FormContext`.
-- [ ] Task 4 — Reestruturar `App.jsx`: extrair `AppLayoutCliente` (hoje `AppLayout`, trocando `<Routes>` internas por `<Outlet/>` e removendo a rota `"/"`), criar `ClienteLayoutRoute`, `VendedorLayoutRoute` e `AppLayoutVendedor`, montar a árvore de rotas descrita na Seção 5. Validar manualmente que o fluxo do cliente (incluindo diálogo de rascunho) permanece idêntico ao de hoje.
-- [ ] Task 5 — Alterar `components/BottomBar/BottomBar.jsx` de forma aditiva (prop `mostrarBotaoVendedor`, default `true`); confirmar que os 4 call sites do cliente continuam sem alteração e com o botão "Vendedor" visível.
-- [ ] Task 6 — Criar `steps/vendedor/StepIdentificacaoVendedor` (nome + lista de contratos com "+" e "−" — este último ausente apenas no primeiro contrato —, validação e mensagens de erro, `BottomBar` com `mostrarBotaoVendedor={false}`).
-- [ ] Task 7 — Criar `steps/vendedor/StepAmbientesVendedor` (réplica funcional de `StepAmbientes.jsx` usando o reducer do Projetista).
-- [ ] Task 8 — Criar `steps/vendedor/StepPerguntasAmbienteVendedor` + `FormGrupoA.jsx` (com os 2 campos de altura em mm e "não se aplica"), `FormGrupoB.jsx`, `FormGrupoC.jsx`, com a validação de avanço descrita na Seção 6.4.
-- [ ] Task 9 — Criar `steps/vendedor/StepRevisaoVendedor` (conferência dos dados, bloqueio de PDF sem ambientes, chamada a `gerarPdfVendedor`).
-- [ ] Task 10 — Criar `services/pdfVendedor.js` (capa, corpo por ambiente, nome de arquivo `Checklist_Projetista_{primeiro_contrato}_{data}.pdf`).
-- [ ] Task 11 — Criar `steps/vendedor/StepSucessoVendedor` (texto do Projetista, `RESET_STATE_VENDEDOR`, navegação de volta a `/vendedor/identificacao`).
-- [ ] Task 12 — Teste manual fim a fim cobrindo CA-01 a CA-16 (Seção 11), incluindo o cenário de isolamento de rascunho (CA-15) com os dois formulários preenchidos em paralelo.
+- [x] Task 1 — Criar `domain/gruposPerguntasVendedor.js` (mapa de grupos A/B/C + `obterGrupo`) e `domain/schemaVendedor.js` (`estadoInicialVendedor` + `defaultsPorGrupo`), sem tocar em `domain/ambientes.js` nem `domain/schema.js`.
+- [x] Task 2 — Criar `context/FormContextVendedor.js` e `context/FormProviderVendedor.jsx` (reducer com as ações da Seção 7.3, chave `byarabi_checklist_vendedor`, diálogo "continuar de onde parou" isolado).
+- [x] Task 3 — Criar `screens/SelecaoPerfil/SelecaoPerfil.jsx` com os dois botões, sem depender de nenhum `FormContext`.
+- [x] Task 4 — Reestruturar `App.jsx`: extrair `AppLayoutCliente` (hoje `AppLayout`, trocando `<Routes>` internas por `<Outlet/>` e removendo a rota `"/"`), criar `ClienteLayoutRoute`, `VendedorLayoutRoute` e `AppLayoutVendedor`, montar a árvore de rotas descrita na Seção 5. Validar manualmente que o fluxo do cliente (incluindo diálogo de rascunho) permanece idêntico ao de hoje.
+- [x] Task 5 — Alterar `components/BottomBar/BottomBar.jsx` de forma aditiva (prop `mostrarBotaoVendedor`, default `true`); confirmar que os 4 call sites do cliente continuam sem alteração e com o botão "Vendedor" visível.
+- [x] Task 6 — Criar `steps/vendedor/StepIdentificacaoVendedor` (nome + lista de contratos com "+" e "−" — este último ausente apenas no primeiro contrato —, validação e mensagens de erro, `BottomBar` com `mostrarBotaoVendedor={false}`).
+- [x] Task 7 — Criar `steps/vendedor/StepAmbientesVendedor` (réplica funcional de `StepAmbientes.jsx` usando o reducer do Projetista).
+- [x] Task 8 — Criar `steps/vendedor/StepPerguntasAmbienteVendedor` + `FormGrupoA.jsx` (com os 2 campos de altura em mm e "não se aplica"), `FormGrupoB.jsx`, `FormGrupoC.jsx`, com a validação de avanço descrita na Seção 6.4.
+- [x] Task 9 — Criar `steps/vendedor/StepRevisaoVendedor` (conferência dos dados, bloqueio de PDF sem ambientes, chamada a `gerarPdfVendedor`).
+- [x] Task 10 — Criar `services/pdfVendedor.js` (capa, corpo por ambiente, nome de arquivo `Checklist_Projetista_{primeiro_contrato}_{data}.pdf`).
+- [x] Task 11 — Criar `steps/vendedor/StepSucessoVendedor` (texto do Projetista, `RESET_STATE_VENDEDOR`, navegação de volta a `/vendedor/identificacao`).
+- [x] Task 12 — Teste manual fim a fim cobrindo CA-01 a CA-17 (Seção 11), incluindo o cenário de isolamento de rascunho (CA-15) com os dois formulários preenchidos em paralelo. Executado com `npm run build` (sem erros) + Playwright headless dirigindo o app real via `npm run dev`, com capturas de tela e checagem de console em cada critério. Nenhum erro de console em nenhuma das rodadas.
 
 ---
 
 ## Desvios
 
-(Esta seção será preenchida durante a implementação.)
+1. **`SelecaoPerfil` reaproveita o componente `Header` diretamente, em vez de recriar a
+   marca visual inline.** A Seção 6.1 dizia para não reaproveitar `Header` "pois ele
+   exige contexto de etapa". Ao ler `components/Header/Header.jsx` antes de implementar,
+   confirmei que o componente é puramente apresentacional — recebe apenas a prop opcional
+   `etapaAtual` e não usa `useFormContext` nem qualquer Context em nenhum ponto. A
+   premissa da Seção 6.1 estava incorreta. Como reaproveitar o componente real é mais
+   consistente do que duplicar a marcação da logo, `SelecaoPerfil.jsx` importa e usa
+   `<Header />` (sem prop `etapaAtual`, que é opcional) em vez de recriar o cabeçalho.
+   Nenhum comportamento do `Header` foi alterado.
+
+2. **`services/pdfVendedor.js` não importa `jspdf-autotable`.** A Seção 9 descreve o
+   gerador como reaproveitando "o padrão visual (jsPDF + jspdf-autotable, capa...)", mas
+   a Seção 9.2 (conteúdo do corpo) especifica apenas uma lista simples de pergunta →
+   resposta por ambiente, sem nenhuma tabela. Como não há conteúdo tabular em nenhum
+   ponto do PDF do Projetista (diferente do PDF do cliente, que usa `autoTable` para o
+   Resumo Executivo e listas de eletrodomésticos/eletrônicos), importar
+   `jspdf-autotable` sem uso seria código morto. Interpretei a menção na Seção 9 como
+   referência ao stack geral do projeto (Seção 2), não como exigência literal de
+   renderizar uma tabela nesta feature. Se o Everton quiser uma tabela de resumo por
+   ambiente no PDF do Projetista, é um ajuste a discutir separadamente — não implementado
+   aqui por não estar descrito na Seção 9.2.
+
+3. **`StepAmbientesVendedor` sempre avança direto para o primeiro ambiente selecionado**,
+   sem a ramificação por `origemNavegacao === 'revisao'` que existe em `StepAmbientes.jsx`
+   do cliente. O Spec (Seção 6.6) não descreve links de "✏️ Editar" na
+   `StepRevisaoVendedor` (diferente da `StepRevisao` do cliente, que tem "Editar
+   Identificação/Ambientes/Perguntas Gerais"), então não existe nenhum fluxo que force o
+   usuário do Projetista a retornar à revisão a meio de uma edição pontual — a navegação
+   é sempre sequencial (identificação → ambientes → cada ambiente em ordem → revisão →
+   sucesso). Por não haver essa ramificação, `_meta.origemNavegacao` do Projetista nunca
+   é setado como `'revisao'`, embora o campo exista no schema (Seção 4.2) para paridade
+   estrutural com o cliente. Nenhum critério de aceitação exige esse fluxo de edição.

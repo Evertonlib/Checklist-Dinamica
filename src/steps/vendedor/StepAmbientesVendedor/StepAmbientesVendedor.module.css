@@ -1,0 +1,86 @@
+.pagina {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.instrucao {
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.ambCard {
+  background: #fff;
+  border: 1px solid #e0d8c8;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.ambTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ambLabel {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.qtdControle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qtdControle button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #f5f0e8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.qtdControle button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qtdControle span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.nomeField {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nomeField label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.nomeField input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  min-height: 40px;
+}
+
+.erro {
+  color: #c0392b;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.espacoBar { height: 80px; }
