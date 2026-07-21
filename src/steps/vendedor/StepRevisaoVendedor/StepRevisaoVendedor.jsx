@@ -74,6 +74,12 @@ export function StepRevisaoVendedor() {
     <div className={styles.pagina}>
       <h2 className={styles.titulo}>Revisão do Preenchimento</h2>
 
+      <p className={styles.avisoChecklist}>
+        ⚠️ Atenção: este checklist não substitui o <strong>Checklist do Cliente</strong>.
+        Envie <strong>os dois juntos</strong> no mesmo e-mail para a liberação. Enviar só
+        um dos dois atrasa a liberação do projeto.
+      </p>
+
       <div className={styles.secao}>
         <h3>Identificação</h3>
         <p className={styles.linhaResumo}><strong>Cliente:</strong> {state.identificacao.nome || '—'}</p>
