@@ -308,24 +308,47 @@ Campos:
 - **Nome completo do cliente** — obrigatório, mesmo padrão de validação "não vazio" do
   campo `nome` do cliente.
 - **Contrato(s)** — array `identificacao.contratos`. O primeiro campo é sempre
-  renderizado; botão **"+ Adicionar contrato"** empurra uma nova string vazia no array
-  e renderiza mais um campo. Cada posição do array é validada com a mesma regex já
-  usada em `StepIdentificacao.jsx` do cliente:
+  renderizado e **nunca pode ser removido** (o array precisa ter no mínimo uma posição,
+  conforme `estadoInicialVendedor` — Seção 4.2). Botão **"+ Adicionar contrato"**
+  empurra uma nova string vazia no array e renderiza mais um campo. A partir do
+  segundo contrato (índice ≥ 1), cada campo exibe também um botão **"−" (remover)** ao
+  lado — ou seja, o botão de remover só aparece quando há mais de um contrato na
+  tela. Clicar em "−" tira aquela posição do array `contratos` e re-renderiza os
+  campos restantes. **Decisão revogada em relação à primeira versão deste Spec:** a
+  versão anterior não previa remoção ("sem ação de remoção, fora de escopo"); isso foi
+  corrigido porque, sem um botão "−", um contrato adicionado por engano ficava preso —
+  o campo extra vazio bloqueia o avanço (regra abaixo) e não havia forma de apagá-lo
+  a não ser digitar um contrato falso, o que sujaria o dado. Cada posição do array é
+  validada com a mesma regex já usada em `StepIdentificacao.jsx` do cliente:
   `const REGEX_CONTRATO = /^(IT|SM|TA|PIN|STA)\d+$/` — **duplicada** neste novo
-  arquivo (ver Seção 12, observação sobre duplicação intencional), nunca importada de
-  `StepIdentificacao.jsx`, para não criar acoplamento nem exigir alterar um arquivo do
-  cliente listado como "não tocado".
+  arquivo (ver Seção 12, observação sobre duplicação intencional — mantida,
+  reconfirmada), nunca importada de `StepIdentificacao.jsx`, para não criar
+  acoplamento nem exigir alterar um arquivo do cliente listado como "não tocado".
+
+  > **Padrão visual do botão "−" (verificado no código antes de decidir):**
+  > `StepIdentificacao.jsx` do cliente não tem nenhum campo repetível — lá, contrato é
+  > um único campo, sem array — logo não existe no fluxo do cliente nenhum padrão de
+  > "remover item de uma lista de campos" para reaproveitar. O precedente mais próximo
+  > encontrado no projeto é o controle de quantidade `+`/`−` de `StepAmbientes.jsx`
+  > (classe `styles.qtdControle`, botões `<button>−</button>`/`<button>+</button>`),
+  > mas ele é um **contador compartilhado** (incrementa/decrementa um número e
+  > instâncias aparecem/somem conforme a contagem), não um botão de remoção por item
+  > de uma lista de campos de texto — não é exatamente o mesmo caso de uso. Na
+  > ausência de um precedente idêntico, o botão "−" do contrato adota o **mesmo
+  > estilo visual do botão "+ Adicionar contrato"** já especificado acima (mesma
+  > classe/família de botão secundário), reaproveitando apenas o **glifo "−"** já
+  > estabelecido no projeto (de `StepAmbientes.jsx`) para manter consistência de
+  > símbolo, posicionado inline ao lado de cada campo de contrato removível.
 - Avanço bloqueado se o nome estiver vazio **ou** qualquer posição de `contratos`
   estiver vazia/inválida — mensagem de erro por campo, no padrão visual de
-  `StepIdentificacao.jsx` (`erro-campo`). Cobre CA-10 e CA-11.
+  `StepIdentificacao.jsx` (`erro-campo`). Cobre CA-10, CA-11 e CA-17.
 - Sem campo de endereço/telefone (confirmado PRD Seção 5 — "sem repetir
   endereço/telefone do cliente").
 - Usa `BottomBar` com `semVoltar` e `mostrarBotaoVendedor={false}`.
 
-Ação no reducer: `SET_IDENTIFICACAO_VENDEDOR_NOME { valor }`,
+Ações no reducer: `SET_IDENTIFICACAO_VENDEDOR_NOME { valor }`,
 `SET_IDENTIFICACAO_VENDEDOR_CONTRATO { index, valor }`,
-`ADD_CONTRATO_VENDEDOR` (sem ação de remoção — fora do escopo desta versão; o PRD só
-pede o botão "+"; nenhuma UI de "remover contrato" é criada nesta versão).
+`ADD_CONTRATO_VENDEDOR`, `REMOVE_CONTRATO_VENDEDOR { index }` (Seção 7.3).
 
 ### 6.3 `StepAmbientesVendedor`
 
@@ -444,6 +467,7 @@ botões), com estas diferenças:
 | `SET_IDENTIFICACAO_VENDEDOR_NOME` | `{ valor }` | Atualiza `identificacao.nome` |
 | `SET_IDENTIFICACAO_VENDEDOR_CONTRATO` | `{ index, valor }` | Atualiza `identificacao.contratos[index]` |
 | `ADD_CONTRATO_VENDEDOR` | — | `identificacao.contratos.push('')` |
+| `REMOVE_CONTRATO_VENDEDOR` | `{ index }` | Remove a posição `index` de `identificacao.contratos` (ação não disponível para `index === 0` — botão "−" não é renderizado no primeiro contrato) |
 | `SET_AMBIENTE_QUANTIDADE_VENDEDOR` | `{ ambienteId, quantidade }` | Reconstrói instâncias (mesma lógica de índice `{ambienteId}-{i}` do cliente); inicializa `respostasPorAmbiente[instanceId]` com `defaultsPorGrupo[obterGrupo(ambienteId)]` |
 | `SET_AMBIENTE_NOME_VENDEDOR` | `{ instanceId, nome }` | Atualiza `nome` de uma instância |
 | `SET_RESPOSTA_AMBIENTE_VENDEDOR` | `{ instanceId, campo, valor }` | Atualiza campo em `respostasPorAmbiente[instanceId]` |
@@ -561,6 +585,7 @@ risco 7 do PRD.
 | CA-09 | Validação de avanço em `StepPerguntasAmbienteVendedor`: bloqueia se algum campo obrigatório do grupo estiver `null` (nem opção, nem número, nem "não se aplica") |
 | CA-10 | Botão "+ Adicionar contrato" em `StepIdentificacaoVendedor` → `ADD_CONTRATO_VENDEDOR`; múltiplos contratos válidos permitem avançar |
 | CA-11 | Cada posição de `identificacao.contratos` validada por `REGEX_CONTRATO`; qualquer posição inválida bloqueia avanço com mensagem |
+| CA-17 *(novo, decisão fechada após a primeira versão deste Spec — não estava na Seção 11 original do PRD)* | Adicionar dois contratos com "+", remover um deles com "−" → `REMOVE_CONTRATO_VENDEDOR`; o formulário volta a permitir avanço com o contrato restante válido; o primeiro contrato (`index === 0`) nunca exibe o botão "−" |
 | CA-12 | `StepRevisaoVendedor` bloqueia clique em "Gerar PDF" (sem chamar `gerarPdfVendedor`) se `ambientesSelecionados.length === 0` |
 | CA-13 | Conteúdo do PDF (Seção 9.2) — pergunta/resposta por ambiente, sem score/CC/Resumo Executivo, "não se aplica" literal, sufixo "mm" |
 | CA-14 | `services/pdfVendedor.js` usa apenas `contratos[0]` no nome do arquivo (Seção 9.3) |
@@ -586,8 +611,16 @@ Divergências ou pontos de atenção identificados ao comparar o PRD com o códi
 - **Duplicação intencional da regex de contrato.** `REGEX_CONTRATO` já existe em
   `StepIdentificacao.jsx` do cliente; para respeitar a restrição do PRD de não tocar
   nesse arquivo, a mesma regex é duplicada em `StepIdentificacaoVendedor.jsx` em vez de
-  extraída para um módulo compartilhado. Isso é uma decisão consciente deste Spec — se
-  a regra de contrato mudar no futuro, terá que ser atualizada nos dois lugares.
+  extraída para um módulo compartilhado. Isso é uma decisão consciente deste Spec,
+  reconfirmada nesta revisão — se a regra de contrato mudar no futuro, terá que ser
+  atualizada nos dois lugares.
+- **Botão de remover contrato (CA-17) é uma decisão tomada no nível do Spec, não do
+  PRD.** O PRD (Seção 5/7) só menciona o botão "+" para adicionar contratos; não fala
+  em remover. A necessidade de um botão "−" foi identificada durante a revisão deste
+  Spec (um contrato adicionado por engano ficava sem forma válida de ser desfeito) e
+  foi fechada diretamente aqui. O PRD não foi alterado — se for necessário manter os
+  dois documentos em sincronia total, vale um ajuste pontual na Seção 5 do PRD
+  mencionando também o botão de remover, mas isso não bloqueia a implementação.
 - **Fora de escopo confirmado, não implementado neste Spec:** unificação ou adição de
   novas opções de marca (ex. Blum, Hafele) às perguntas de dobradiças/corrediças
   (PRD Seção 14) — os `FormGrupoA/B/C` desta versão usam exatamente as opções fechadas
@@ -602,7 +635,7 @@ Divergências ou pontos de atenção identificados ao comparar o PRD com o códi
 - [ ] Task 3 — Criar `screens/SelecaoPerfil/SelecaoPerfil.jsx` com os dois botões, sem depender de nenhum `FormContext`.
 - [ ] Task 4 — Reestruturar `App.jsx`: extrair `AppLayoutCliente` (hoje `AppLayout`, trocando `<Routes>` internas por `<Outlet/>` e removendo a rota `"/"`), criar `ClienteLayoutRoute`, `VendedorLayoutRoute` e `AppLayoutVendedor`, montar a árvore de rotas descrita na Seção 5. Validar manualmente que o fluxo do cliente (incluindo diálogo de rascunho) permanece idêntico ao de hoje.
 - [ ] Task 5 — Alterar `components/BottomBar/BottomBar.jsx` de forma aditiva (prop `mostrarBotaoVendedor`, default `true`); confirmar que os 4 call sites do cliente continuam sem alteração e com o botão "Vendedor" visível.
-- [ ] Task 6 — Criar `steps/vendedor/StepIdentificacaoVendedor` (nome + lista de contratos com "+", validação e mensagens de erro, `BottomBar` com `mostrarBotaoVendedor={false}`).
+- [ ] Task 6 — Criar `steps/vendedor/StepIdentificacaoVendedor` (nome + lista de contratos com "+" e "−" — este último ausente apenas no primeiro contrato —, validação e mensagens de erro, `BottomBar` com `mostrarBotaoVendedor={false}`).
 - [ ] Task 7 — Criar `steps/vendedor/StepAmbientesVendedor` (réplica funcional de `StepAmbientes.jsx` usando o reducer do Projetista).
 - [ ] Task 8 — Criar `steps/vendedor/StepPerguntasAmbienteVendedor` + `FormGrupoA.jsx` (com os 2 campos de altura em mm e "não se aplica"), `FormGrupoB.jsx`, `FormGrupoC.jsx`, com a validação de avanço descrita na Seção 6.4.
 - [ ] Task 9 — Criar `steps/vendedor/StepRevisaoVendedor` (conferência dos dados, bloqueio de PDF sem ambientes, chamada a `gerarPdfVendedor`).
