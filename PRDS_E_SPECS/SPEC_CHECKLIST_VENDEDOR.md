@@ -436,7 +436,15 @@ exibem número de etapa, mesmo padrão do cliente.
 - Mesma estrutura de `StepSucesso.jsx` do cliente, adaptada ao texto do Projetista
   (sem a palavra "Vendedor" em texto visível). Botão "Iniciar novo preenchimento" →
   `dispatch(RESET_STATE_VENDEDOR)` (limpa a chave própria de `localStorage`) →
-  `navigate('/vendedor/identificacao')`.
+  ~~`navigate('/vendedor/identificacao')`~~ *(decisão original desta versão do Spec,
+  superada — ver atualização abaixo)*.
+
+  > **Atualização (2026-07-21):** o destino da navegação passou a ser `navigate('/')`
+  > (volta à tela `SelecaoPerfil`, Seção 6.1), em vez de `/vendedor/identificacao`.
+  > Motivo: ao terminar um preenchimento, o usuário deve poder escolher de novo entre
+  > "Cliente" e "Projetista" em vez de cair automaticamente na identificação do
+  > Projetista. O mesmo ajuste foi replicado em `StepSucesso.jsx` do Cliente (que
+  > também navegava direto para `/identificacao`), fora do escopo original deste Spec.
 
 ---
 
@@ -640,7 +648,7 @@ Divergências ou pontos de atenção identificados ao comparar o PRD com o códi
 - [x] Task 8 — Criar `steps/vendedor/StepPerguntasAmbienteVendedor` + `FormGrupoA.jsx` (com os 2 campos de altura em mm e "não se aplica"), `FormGrupoB.jsx`, `FormGrupoC.jsx`, com a validação de avanço descrita na Seção 6.4.
 - [x] Task 9 — Criar `steps/vendedor/StepRevisaoVendedor` (conferência dos dados, bloqueio de PDF sem ambientes, chamada a `gerarPdfVendedor`).
 - [x] Task 10 — Criar `services/pdfVendedor.js` (capa, corpo por ambiente, nome de arquivo `Checklist_Projetista_{primeiro_contrato}_{data}.pdf`).
-- [x] Task 11 — Criar `steps/vendedor/StepSucessoVendedor` (texto do Projetista, `RESET_STATE_VENDEDOR`, navegação de volta a `/vendedor/identificacao`).
+- [x] Task 11 — Criar `steps/vendedor/StepSucessoVendedor` (texto do Projetista, `RESET_STATE_VENDEDOR`, ~~navegação de volta a `/vendedor/identificacao`~~ *(superado em 2026-07-21, ver Seção 6.7 — destino passou a ser `/`, tela `SelecaoPerfil`)*).
 - [x] Task 12 — Teste manual fim a fim cobrindo CA-01 a CA-17 (Seção 11), incluindo o cenário de isolamento de rascunho (CA-15) com os dois formulários preenchidos em paralelo. Executado com `npm run build` (sem erros) + Playwright headless dirigindo o app real via `npm run dev`, com capturas de tela e checagem de console em cada critério. Nenhum erro de console em nenhuma das rodadas.
 
 ---

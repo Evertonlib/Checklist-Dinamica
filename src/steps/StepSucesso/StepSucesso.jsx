@@ -8,7 +8,7 @@ export function StepSucesso() {
 
   const reiniciar = () => {
     dispatch({ type: 'RESET_STATE' })
-    navigate('/identificacao')
+    navigate('/')
   }
 
   return (

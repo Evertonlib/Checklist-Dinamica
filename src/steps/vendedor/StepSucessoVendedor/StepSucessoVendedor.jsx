@@ -8,7 +8,7 @@ export function StepSucessoVendedor() {
 
   const reiniciar = () => {
     dispatch({ type: 'RESET_STATE_VENDEDOR' })
-    navigate('/vendedor/identificacao')
+    navigate('/')
   }
 
   return (
