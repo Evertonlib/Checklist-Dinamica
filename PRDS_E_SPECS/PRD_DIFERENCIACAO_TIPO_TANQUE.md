@@ -1,4 +1,4 @@
-# PRD — Diferenciação de Tipo de Tanque (Tradicional vs. Cuba-Tanque)
+# PRD — Diferenciação de Tipo de Tanque (Tanque Tradicional vs. Tanque Embutido na Bancada)
 
 **Status:** Aguardando aprovação
 **Data:** 2026-07-22
@@ -10,17 +10,17 @@
 
 ## 1. Objetivo
 
-Corrigir um erro funcional no fluxo de perguntas de tanque: hoje, sempre que o cliente informa que "haverá móveis na região do tanque", o sistema gera um CC (Cliente Ciente) pedindo a remoção do tanque existente — mesmo quando o tanque em questão é uma **cuba-tanque embutida no granito/bancada**, caso em que a estrutura ao redor é intencional (serve de apoio) e não deve ser removida.
+Corrigir um erro funcional no fluxo de perguntas de tanque: hoje, sempre que o cliente informa que "haverá móveis na região do tanque", o sistema gera um CC (Cliente Ciente) pedindo a remoção do tanque existente — mesmo quando o tanque em questão está **embutido na bancada de granito**, caso em que a estrutura ao redor é intencional (serve de apoio) e não deve ser removida.
 
-A melhoria adiciona uma pergunta de diferenciação logo após "Existe tanque no local?", perguntando se o tanque é:
+A melhoria adiciona uma nova pergunta, com o texto **"Qual o tipo de tanque?"**, logo após "Existe tanque no local?", com duas opções:
 
-1. **Tradicional** — porcelana ou plástico, com coluna que vai até o piso; ou
-2. **Cuba-tanque** — embutida no granito/bancada.
+1. **"Tanque tradicional (de porcelana ou plástico, apoiado no chão)"**; ou
+2. **"Tanque embutido na bancada de granito"**.
 
 Regra de negócio final, igual para **todos os ambientes que hoje têm o fluxo de tanque**:
 
 - **Tanque tradicional** → mantém o comportamento atual do sistema: a pergunta "Haverá móveis na região do tanque?" continua sendo feita e, se a resposta for "Sim", o CC de remoção do tanque continua sendo gerado.
-- **Cuba-tanque** → a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida, e o sistema não gera o CC de remoção nem os pontos de risco associados nesse ponto do fluxo, pois a estrutura ao redor é intencional.
+- **Tanque embutido na bancada de granito** → a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida, e o sistema não gera o CC de remoção nem os pontos de risco associados nesse ponto do fluxo, pois a estrutura ao redor é intencional.
 
 Diferença em relação ao PRD anterior (`PRD_DIFERENCIACAO_TANQUE_COZINHA.md`): aquele documento restringia a correção apenas ao ambiente Cozinha e tratava o ambiente "Outros" — que tem exatamente o mesmo problema — como fora de escopo. Essa restrição foi descartada a pedido do responsável pelo projeto. Este PRD cobre **todos os ambientes que hoje possuem o fluxo "Existe tanque no local?" → "Haverá móveis na região do tanque?"**, identificados na seção 3 abaixo.
 
@@ -111,7 +111,7 @@ Confirmação cruzada em `src/domain/schema.js`: os blocos `defaultsPorFormType.
 
 ### 4.1 Pergunta e sub-pergunta no formulário
 
-Em `FormCozinha.jsx` (linhas 76-90) e em `FormOutros.jsx` (linhas 99-113), a pergunta "Existe tanque no local?" é exibida com os dois botões padrão Sim/Não. Quando a resposta é "Sim", a sub-pergunta "Haverá móveis na região do tanque?" aparece logo abaixo. Quando essa sub-pergunta é respondida "Sim", um texto de pré-visualização do CC aparece imediatamente na tela, prefixado por "CC:". Hoje esse texto aparece sempre que há tanque e há móveis na região — não importa se o tanque é tradicional ou cuba-tanque.
+Em `FormCozinha.jsx` (linhas 76-90) e em `FormOutros.jsx` (linhas 99-113), a pergunta "Existe tanque no local?" é exibida com os dois botões padrão Sim/Não. Quando a resposta é "Sim", a sub-pergunta "Haverá móveis na região do tanque?" aparece logo abaixo. Quando essa sub-pergunta é respondida "Sim", um texto de pré-visualização do CC aparece imediatamente na tela, prefixado por "CC:". Hoje esse texto aparece sempre que há tanque e há móveis na região — não importa se o tanque é tradicional ou embutido na bancada de granito.
 
 ### 4.2 Geração do gatilho que decide o CC — bloco único compartilhado
 
@@ -137,7 +137,7 @@ O texto do CC, definido em `src/domain/checklistTextos.js` (`TEXTO_TANQUE_RETIRA
 
 > "CLIENTE CIENTE E DE ACORDO DE QUE DEVERÁ RETIRAR TANQUE EXISTENTE DO LOCAL ATÉ DIA DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO."
 
-Este CC só faz sentido para tanque tradicional (peça avulsa, removível). Para cuba-tanque embutida no granito, não existe um "tanque" avulso a ser retirado.
+Este CC só faz sentido para tanque tradicional (peça avulsa, removível). Para o tanque embutido na bancada de granito, não existe um "tanque" avulso a ser retirado.
 
 ### 4.4 Validação do formulário — bloco único compartilhado
 
@@ -199,17 +199,18 @@ O cálculo de score (`scoreEngine.js`), a validação (`formUtils.js`) e a exibi
 | Arquivo | Tipo de alteração |
 |---|---|
 | `src/domain/schema.js` | Adicionar o novo campo de resposta, iniciado como não respondido, em **dois** blocos de valores padrão: `defaultsPorFormType.cozinha` e `defaultsPorFormType.outros` |
-| `src/steps/StepPerguntasPorAmbiente/FormCozinha.jsx` | Adicionar a nova pergunta de tipo de tanque logo após "Existe tanque no local?" e antes de "Haverá móveis na região do tanque?"; ocultar a pergunta de móveis quando o tipo for cuba-tanque. Afeta os ambientes de catálogo "Cozinha / Área de Serviço" e "Varanda / Área Gourmet" |
+| `src/steps/StepPerguntasPorAmbiente/FormCozinha.jsx` | Adicionar a nova pergunta de tipo de tanque logo após "Existe tanque no local?" e antes de "Haverá móveis na região do tanque?"; ocultar a pergunta de móveis quando o tipo for tanque embutido na bancada de granito. Afeta os ambientes de catálogo "Cozinha / Área de Serviço" e "Varanda / Área Gourmet" |
 | `src/steps/StepPerguntasPorAmbiente/FormOutros.jsx` | Mesma alteração acima, aplicada de forma independente neste componente. Afeta o ambiente de catálogo "Outros" |
-| `src/steps/StepPerguntasPorAmbiente/formUtils.js` | Adicionar validação da nova pergunta (obrigatória quando há tanque) e ajustar a obrigatoriedade da pergunta de móveis para não bloquear o avanço quando o tipo for cuba-tanque — dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
+| `src/steps/StepPerguntasPorAmbiente/formUtils.js` | Adicionar validação da nova pergunta (obrigatória quando há tanque) e ajustar a obrigatoriedade da pergunta de móveis para não bloquear o avanço quando o tipo for tanque embutido na bancada de granito — dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
 | `src/domain/scoreEngine.js` | Adicionar a condição de tipo de tanque ao gatilho de remoção de tanque, dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
-| `src/services/pdf.js` | Exibir a nova pergunta e resposta no bloco de tanque do PDF (dentro do bloco único já compartilhado por `['cozinha', 'outros']`), na mesma posição em que aparece no formulário, e ocultar a pergunta/CC de móveis quando o tipo for cuba-tanque |
+| `src/services/pdf.js` | Exibir a nova pergunta e resposta no bloco de tanque do PDF (dentro do bloco único já compartilhado por `['cozinha', 'outros']`), na mesma posição em que aparece no formulário, e ocultar a pergunta/CC de móveis quando o tipo for tanque embutido na bancada de granito |
+| `especificacao-checklist-dinamica.md` | Acrescentar a nova pergunta de tipo de tanque e a condição que ela cria sobre o CC de remoção. **Proibido renumerar as perguntas existentes** — a numeração `P2.1` e todas as demais permanecem exatamente como estão, pois `ccBuilder.js` referencia esses códigos |
 
 ### Arquivos verificados, mas não previstos para alteração
 
 | Arquivo | Motivo |
 |---|---|
-| `src/domain/ccBuilder.js` | Já monta o CC a partir do gatilho `TANQUE_RETIRAR_${instanceId}` de forma genérica, sem checar `formType`; a supressão para cuba-tanque acontece antes, no cálculo do gatilho em `scoreEngine.js` |
+| `src/domain/ccBuilder.js` | Já monta o CC a partir do gatilho `TANQUE_RETIRAR_${instanceId}` de forma genérica, sem checar `formType`; a supressão para tanque embutido na bancada de granito acontece antes, no cálculo do gatilho em `scoreEngine.js` |
 | `src/domain/checklistTextos.js` | O texto legal do CC de remoção de tanque não muda; continua válido para o caso tradicional |
 | `src/steps/StepRevisao/StepRevisao.jsx` | Consome a lista final de CCs (via `construirCCs`) e o score por ambiente (via `calcularScore`) já prontos; não tem lógica própria sobre tipo de tanque |
 | `src/context/FormProvider.jsx` | O reducer `SET_RESPOSTA_AMBIENTE` é genérico; não precisa de ação nova nem de lógica específica de tanque |
@@ -222,27 +223,31 @@ O cálculo de score (`scoreEngine.js`), a validação (`formUtils.js`) e a exibi
 
 ## 7. O que será adicionado
 
-1. Um novo campo de resposta, adicionado tanto em `defaultsPorFormType.cozinha` quanto em `defaultsPorFormType.outros` no `schema.js`, iniciado como não respondido, representando o tipo de tanque informado pelo cliente. Sugestão de nome, seguindo a convenção de campos booleanos já usada no projeto (como os campos que registram se o granito será adaptado ou se há móveis na região do tanque): **`tanqueEmbutido`**, onde um valor representaria "cuba-tanque embutida no granito/bancada" e o outro representaria "tanque tradicional (porcelana/plástico, com coluna até o piso)". O nome exato pode ser ajustado na fase de especificação técnica, desde que a semântica dos dois valores seja preservada e igual nos dois ambientes.
+1. Um novo campo de resposta, adicionado tanto em `defaultsPorFormType.cozinha` quanto em `defaultsPorFormType.outros` no `schema.js`, iniciado como não respondido, representando o tipo de tanque informado pelo cliente. Sugestão de nome, seguindo a convenção de campos booleanos já usada no projeto (como os campos que registram se o granito será adaptado ou se há móveis na região do tanque): **`tanqueEmbutido`**, onde um valor representaria "Tanque embutido na bancada de granito" e o outro representaria "Tanque tradicional (de porcelana ou plástico, apoiado no chão)". O nome exato pode ser ajustado na fase de especificação técnica, desde que a semântica dos dois valores seja preservada e igual nos dois ambientes.
 
-2. Uma nova pergunta, adicionada de forma independente em `FormCozinha.jsx` e em `FormOutros.jsx`, exibida somente quando "Existe tanque no local?" for respondida "Sim", posicionada entre essa pergunta e "Haverá móveis na região do tanque?". A pergunta apresenta duas opções com os textos completos:
-   - "Tanque tradicional (porcelana ou plástico, com coluna até o piso)"
-   - "Cuba-tanque (embutida no granito/bancada)"
+2. Uma nova pergunta, com o texto **"Qual o tipo de tanque?"**, adicionada de forma independente em `FormCozinha.jsx` e em `FormOutros.jsx`, exibida somente quando "Existe tanque no local?" for respondida "Sim", posicionada entre essa pergunta e "Haverá móveis na região do tanque?". A pergunta apresenta duas opções com os textos completos:
+   - "Tanque tradicional (de porcelana ou plástico, apoiado no chão)"
+   - "Tanque embutido na bancada de granito"
 
    Como "Cozinha / Área de Serviço" e "Varanda / Área Gourmet" usam o mesmo componente `FormCozinha.jsx`, a alteração feita nesse arquivo aparece automaticamente para os dois ambientes de catálogo, sem exigir nenhum código adicional específico para "Varanda".
 
-3. Uma condição adicional no cálculo do gatilho de remoção de tanque, no bloco único já compartilhado de `scoreEngine.js`: o gatilho (e, por consequência, o CC e os 2 pontos de risco Médio) só é gerado quando o tanque for do tipo tradicional **e** houver móveis na região. Quando o tipo for cuba-tanque, o gatilho não é gerado, independentemente da resposta sobre móveis — válido para todos os ambientes afetados (Cozinha, Varanda, Outros).
+   Enquanto "Qual o tipo de tanque?" ainda não tiver sido respondida, a pergunta "Haverá móveis na região do tanque?" **não é exibida** no formulário (e, por consequência, não é impressa no PDF — ver item 5 abaixo). Ela só passa a existir depois que a opção "Tanque tradicional (de porcelana ou plástico, apoiado no chão)" for escolhida.
+
+3. Uma condição adicional no cálculo do gatilho de remoção de tanque, no bloco único já compartilhado de `scoreEngine.js`: o gatilho (e, por consequência, o CC e os 2 pontos de risco Médio) só é gerado quando o tanque for do tipo tradicional **e** houver móveis na região. Quando o tipo for tanque embutido na bancada de granito, o gatilho não é gerado, independentemente da resposta sobre móveis — válido para todos os ambientes afetados (Cozinha, Varanda, Outros).
 
 4. Validação obrigatória da nova pergunta: quando "Existe tanque no local?" for "Sim" em qualquer ambiente afetado, o usuário não pode avançar para a próxima etapa sem responder o tipo de tanque — seguindo o mesmo padrão de erro já usado nas demais perguntas condicionais do formulário.
 
-5. Exibição da nova pergunta e da resposta escolhida no bloco de tanque do PDF, na mesma posição em que aparece no formulário (entre "Existe tanque no local?" e "Haverá móveis na região do tanque?"), para todos os ambientes afetados.
+5. Exibição da nova pergunta e da resposta escolhida no bloco de tanque do PDF, na mesma posição em que aparece no formulário (entre "Existe tanque no local?" e "Haverá móveis na região do tanque?"), para todos os ambientes afetados. O PDF imprime a pergunta **"Qual o tipo de tanque?"** com a resposta em texto por extenso, na versão curta: **"Tanque tradicional"** ou **"Embutido na bancada"**. O PDF nunca imprime "Sim"/"Não" para essa pergunta. Enquanto o tipo de tanque não tiver sido respondido, nem a pergunta "Qual o tipo de tanque?" nem "Haverá móveis na região do tanque?" são impressas.
+
+6. Regra de reset ao alternar o tipo de tanque: sempre que a resposta de "Qual o tipo de tanque?" for alterada — em qualquer uma das duas direções (tradicional → embutido ou embutido → tradicional) — a resposta de "Haverá móveis na região do tanque?" volta ao estado "não respondido". Consequência: se o cliente escolher "Tanque embutido na bancada de granito" e depois voltar para "Tanque tradicional (de porcelana ou plástico, apoiado no chão)", ele precisa responder novamente "Haverá móveis na região do tanque?", e o CC de remoção só reaparece depois dessa nova resposta.
 
 ---
 
 ## 8. O que será removido
 
-1. A obrigatoriedade de responder "Haverá móveis na região do tanque?" quando o tipo de tanque for cuba-tanque — essa sub-pergunta deixa de ser exibida e deixa de ser exigida nesse cenário, tanto no formulário quanto no PDF, em todos os ambientes afetados.
+1. A obrigatoriedade de responder "Haverá móveis na região do tanque?" quando o tipo de tanque for tanque embutido na bancada de granito — essa sub-pergunta deixa de ser exibida e deixa de ser exigida nesse cenário, tanto no formulário quanto no PDF, em todos os ambientes afetados.
 
-2. A geração do CC de remoção de tanque e dos 2 pontos de risco associados, exclusivamente para o cenário de cuba-tanque, em qualquer ambiente afetado. O CC continua sendo gerado normalmente para tanque tradicional, exatamente como hoje.
+2. A geração do CC de remoção de tanque e dos 2 pontos de risco associados, exclusivamente para o cenário de tanque embutido na bancada de granito, em qualquer ambiente afetado. O CC continua sendo gerado normalmente para tanque tradicional, exatamente como hoje.
 
 Nenhum texto legal existente é removido ou reescrito — o texto do CC de remoção de tanque permanece o mesmo, apenas passa a ser usado de forma condicionada ao tipo de tanque.
 
@@ -269,7 +274,7 @@ Nenhum texto legal existente é removido ou reescrito — o texto do CC de remo�
 
 2. **Escopo abrange todos os ambientes com o fluxo de tanque hoje.** Diferente da versão anterior deste PRD, esta versão altera o formulário, a validação, o motor de score e o PDF tanto de Cozinha/Varanda quanto de Outros — os três pontos de catálogo que hoje compartilham o problema.
 
-3. **Quando cuba-tanque é selecionada, a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida** (em vez de continuar aparecendo, porém sem gerar CC). Assume-se essa abordagem porque, para uma cuba-tanque embutida no granito, a pergunta sobre "móveis na região do tanque" perde sentido prático — não existe um tanque avulso a ser cercado ou removido. Caso essa suposição não reflita a intenção do negócio, a alternativa (manter a pergunta visível, apenas sem gerar CC) deve ser indicada antes da implementação.
+3. **Quando "Tanque embutido na bancada de granito" é selecionada, a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida** (em vez de continuar aparecendo, porém sem gerar CC). Assume-se essa abordagem porque, para um tanque embutido no granito, a pergunta sobre "móveis na região do tanque" perde sentido prático — não existe um tanque avulso a ser cercado ou removido. Caso essa suposição não reflita a intenção do negócio, a alternativa (manter a pergunta visível, apenas sem gerar CC) deve ser indicada antes da implementação.
 
 4. O novo campo de resposta é obrigatório sempre que "Existe tanque no local?" for "Sim", em qualquer ambiente afetado, seguindo o mesmo padrão de obrigatoriedade das demais sub-perguntas do projeto.
 
@@ -297,13 +302,13 @@ Diferente de `scoreEngine.js`, `formUtils.js` e `pdf.js` (que têm um único blo
 `defaultsPorFormType.cozinha` e `defaultsPorFormType.outros` são objetos distintos. Se o novo campo for adicionado com nomes ou semânticas diferentes em cada bloco, o `scoreEngine.js`, o `formUtils.js` e o `pdf.js` (que leem o campo de forma genérica, sem saber o `formType`) podem se comportar de forma inconsistente entre os dois ambientes. Mitigação: usar exatamente o mesmo nome de campo e os mesmos dois valores possíveis nos dois blocos.
 
 **Risco 4 — Pergunta "Haverá móveis" some sem aviso ao alternar o tipo de tanque.**
-Se o usuário responder "Haverá móveis na região do tanque?" com "Sim" (gerando o CC), e depois voltar e mudar a resposta de "tradicional" para "cuba-tanque", a pergunta de móveis (e o CC) deixam de aparecer imediatamente. Isso é o comportamento correto e esperado, mas precisa ser validado visualmente em ambos os formulários para garantir que o CC não fique "preso" na tela por engano.
+Se o usuário responder "Haverá móveis na região do tanque?" com "Sim" (gerando o CC), e depois voltar e mudar a resposta de "Tanque tradicional" para "Tanque embutido na bancada de granito", a pergunta de móveis (e o CC) deixam de aparecer imediatamente — e a resposta de móveis volta ao estado "não respondido" (ver seção 7, item 6). Isso é o comportamento correto e esperado, mas precisa ser validado visualmente em ambos os formulários para garantir que o CC não fique "preso" na tela por engano. Vale também no sentido inverso: se o usuário alternar de volta para "Tanque tradicional", precisará responder novamente "Haverá móveis na região do tanque?" antes que o CC possa reaparecer.
 
 **Risco 5 — Rascunhos salvos no armazenamento local do navegador.**
 Como descrito na Premissa 7, formulários de Cozinha, Varanda ou Outros já em andamento, com tanque já respondido, exigirão que o usuário responda a nova pergunta antes de conseguir avançar novamente por aquele ambiente. Impacto baixo, mesmo padrão já aceito em melhorias anteriores.
 
 **Risco 6 — Nome do campo em conflito conceitual com o campo de cuba do Banheiro/Outros.**
-O Banheiro e o "Outros" já têm um campo `cuba` que registra o tipo de cuba (Embutir, Semi-encaixe, Sobrepor, Apoio, Esculpida, e "Não se aplica" em Outros) — um conceito totalmente diferente da "cuba-tanque" desta melhoria. Não há conflito técnico, pois os campos pertencem a chaves diferentes dentro da mesma resposta de ambiente (em "Outros" os dois campos, `cuba` e o novo campo de tipo de tanque, conviveriam no mesmo objeto de resposta), mas o nome pode causar confusão para quem for implementar ou manter o código depois. Mitigação: evitar nomear o novo campo apenas como "cuba" ou similar; usar um nome que deixe claro que se trata do tipo de tanque (ex.: `tanqueEmbutido` ou `tanqueTipo`).
+O Banheiro e o "Outros" já têm um campo `cuba` que registra o tipo de cuba (Embutir, Semi-encaixe, Sobrepor, Apoio, Esculpida, e "Não se aplica" em Outros) — um conceito totalmente diferente do "tanque embutido na bancada de granito" desta melhoria. Não há conflito técnico, pois os campos pertencem a chaves diferentes dentro da mesma resposta de ambiente (em "Outros" os dois campos, `cuba` e o novo campo de tipo de tanque, conviveriam no mesmo objeto de resposta), mas o nome pode causar confusão para quem for implementar ou manter o código depois. Mitigação: evitar nomear o novo campo apenas como "cuba" ou similar; usar um nome que deixe claro que se trata do tipo de tanque (ex.: `tanqueEmbutido` ou `tanqueTipo`).
 
 **Risco 7 — Helper `simNao` de `FormOutros.jsx` não aceita rótulos customizados hoje.**
 Ao contrário de `FormCozinha.jsx`, cujo helper `simNao` já aceita `valorTrue`/`valorFalse` customizados, o helper equivalente em `FormOutros.jsx` (linhas 30-43) só produz botões fixos "Sim"/"Não". Implementar a nova pergunta de tipo de tanque em `FormOutros.jsx` exigirá adaptar esse helper (para aceitar rótulos customizados, replicando o padrão de `FormCozinha.jsx`) ou criar um bloco de botões específico só para essa pergunta, sem usar o helper genérico. Qualquer uma das duas opções é simples, mas a divergência precisa ser observada para não gerar um padrão de código diferente entre os dois arquivos sem necessidade.
@@ -316,13 +321,13 @@ Ao contrário de `FormCozinha.jsx`, cujo helper `simNao` já aceita `valorTrue`/
 
 Entrada: usuário está no formulário de um ambiente "Cozinha / Área de Serviço" ou "Varanda / Área Gourmet" e responde "Sim" para "Existe tanque no local?".
 
-Resultado esperado: imediatamente abaixo, antes da pergunta "Haverá móveis na região do tanque?", aparece a nova pergunta com as duas opções: "Tanque tradicional (porcelana ou plástico, com coluna até o piso)" e "Cuba-tanque (embutida no granito/bancada)". Nenhuma das duas opções vem pré-selecionada.
+Resultado esperado: imediatamente abaixo, antes da pergunta "Haverá móveis na região do tanque?", aparece a nova pergunta com o texto **"Qual o tipo de tanque?"** e as duas opções: "Tanque tradicional (de porcelana ou plástico, apoiado no chão)" e "Tanque embutido na bancada de granito". Nenhuma das duas opções vem pré-selecionada. Enquanto nenhuma opção for escolhida, a pergunta "Haverá móveis na região do tanque?" não é exibida.
 
 ### CA-02 — Nova pergunta aparece após "Existe tanque no local?" (Outros)
 
 Entrada: usuário está no formulário de um ambiente "Outros" e responde "Sim" para "Existe tanque no local?".
 
-Resultado esperado: o mesmo comportamento do CA-01 ocorre também neste ambiente, de forma independente.
+Resultado esperado: o mesmo comportamento do CA-01 ocorre também neste ambiente, de forma independente — incluindo o texto exato da pergunta, **"Qual o tipo de tanque?"**, e das duas opções.
 
 ### CA-03 — Nova pergunta não aparece quando não há tanque
 
@@ -342,17 +347,17 @@ Entrada: "Existe tanque no local?" = Sim; tipo de tanque = Tradicional; "Haverá
 
 Resultado esperado: nenhum CC de remoção de tanque é gerado, em nenhum lugar do sistema. Comportamento idêntico ao atual, em qualquer ambiente afetado.
 
-### CA-06 — Cuba-tanque nunca gera o CC de remoção (todos os ambientes afetados)
+### CA-06 — Tanque embutido na bancada de granito nunca gera o CC de remoção (todos os ambientes afetados)
 
-Entrada: "Existe tanque no local?" = Sim; tipo de tanque = Cuba-tanque — testado em Cozinha, Varanda e Outros.
+Entrada: "Existe tanque no local?" = Sim; tipo de tanque = Tanque embutido na bancada de granito — testado em Cozinha, Varanda e Outros.
 
 Resultado esperado: a pergunta "Haverá móveis na região do tanque?" não é exibida no formulário. Nenhum CC de remoção de tanque é gerado para este ambiente — nem no preview do formulário, nem na tela de Revisão, nem no Resumo Executivo do PDF, nem no bloco do ambiente no PDF. O score do ambiente não soma os 2 pontos de risco Médio do gatilho de tanque.
 
-### CA-07 — Alternância entre tradicional e cuba-tanque com CC já visível
+### CA-07 — Alternância entre tradicional e tanque embutido com CC já visível
 
-Entrada: usuário responde tipo de tanque = Tradicional, depois "Haverá móveis" = Sim (CC aparece), e em seguida volta e muda o tipo de tanque para Cuba-tanque.
+Entrada: usuário responde tipo de tanque = Tradicional, depois "Haverá móveis" = Sim (CC aparece), e em seguida volta e muda o tipo de tanque para Tanque embutido na bancada de granito.
 
-Resultado esperado: assim que "Cuba-tanque" é selecionada, a pergunta "Haverá móveis na região do tanque?" e o CC associado desaparecem imediatamente da tela, sem exigir recarregar a página. Válido em qualquer ambiente afetado.
+Resultado esperado: assim que "Tanque embutido na bancada de granito" é selecionada, a pergunta "Haverá móveis na região do tanque?" e o CC associado desaparecem imediatamente da tela, sem exigir recarregar a página. A resposta anterior de "Haverá móveis" não fica apenas oculta — ela volta ao estado "não respondido" (ver CA-18). Válido em qualquer ambiente afetado.
 
 ### CA-08 — Bloqueio de avanço sem responder o tipo de tanque
 
@@ -366,23 +371,23 @@ Entrada: usuário responde "Sim" para "Existe tanque no local?", seleciona "Trad
 
 Resultado esperado: o avanço é bloqueado com erro na pergunta de móveis — mesmo comportamento de hoje, em qualquer ambiente afetado.
 
-### CA-10 — Nenhum bloqueio sobre móveis quando cuba-tanque
+### CA-10 — Nenhum bloqueio sobre móveis quando tanque embutido
 
-Entrada: usuário responde "Sim" para "Existe tanque no local?", seleciona "Cuba-tanque", e tenta avançar sem responder nada mais sobre o tanque.
+Entrada: usuário responde "Sim" para "Existe tanque no local?", seleciona "Tanque embutido na bancada de granito", e tenta avançar sem responder nada mais sobre o tanque.
 
 Resultado esperado: o avanço não é bloqueado por causa da pergunta de móveis, pois ela não é exibida nem exigida nesse cenário. As demais validações do formulário continuam se aplicando normalmente (granito, eletrodomésticos, cortineiro, rodapé, etc., conforme o ambiente).
 
-### CA-11 — PDF reflete o tipo de tanque escolhido, sem CC para cuba-tanque
+### CA-11 — PDF reflete o tipo de tanque escolhido, sem CC para tanque embutido
 
 Entrada: PDF gerado para um ambiente afetado (Cozinha, Varanda ou Outros) com tanque tradicional e móveis = Sim.
 
-Resultado esperado: o bloco do ambiente no PDF exibe, nesta ordem: a pergunta e resposta "Existe tanque no local? — Sim", a pergunta e resposta do tipo de tanque escolhido, a pergunta e resposta "Haverá móveis na região do tanque? — Sim" e o CC de remoção logo abaixo.
+Resultado esperado: o bloco do ambiente no PDF exibe, nesta ordem: a pergunta e resposta "Existe tanque no local? — Sim", a pergunta **"Qual o tipo de tanque?"** com a resposta impressa por extenso como **"Tanque tradicional"** (nunca "Sim"/"Não"), a pergunta e resposta "Haverá móveis na região do tanque? — Sim" e o CC de remoção logo abaixo.
 
-### CA-12 — PDF sem a pergunta de móveis quando cuba-tanque
+### CA-12 — PDF sem a pergunta de móveis quando tanque embutido
 
-Entrada: PDF gerado para um ambiente afetado com "Existe tanque no local?" = Sim e tipo de tanque = Cuba-tanque.
+Entrada: PDF gerado para um ambiente afetado com "Existe tanque no local?" = Sim e tipo de tanque = Tanque embutido na bancada de granito.
 
-Resultado esperado: o bloco do ambiente no PDF exibe a pergunta e resposta "Existe tanque no local? — Sim" e a pergunta e resposta do tipo de tanque escolhido (Cuba-tanque). A pergunta "Haverá móveis na região do tanque?" e qualquer CC de remoção de tanque não aparecem nesse bloco.
+Resultado esperado: o bloco do ambiente no PDF exibe a pergunta e resposta "Existe tanque no local? — Sim" e a pergunta **"Qual o tipo de tanque?"** com a resposta impressa por extenso como **"Embutido na bancada"** (nunca "Sim"/"Não"). A pergunta "Haverá móveis na região do tanque?" e qualquer CC de remoção de tanque não aparecem nesse bloco.
 
 ### CA-13 — Ambientes sem pergunta de tanque permanecem inalterados
 
@@ -394,7 +399,7 @@ Resultado esperado: nenhuma pergunta sobre tanque (nem a atual, nem a nova de ti
 
 Entrada: rascunho salvo no armazenamento local do navegador antes desta mudança, com um ambiente afetado (Cozinha, Varanda ou Outros) em que "Existe tanque no local?" já está respondido como "Sim" (o novo campo de tipo de tanque não existe nesse rascunho).
 
-Resultado esperado: ao reabrir o rascunho, o ambiente é carregado sem erro. A nova pergunta de tipo de tanque aparece como não respondida. Se o usuário tentar avançar por aquele ambiente sem escolher o tipo, o avanço é bloqueado com a mensagem de erro padrão (CA-08). A geração do PDF a partir de um rascunho nesse estado intermediário não deve quebrar — se o campo de tipo de tanque não estiver preenchido, nenhum CC de remoção de tanque é impresso, evitando gerar um CC indevido por dado incompleto.
+Resultado esperado: ao reabrir o rascunho, o ambiente é carregado sem erro. A nova pergunta "Qual o tipo de tanque?" aparece como não respondida. Enquanto ela permanecer não respondida, a pergunta "Haverá móveis na região do tanque?" **não é exibida no formulário nem impressa no PDF**, mesmo que o rascunho legado tenha essa resposta de móveis preenchida de antes desta melhoria — o valor legado de móveis é ignorado até que o tipo de tanque seja escolhido. Se o usuário tentar avançar por aquele ambiente sem escolher o tipo, o avanço é bloqueado com a mensagem de erro padrão (CA-08). A geração do PDF a partir de um rascunho nesse estado intermediário não deve quebrar — se o campo de tipo de tanque não estiver preenchido, nem a pergunta de móveis nem nenhum CC de remoção de tanque são impressos, evitando gerar um CC indevido por dado incompleto.
 
 ### CA-15 — Estado inconsistente sem tanque, mas com tipo preenchido (cenário de erro)
 
@@ -402,26 +407,32 @@ Entrada: por qualquer inconsistência de rascunho, o estado tem "Existe tanque n
 
 Resultado esperado: nem a pergunta de tipo de tanque, nem a pergunta de móveis, nem qualquer CC de remoção de tanque aparecem — o valor do campo de tipo de tanque é ignorado sempre que "Existe tanque no local?" não for "Sim", tanto no formulário quanto no PDF e no cálculo de score. Nenhum erro é lançado.
 
-### CA-16 — Score do ambiente não é afetado pela cuba-tanque
+### CA-16 — Score do ambiente não é afetado pelo tanque embutido na bancada de granito
 
-Entrada: ambiente afetado (Cozinha, Varanda ou Outros) com cuba-tanque e nenhum outro gatilho de risco ativo.
+Entrada: ambiente afetado (Cozinha, Varanda ou Outros) com tanque embutido na bancada de granito e nenhum outro gatilho de risco ativo.
 
 Resultado esperado: o gatilho de remoção de tanque não entra na lista de gatilhos do ambiente, os 2 pontos de risco Médio não são somados, e a classificação de risco do ambiente reflete apenas os demais gatilhos eventualmente ativos (ou fica "Baixo", se nenhum outro gatilho existir).
 
 ### CA-17 — Consistência entre Cozinha, Varanda e Outros com a mesma resposta
 
-Entrada: dois ambientes distintos no mesmo checklist — um "Cozinha / Área de Serviço" e um "Outros" — ambos com "Existe tanque no local?" = Sim, tipo de tanque = Cuba-tanque.
+Entrada: dois ambientes distintos no mesmo checklist — um "Cozinha / Área de Serviço" e um "Outros" — ambos com "Existe tanque no local?" = Sim, tipo de tanque = Tanque embutido na bancada de granito.
 
 Resultado esperado: nenhum dos dois ambientes gera o CC de remoção de tanque nem os 2 pontos de risco; o comportamento é idêntico entre os dois ambientes, sem depender de qual `formType` está sendo avaliado.
+
+### CA-18 — Ida e volta do tipo de tanque exige responder móveis novamente
+
+Entrada: usuário seleciona tipo de tanque = Tanque tradicional, responde "Haverá móveis na região do tanque?" = Sim (CC aparece), depois muda o tipo de tanque para "Tanque embutido na bancada de granito" (pergunta de móveis e CC desaparecem), e em seguida muda o tipo de tanque de volta para "Tanque tradicional".
+
+Resultado esperado: ao voltar para "Tanque tradicional", a pergunta "Haverá móveis na região do tanque?" reaparece, porém no estado "não respondido" — a resposta "Sim" dada anteriormente não é reaproveitada. O CC de remoção não aparece nesse momento. O usuário precisa responder à pergunta de móveis novamente; somente depois dessa nova resposta ser "Sim" o CC volta a ser gerado. Válido em qualquer ambiente afetado, nas duas direções da troca (tradicional → embutido → tradicional e embutido → tradicional → embutido).
 
 ---
 
 ## 13. Fora do escopo
 
 - Alterar o texto legal do CC de remoção de tanque.
-- Criar um novo nível de risco ou uma nova pontuação para cuba-tanque.
+- Criar um novo nível de risco ou uma nova pontuação para tanque embutido na bancada de granito.
 - Alterar qualquer outra pergunta de Cozinha, Varanda ou Outros (granito, eletrodomésticos, eletrônicos, cortineiro, rodapé, tamanho de cama, cuba, observações).
-- Alterar a tela de Revisão ou o Resumo Executivo do PDF além do reflexo natural de o CC não ser mais gerado para cuba-tanque.
+- Alterar a tela de Revisão ou o Resumo Executivo do PDF além do reflexo natural de o CC não ser mais gerado para tanque embutido na bancada de granito.
 - Adicionar pergunta de tanque a ambientes que hoje não a têm (Banheiro, Dormitório, Home/Sala/Office).
 - Migração automática de rascunhos salvos antes desta mudança.
 - Criar testes automatizados.
