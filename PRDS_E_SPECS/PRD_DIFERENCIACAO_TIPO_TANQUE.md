@@ -201,7 +201,7 @@ O cálculo de score (`scoreEngine.js`), a validação (`formUtils.js`) e a exibi
 | `src/domain/schema.js` | Adicionar o novo campo de resposta, iniciado como não respondido, em **dois** blocos de valores padrão: `defaultsPorFormType.cozinha` e `defaultsPorFormType.outros` |
 | `src/steps/StepPerguntasPorAmbiente/FormCozinha.jsx` | Adicionar a nova pergunta de tipo de tanque logo após "Existe tanque no local?" e antes de "Haverá móveis na região do tanque?"; ocultar a pergunta de móveis quando o tipo for tanque embutido na bancada de granito. Afeta os ambientes de catálogo "Cozinha / Área de Serviço" e "Varanda / Área Gourmet" |
 | `src/steps/StepPerguntasPorAmbiente/FormOutros.jsx` | Mesma alteração acima, aplicada de forma independente neste componente. Afeta o ambiente de catálogo "Outros" |
-| `src/steps/StepPerguntasPorAmbiente/formUtils.js` | Adicionar validação da nova pergunta (obrigatória quando há tanque) e ajustar a obrigatoriedade da pergunta de móveis para não bloquear o avanço quando o tipo for tanque embutido na bancada de granito — dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
+| `src/steps/StepPerguntasPorAmbiente/formUtils.js` | Adicionar validação da nova pergunta (obrigatória quando há tanque) e ajustar a obrigatoriedade da pergunta de móveis para não bloquear o avanço quando o tipo for tanque embutido na bancada de granito, nem quando o tipo de tanque ainda não tiver sido respondido (a pergunta de móveis só é validada quando está de fato visível na tela) — dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
 | `src/domain/scoreEngine.js` | Adicionar a condição de tipo de tanque ao gatilho de remoção de tanque, dentro do bloco único já compartilhado por `['cozinha', 'outros']` |
 | `src/services/pdf.js` | Exibir a nova pergunta e resposta no bloco de tanque do PDF (dentro do bloco único já compartilhado por `['cozinha', 'outros']`), na mesma posição em que aparece no formulário, e ocultar a pergunta/CC de móveis quando o tipo for tanque embutido na bancada de granito |
 | `especificacao-checklist-dinamica.md` | Acrescentar a nova pergunta de tipo de tanque e a condição que ela cria sobre o CC de remoção. **Proibido renumerar as perguntas existentes** — a numeração `P2.1` e todas as demais permanecem exatamente como estão, pois `ccBuilder.js` referencia esses códigos |
@@ -241,6 +241,8 @@ O cálculo de score (`scoreEngine.js`), a validação (`formUtils.js`) e a exibi
 
 6. Regra de reset ao alternar o tipo de tanque: sempre que a resposta de "Qual o tipo de tanque?" for alterada — em qualquer uma das duas direções (tradicional → embutido ou embutido → tradicional) — a resposta de "Haverá móveis na região do tanque?" volta ao estado "não respondido". Consequência: se o cliente escolher "Tanque embutido na bancada de granito" e depois voltar para "Tanque tradicional (de porcelana ou plástico, apoiado no chão)", ele precisa responder novamente "Haverá móveis na região do tanque?", e o CC de remoção só reaparece depois dessa nova resposta.
 
+7. Regra de validação: nenhuma mensagem de erro de validação é gerada para uma pergunta que não está sendo exibida na tela. Consequência prática: quando "Existe tanque no local?" = Sim e "Qual o tipo de tanque?" ainda não foi respondida, o único erro exibido ao tentar avançar é o da pergunta de tipo de tanque. A pergunta "Haverá móveis na região do tanque?", por não estar visível nesse momento, não gera erro.
+
 ---
 
 ## 8. O que será removido
@@ -256,7 +258,7 @@ Nenhum texto legal existente é removido ou reescrito — o texto do CC de remo�
 ## 9. O que não será tocado
 
 - A pergunta "Existe tanque no local?" em si — continua exatamente como está, com as mesmas opções "Sim"/"Não", em todos os ambientes afetados.
-- A pergunta "Haverá móveis na região do tanque?" para o caso de tanque tradicional — continua com o mesmo texto, mesmo comportamento e mesmo CC.
+- O TEXTO da pergunta "Haverá móveis na região do tanque?" e o TEXTO do CC de remoção — permanecem idênticos para o caso de tanque tradicional. O COMPORTAMENTO de exibição dessa pergunta muda conforme descrito na seção 7: ela passa a depender da resposta de "Qual o tipo de tanque?" (só existe quando o tipo for tradicional) e é zerada (volta a "não respondida") sempre que o tipo de tanque é alterado.
 - O texto legal do CC de remoção de tanque, em `checklistTextos.js`.
 - As demais perguntas de Cozinha e Outros (granito, eletrodomésticos, eletrônicos, cortineiro, rodapé, tamanho de cama, cuba, observações).
 - O motor de pontuação para os demais gatilhos (perguntas globais G1 a G5, granito, TV, eletros, eletrônicos, rodapé, cortineiro).
@@ -270,11 +272,11 @@ Nenhum texto legal existente é removido ou reescrito — o texto do CC de remo�
 
 ## 10. Premissas assumidas
 
-1. **Interpretação do termo "madeiramento".** Assume-se que a pergunta problemática é a já existente "Haverá móveis na região do tanque?" (campo `tanqueMoveis`), pois é a única pergunta do fluxo de tanque que gera CC de remoção e o cenário descrito só se aplica a ela.
+1. **Interpretação do termo "madeiramento" — confirmada pelo responsável.** A pergunta problemática é a já existente "Haverá móveis na região do tanque?" (campo `tanqueMoveis`), pois é a única pergunta do fluxo de tanque que gera CC de remoção e o cenário descrito só se aplica a ela.
 
 2. **Escopo abrange todos os ambientes com o fluxo de tanque hoje.** Diferente da versão anterior deste PRD, esta versão altera o formulário, a validação, o motor de score e o PDF tanto de Cozinha/Varanda quanto de Outros — os três pontos de catálogo que hoje compartilham o problema.
 
-3. **Quando "Tanque embutido na bancada de granito" é selecionada, a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida** (em vez de continuar aparecendo, porém sem gerar CC). Assume-se essa abordagem porque, para um tanque embutido no granito, a pergunta sobre "móveis na região do tanque" perde sentido prático — não existe um tanque avulso a ser cercado ou removido. Caso essa suposição não reflita a intenção do negócio, a alternativa (manter a pergunta visível, apenas sem gerar CC) deve ser indicada antes da implementação.
+3. **Quando "Tanque embutido na bancada de granito" é selecionada, a pergunta "Haverá móveis na região do tanque?" deixa de ser exibida.** Decisão fechada pelo responsável pelo projeto: para um tanque embutido no granito, a pergunta sobre "móveis na região do tanque" perde sentido prático — não existe um tanque avulso a ser cercado ou removido.
 
 4. O novo campo de resposta é obrigatório sempre que "Existe tanque no local?" for "Sim", em qualquer ambiente afetado, seguindo o mesmo padrão de obrigatoriedade das demais sub-perguntas do projeto.
 
@@ -286,14 +288,14 @@ Nenhum texto legal existente é removido ou reescrito — o texto do CC de remo�
 
 8. Não é necessário criar um novo tipo de CC nem um novo nível de risco. A mudança é uma condição adicional sobre o gatilho já existente de remoção de tanque, mantendo o mesmo nível "Médio" e os mesmos 2 pontos quando aplicável.
 
-9. "Varanda / Área Gourmet" não exige nenhuma alteração de código própria — por compartilhar `formType: 'cozinha'` com "Cozinha / Área de Serviço", a alteração em `FormCozinha.jsx` cobre os dois automaticamente.
+9. **Cobertura automática de "Varanda / Área Gourmet" — confirmada e desejada pelo responsável.** "Varanda / Área Gourmet" não exige nenhuma alteração de código própria — por compartilhar `formType: 'cozinha'` com "Cozinha / Área de Serviço", a alteração em `FormCozinha.jsx` cobre os dois automaticamente.
 
 ---
 
 ## 11. Riscos identificados
 
-**Risco 1 — Divergência de terminologia ("madeiramento" vs. "móveis").**
-Se a pergunta que o solicitante tinha em mente não for a pergunta "Haverá móveis na região do tanque?", a implementação resolveria o problema errado. Mitigação: confirmar a Premissa 1 com o solicitante antes de iniciar a implementação.
+**Nota de contexto (antigo Risco 1) — Divergência de terminologia ("madeiramento" vs. "móveis"), já resolvida.**
+A interpretação de "madeiramento" como a pergunta "Haverá móveis na região do tanque?" foi confirmada pelo responsável (ver Premissa 1). Não há mitigação pendente.
 
 **Risco 2 — Dois componentes de formulário independentes exigem duas edições de interface.**
 Diferente de `scoreEngine.js`, `formUtils.js` e `pdf.js` (que têm um único bloco condicional compartilhado — ver seção 4.6), `FormCozinha.jsx` e `FormOutros.jsx` são componentes React separados, cada um com seu próprio JSX. Um descuido pode fazer a nova pergunta aparecer em um formulário e ser esquecida no outro, deixando o comportamento inconsistente entre Cozinha/Varanda e Outros (esse mesmo tipo de risco já foi registrado antes no projeto — ver `PRD_POLEGADAS_TV.md`, Risco 2, para o par `FormHomeSalaOffice.jsx`/`FormOutros.jsx`). Mitigação: implementar e revisar visualmente os dois formulários lado a lado antes de considerar a melhoria concluída.
@@ -363,7 +365,7 @@ Resultado esperado: assim que "Tanque embutido na bancada de granito" é selecio
 
 Entrada: usuário responde "Sim" para "Existe tanque no local?", não seleciona nenhuma opção na nova pergunta de tipo de tanque, e tenta avançar para o próximo ambiente ou etapa.
 
-Resultado esperado: o avanço é bloqueado, com mensagem de erro do tipo "Selecione uma opção" exibida junto à nova pergunta, seguindo o mesmo padrão visual das demais mensagens de erro do formulário. Válido em qualquer ambiente afetado.
+Resultado esperado: o avanço é bloqueado, com mensagem de erro do tipo "Selecione uma opção" exibida junto à nova pergunta, seguindo o mesmo padrão visual das demais mensagens de erro do formulário. Como "Haverá móveis na região do tanque?" não está sendo exibida nesse momento (ver seção 7, item 7), nenhuma mensagem de erro é gerada para ela — o único erro exibido é o da pergunta de tipo de tanque. Válido em qualquer ambiente afetado.
 
 ### CA-09 — Bloqueio de avanço sem responder sobre móveis, apenas quando tradicional
 
