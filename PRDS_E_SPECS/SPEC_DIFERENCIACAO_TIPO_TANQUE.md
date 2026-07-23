@@ -19,7 +19,7 @@ Sete arquivos são alterados:
 | `src/steps/StepPerguntasPorAmbiente/formUtils.js` | Validação da nova pergunta e ajuste da obrigatoriedade de `tanqueMoveis` |
 | `src/domain/scoreEngine.js` | Condição adicional `tanqueEmbutido === false` no gatilho `TANQUE_RETIRAR_${instanceId}` |
 | `src/services/pdf.js` | Impressão da nova pergunta/resposta e ocultação condicional de "Haverá móveis" |
-| `especificacao-checklist-dinamica.md` | Documentar a nova pergunta e a condição sobre o CC, sem renumerar `P2.1`/demais códigos |
+| `especificacao-checklist-dinamica.md` | Acrescentar, apenas no trecho da pergunta de tanque, a nova pergunta e a condição que ela cria sobre o CC (ver seção 8) |
 
 Nenhuma dependência nova é introduzida e **nenhum arquivo de CSS é criado, movido ou alterado**: as classes reaproveitadas na seção 4 (`styles.opcoesCama`, `styles.opcaoCama`, `styles.ativo`) já existem hoje em `StepPerguntasPorAmbiente.module.css`, módulo já importado por `FormCozinha.jsx` e `FormOutros.jsx` (ver seção 4.1). `src/domain/ccBuilder.js`, `src/domain/checklistTextos.js`, `src/domain/ambientes.js`, `src/context/FormProvider.jsx` e `src/steps/StepRevisao/StepRevisao.jsx` não são tocados (ver seção 9).
 
@@ -129,7 +129,7 @@ Confirmado em `StepPerguntasPorAmbiente.module.css` (linhas 137–147): `.opcoes
 
 **Classe já compartilhada — nenhuma migração de CSS necessária.** `.opcoesCama`, `.opcaoCama` e `.ativo` estão definidas em `StepPerguntasPorAmbiente.module.css`, o **mesmo módulo de estilo já importado por `FormCozinha.jsx` e `FormOutros.jsx`** (`import styles from './StepPerguntasPorAmbiente.module.css'`, confirmado nos dois arquivos). Não há nada restrito ao módulo do Dormitório: o CSS já é acessível aos dois formulários afetados. Por isso a decisão é **reutilizar `styles.opcoesCama`/`styles.opcaoCama` exatamente como estão, sem criar, mover ou duplicar nenhuma classe ou arquivo CSS**.
 
-**Por que não `styles.botoesSimNao`/o helper `simNao`.** `styles.botoesSimNao` é o container de dois botões lado a lado usado por todas as perguntas Sim/Não existentes no projeto; alterá-lo ou reutilizá-lo para uma pergunta com textos longos ("Tanque tradicional (de porcelana ou plástico, apoiado no chão)" / "Tanque embutido na bancada de granito") afetaria visualmente todas as demais perguntas Sim/Não do sistema — **proibido**. O helper `simNao` também não cobre o comportamento necessário (reset condicional de `tanqueMoveis` em **ambas** as direções da troca — ver seção 4.4). A nova pergunta usa, portanto, um bloco de botões dedicado no layout de `styles.opcoesCama`/`styles.opcaoCama`, escrito diretamente no JSX de cada formulário — sem alterar `styles.botoesSimNao`, `styles.ativo` ou o helper `simNao`, e sem tocar em `FormDormitorio.jsx` (usado aqui apenas como referência de leitura, fora do escopo de alteração).
+**Por que não `styles.botoesSimNao`/o helper `simNao`.** `styles.botoesSimNao` é o container de dois botões lado a lado (`display: flex; gap: 10px`, cada `button` com `flex: 1`, confirmado em `StepPerguntasPorAmbiente.module.css` linhas 21–36) usado por todas as perguntas Sim/Não existentes no projeto — o mesmo arquivo define `.ativo` (linhas 38–43), classe de estado "selecionado" compartilhada por `.botoesSimNao button` e por `.opcaoCama`. Alterar `.botoesSimNao` ou reutilizá-lo para uma pergunta com textos longos ("Tanque tradicional (de porcelana ou plástico, apoiado no chão)" / "Tanque embutido na bancada de granito") afetaria visualmente todas as demais perguntas Sim/Não do sistema — **proibido**. O helper `simNao` também não cobre o comportamento necessário (reset condicional de `tanqueMoveis` em **ambas** as direções da troca — ver seção 4.4). A nova pergunta usa, portanto, um bloco de botões dedicado no layout de `styles.opcoesCama`/`styles.opcaoCama`, escrito diretamente no JSX de cada formulário — sem alterar `styles.botoesSimNao`, `styles.ativo` ou o helper `simNao`, e sem tocar em `FormDormitorio.jsx` (usado aqui apenas como referência de leitura, fora do escopo de alteração).
 
 ### 4.2 `FormCozinha.jsx` — bloco "Tanque" (linhas 76–90)
 
@@ -161,6 +161,7 @@ Confirmado em `StepPerguntasPorAmbiente.module.css` (linhas 137–147): `.opcoes
       <p className={styles.subpergunta}>Qual o tipo de tanque?</p>
       <div className={styles.opcoesCama}>
         <button
+          type="button"
           className={`${styles.opcaoCama} ${resp.tanqueEmbutido === false ? styles.ativo : ''}`}
           onClick={() => {
             if (resp.tanqueEmbutido !== false) set('tanqueMoveis', null)
@@ -170,6 +171,7 @@ Confirmado em `StepPerguntasPorAmbiente.module.css` (linhas 137–147): `.opcoes
           Tanque tradicional (de porcelana ou plástico, apoiado no chão)
         </button>
         <button
+          type="button"
           className={`${styles.opcaoCama} ${resp.tanqueEmbutido === true ? styles.ativo : ''}`}
           onClick={() => {
             if (resp.tanqueEmbutido !== true) set('tanqueMoveis', null)
@@ -196,7 +198,7 @@ Confirmado em `StepPerguntasPorAmbiente.module.css` (linhas 137–147): `.opcoes
 </FieldGroup>
 ```
 
-Nenhum import novo é necessário (`TEXTO_TANQUE_RETIRAR` já está importado; `styles.opcoesCama`/`styles.opcaoCama` já existem no mesmo `styles` já importado pelo arquivo).
+Nenhum import novo é necessário (`TEXTO_TANQUE_RETIRAR` já está importado; `styles.opcoesCama`/`styles.opcaoCama` já existem no mesmo `styles` já importado pelo arquivo). Ver seção 4.6 sobre o atributo `type="button"` acrescentado.
 
 ### 4.3 `FormOutros.jsx` — bloco "2. Tanque Existente" (linhas 99–113)
 
@@ -230,6 +232,7 @@ Mesmo diff da seção 4.2, aplicado ao trecho equivalente deste arquivo (título
       <p className={styles.subpergunta}>Qual o tipo de tanque?</p>
       <div className={styles.opcoesCama}>
         <button
+          type="button"
           className={`${styles.opcaoCama} ${resp.tanqueEmbutido === false ? styles.ativo : ''}`}
           onClick={() => {
             if (resp.tanqueEmbutido !== false) set('tanqueMoveis', null)
@@ -239,6 +242,7 @@ Mesmo diff da seção 4.2, aplicado ao trecho equivalente deste arquivo (título
           Tanque tradicional (de porcelana ou plástico, apoiado no chão)
         </button>
         <button
+          type="button"
           className={`${styles.opcaoCama} ${resp.tanqueEmbutido === true ? styles.ativo : ''}`}
           onClick={() => {
             if (resp.tanqueEmbutido !== true) set('tanqueMoveis', null)
@@ -265,15 +269,25 @@ Mesmo diff da seção 4.2, aplicado ao trecho equivalente deste arquivo (título
 </FieldGroup>
 ```
 
-Nenhum import novo é necessário (`TEXTO_TANQUE_RETIRAR` já está importado neste arquivo; `styles.opcoesCama`/`styles.opcaoCama` já existem no mesmo `styles` já importado pelo arquivo).
+Nenhum import novo é necessário (`TEXTO_TANQUE_RETIRAR` já está importado neste arquivo; `styles.opcoesCama`/`styles.opcaoCama` já existem no mesmo `styles` já importado pelo arquivo). Ver seção 4.6 sobre o atributo `type="button"` acrescentado.
 
 ### 4.4 Regra de reset (cobre CA-07 e CA-18)
 
 O `onClick` de cada botão só zera `tanqueMoveis` quando o valor de `tanqueEmbutido` está de fato mudando (`if (resp.tanqueEmbutido !== <novo valor>) set('tanqueMoveis', null)`), evitando um reset desnecessário ao clicar novamente no botão já selecionado. Isso cobre as duas direções pedidas pelo PRD (tradicional → embutido e embutido → tradicional): em qualquer uma delas, ao entrar em um novo valor de `tanqueEmbutido`, a resposta anterior de `tanqueMoveis` é descartada, então, se o usuário voltar a "Tanque tradicional", terá que responder "Haverá móveis..." novamente antes que o CC volte a aparecer.
 
+**Confirmação — helper `set(campo, valor)` (V1).** Confirmado por leitura direta: `FormCozinha.jsx` linha 15–16 e `FormOutros.jsx` linha 27–28 declaram, nos dois arquivos, `const set = (campo, valor) => dispatch({ type: 'SET_RESPOSTA_AMBIENTE', instanceId, campo, valor })`. O código proposto nas seções 4.2 e 4.3 depende exatamente dessa assinatura, já existente e inalterada nos dois arquivos.
+
+**Confirmação — duas chamadas consecutivas de `set(...)` no mesmo `onClick` (V4).** Confirmado por leitura de `src/context/FormProvider.jsx`: o reducer é declarado como função pura `function reducer(state, action)` (linha 55), e o caso `'SET_RESPOSTA_AMBIENTE'` (linhas 160–168) apenas lê `instanceId`/`campo`/`valor` da própria `action` e devolve um novo objeto de estado a partir do `state` recebido como parâmetro — nunca lê uma variável de estado fechada em closure de componente. O `dispatch` retornado por `useReducer` (linha 274) segue o contrato padrão do React: cada chamada de `dispatch` dentro do mesmo `onClick` é enfileirada e processada pelo reducer em sequência, cada uma recebendo o estado já atualizado pela chamada anterior — não o estado desatualizado lido no início do render. Por isso, `set('tanqueMoveis', null)` seguido de `set('tanqueEmbutido', false)` (ou `true`) no mesmo clique aplica as duas gravações corretamente ao estado final, sem risco de a segunda sobrescrever a primeira com um valor defasado. Nenhum ajuste é necessário na regra de reset já descrita nas seções 4.2/4.3.
+
 ### 4.5 Nenhuma alteração de CSS
 
 Como decidido na seção 4.1, a nova pergunta reaproveita exatamente `styles.opcoesCama` (container empilhado, largura total) e `styles.opcaoCama` (botão individual, já preparado para textos mais longos que "Sim"/"Não", inclusive quebra de linha) — o mesmo padrão visual já em produção na pergunta de tamanho de cama do Dormitório. `styles.botoesSimNao` e `styles.ativo` não são tocados em nenhum ponto desta melhoria, preservando o layout de todas as demais perguntas Sim/Não do sistema. `StepPerguntasPorAmbiente.module.css` não entra na lista de arquivos alterados (seção 1): nenhuma classe nova é criada, nenhuma classe existente muda de módulo.
+
+### 4.6 Atributo `type="button"` nos dois novos botões (V3)
+
+**Verificação feita:** os botões gerados hoje pelo helper `simNao` (em `FormCozinha.jsx`, `FormOutros.jsx`, `FormDormitorio.jsx` e `FormHomeSalaOffice.jsx`) **não** declaram o atributo `type`, ou seja, assumem o padrão HTML `type="submit"`. Uma busca em todo o diretório `src/` por `<form` não encontrou nenhuma ocorrência — não existe, hoje, nenhum elemento `<form>` envolvendo esses botões em lugar nenhum da aplicação, portanto o `type="submit"` implícito nunca dispara envio ou recarregamento de página; o clique apenas executa o `onClick`.
+
+Ainda assim, os dois botões novos desta melhoria (seções 4.2 e 4.3) declaram explicitamente `type="button"`. Isso não corrige nenhum defeito hoje existente (o comportamento atual já é seguro, pela ausência de `<form>`) e não é aplicado retroativamente ao helper `simNao` ou a nenhum outro botão já existente — é apenas uma prática defensiva adotada para o código novo, sem exigir nenhuma alteração em arquivo já existente além do próprio bloco de tanque descrito nas seções 4.2/4.3.
 
 ---
 
@@ -406,15 +420,21 @@ if (['cozinha', 'outros'].includes(formType)) {
 - "Qual o tipo de tanque?" nunca imprime "Sim"/"Não" — sempre "Tanque tradicional" ou "Embutido na bancada" (CA-11, CA-12).
 - Quando `tanqueEmbutido` ainda não foi respondido (`null`/`undefined`, incluindo rascunho legado sem o campo), nem "Qual o tipo de tanque?" nem "Haverá móveis..." são impressas — evita gerar um CC indevido por dado incompleto (CA-14).
 - Quando `tanqueEmbutido === true` (embutido), "Haverá móveis..." e o CC associado não são impressos (CA-12).
-- `ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)` já retorna `undefined` para ambientes onde o gatilho não foi ativado (seção 6); `escreverPergunta` já trata itens `undefined`/falsy no array de itens relacionados (ver `itensRelacionados.filter(Boolean)`, confirmado na leitura do arquivo) — nenhuma mudança adicional é necessária nesse ponto.
+- **Confirmação — filtro de itens indefinidos (V5).** Confirmado por leitura de `src/services/pdf.js`: a função `escreverPergunta(pergunta, resposta, itensRelacionados = [])` (linha 187) executa, na linha 198, exatamente `itensRelacionados.filter(Boolean).forEach((item) => escreverInline(item))`. Portanto, quando `ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)` retorna `undefined` (gatilho não ativado para aquele ambiente — seção 6), o array `[undefined]` passado como terceiro argumento é filtrado antes do `forEach`, e nenhuma linha extra é escrita no PDF. Nenhuma mudança adicional é necessária nesse ponto.
 
 ---
 
 ## 8. `especificacao-checklist-dinamica.md`
 
-### 8.1 Contexto encontrado no arquivo
+### 8.1 Contexto encontrado no arquivo e limite da edição autorizada
 
-A seção "Cozinha / A.S. / Varanda" documenta a pergunta do tanque como **"P2 — Existe tanque no local?"** (linhas 125–130), sem uma subnumeração explícita tipo "P2.1" para a sub-pergunta "Haverá móveis..." (diferente do padrão G2.1/G2.2 usado nas perguntas globais). O código de `ccBuilder.js`, por sua vez, usa o valor de string `'P2.1'` internamente no campo `perguntaOrigem` (linha 115) — um identificador interno do CC, não um título deste documento. **Não há relação direta entre a heading "P2" deste arquivo e a string `'P2.1'` do código** — são numerações independentes. A instrução do PRD de "não renumerar `P2.1` e demais códigos" refere-se exclusivamente às strings usadas em `ccBuilder.js`/`pdf.js` como identificadores de CC, que este Spec não altera (seção 6–7). A edição deste arquivo de especificação funcional é livre para descrever a nova pergunta sem qualquer risco de conflito com essas strings internas.
+A seção "Cozinha / A.S. / Varanda" documenta a pergunta do tanque como **"P2 — Existe tanque no local?"** (linhas 125–130), sem uma subnumeração explícita tipo "P2.1" para a sub-pergunta "Haverá móveis..." (diferente do padrão G2.1/G2.2 usado nas perguntas globais). O código de `ccBuilder.js`, por sua vez, usa o valor de string `'P2.1'` internamente no campo `perguntaOrigem` (linha 115) — um identificador interno do CC, não um título deste documento. **Não há relação direta entre a heading "P2" deste arquivo e a string `'P2.1'` do código** — são numerações independentes.
+
+Esse achado técnico **não autoriza uma edição ampla** do arquivo. A alteração permitida neste Spec está estritamente limitada ao trecho da pergunta de tanque (linhas 125–130, seção 8.2): acrescentar a nova pergunta "Qual o tipo de tanque?" e a condição que ela cria sobre o CC de remoção. Continua **proibido**, em qualquer parte do arquivo:
+
+- Renumerar qualquer pergunta existente (P1, P2, P3 em diante, G1–G5, ou qualquer outro código).
+- Alterar qualquer outra seção do arquivo além do trecho indicado na seção 8.2.
+- Reorganizar a estrutura do documento (ordem das seções, das perguntas ou da tabela de gatilhos de score).
 
 ### 8.2 Edição proposta (linhas 125–130)
 
@@ -446,7 +466,7 @@ Nenhuma outra parte do arquivo (numeração de P1, P3 em diante, G1–G5, tabela
 
 - `src/domain/ccBuilder.js` — já consome `TANQUE_RETIRAR_${instanceId}` de `gatilhosAtivados` de forma genérica, sem checar `formType` nem `tanqueEmbutido`; nenhuma alteração necessária.
 - `src/domain/checklistTextos.js` — `TEXTO_TANQUE_RETIRAR` permanece idêntico.
-- `src/context/FormProvider.jsx` — `SET_RESPOSTA_AMBIENTE` é genérico (grava um campo por vez); os dois `set(...)` disparados pelos novos botões (seção 4.4) já são suficientes, sem exigir uma ação de reducer nova.
+- `src/context/FormProvider.jsx` — `SET_RESPOSTA_AMBIENTE` é genérico (grava um campo por vez); os dois `set(...)` disparados pelos novos botões (seção 4.4) já são suficientes, sem exigir uma ação de reducer nova. Ver seção 4.4 para a confirmação de que chamadas consecutivas de `dispatch` no mesmo `onClick` são aplicadas corretamente em sequência.
 - `src/domain/ambientes.js` — nenhum ambiente ou `formType` novo.
 - `src/steps/StepPerguntasPorAmbiente/StepPerguntasPorAmbiente.jsx` — apenas roteia por `formType` e chama a validação genérica; nenhuma lógica nova.
 - `src/steps/StepPerguntasPorAmbiente/FormBanheiro.jsx` — sem pergunta de tanque, não tocado.
@@ -455,6 +475,7 @@ Nenhuma outra parte do arquivo (numeração de P1, P3 em diante, G1–G5, tabela
 - `src/steps/StepPerguntasPorAmbiente/StepPerguntasPorAmbiente.module.css` — nenhuma classe nova, nenhuma classe movida; `styles.opcoesCama`, `styles.opcaoCama`, `styles.ativo` e `styles.botoesSimNao` permanecem exatamente como estão.
 - `src/steps/StepRevisao/StepRevisao.jsx` — consome `construirCCs`/`calcularScore` já prontos; sem lógica própria de tanque.
 - Tabela de eletrodomésticos/eletrônicos, granito, cortineiro, rodapé, tamanho de cama, cuba, TV — nenhuma alteração.
+- Nenhum elemento `<form>` existe em `src/` (busca confirmada) — os botões `type="button"` da seção 4.6 são uma prática defensiva adicional, não a correção de um problema hoje existente.
 
 ---
 
@@ -479,14 +500,23 @@ Referência: seção **Critérios de aceitação** do `PRD_DIFERENCIACAO_TIPO_TA
 ## Plano de Execução
 
 - [ ] Task 1 — Adicionar o campo `tanqueEmbutido: null` em `defaultsPorFormType.cozinha` e `defaultsPorFormType.outros` em `src/domain/schema.js` (seção 3)
-- [ ] Task 2 — Implementar a nova pergunta "Qual o tipo de tanque?" em `FormCozinha.jsx`, usando o layout empilhado `styles.opcoesCama`/`styles.opcaoCama` e o reset condicional de `tanqueMoveis` (seção 4.2, 4.4)
-- [ ] Task 3 — Implementar a mesma pergunta, de forma independente, em `FormOutros.jsx` (seção 4.3, 4.4)
+- [ ] Task 2 — Implementar a nova pergunta "Qual o tipo de tanque?" em `FormCozinha.jsx`, usando o layout empilhado `styles.opcoesCama`/`styles.opcaoCama`, os botões com `type="button"` e o reset condicional de `tanqueMoveis` (seção 4.2, 4.4, 4.6)
+- [ ] Task 3 — Implementar a mesma pergunta, de forma independente, em `FormOutros.jsx` (seção 4.3, 4.4, 4.6)
 - [ ] Task 4 — Ajustar `validarFormularioAmbiente` em `formUtils.js`: validar `tanqueEmbutido` como obrigatório quando há tanque, e tornar `tanqueMoveis` obrigatório apenas quando `tanqueEmbutido === false` (seção 5)
 - [ ] Task 5 — Ajustar o gatilho `TANQUE_RETIRAR_${instanceId}` em `scoreEngine.js`, acrescentando `resp.tanqueEmbutido === false` à condição (seção 6)
 - [ ] Task 6 — Ajustar o bloco de tanque em `pdf.js`: imprimir "Qual o tipo de tanque?" com resposta por extenso e ocultar "Haverá móveis..."/CC quando embutido ou não respondido (seção 7)
-- [ ] Task 7 — Atualizar `especificacao-checklist-dinamica.md` (seção "P2 — Existe tanque no local?") com a nova pergunta e a condição sobre o CC, sem renumerar nada (seção 8)
+- [ ] Task 7 — Atualizar `especificacao-checklist-dinamica.md`, estritamente no trecho "P2 — Existe tanque no local?" (linhas 125–130), com a nova pergunta e a condição sobre o CC — sem renumerar nem reorganizar nenhuma outra parte do arquivo (seção 8)
 - [ ] Task 8 — Validar manualmente, rodando `npm run dev`, os cenários de CA-01 a CA-18 nos três ambientes afetados (Cozinha, Varanda, Outros), incluindo a alternância de tipo com CC já visível (CA-07/CA-18), um rascunho legado simulado no `localStorage` (CA-14) e a checagem visual de que o layout empilhado não alterou nenhuma pergunta Sim/Não existente
 - [ ] Task 9 — Rodar `npm run build` para confirmar que o projeto compila sem erros após todas as alterações
 
 ## Desvios
 
+Nenhum desvio de código encontrado nesta rodada de verificação. As cinco verificações solicitadas (V1–V5) foram confirmadas como verdadeiras por leitura direta do código, sem necessidade de correção no Spec:
+
+- **V1** — confirmado: `set(campo, valor)` existe com essa assinatura em `FormCozinha.jsx` (linha 15–16) e `FormOutros.jsx` (linha 27–28). Ver seção 4.4.
+- **V2** — confirmado: `styles.botoesSimNao` (linhas 21–36) e `styles.ativo` (linhas 38–43) existem com esses nomes exatos em `StepPerguntasPorAmbiente.module.css`; o helper `simNao` usa exatamente essas duas classes. Ver seção 4.1.
+- **V3** — parcialmente diferente do pressuposto implícito do Spec anterior: os botões do helper `simNao` **não** declaram `type="button"` hoje (assumem `type="submit"` por padrão do HTML), mas isso não causa efeito colateral porque **não existe nenhum `<form>`** em `src/`. Ajuste aplicado: os dois botões novos (seções 4.2/4.3) passaram a declarar `type="button"` explicitamente, como prática defensiva, sem alterar o helper `simNao` existente. Ver seção 4.6.
+- **V4** — confirmado: o reducer de `FormProvider.jsx` é uma função pura (`function reducer(state, action)`, linha 55) e o caso `SET_RESPOSTA_AMBIENTE` (linhas 160–168) não depende de closures; duas chamadas consecutivas de `dispatch` no mesmo `onClick` são processadas em sequência pelo React, cada uma sobre o estado já atualizado pela anterior. A regra de reset da seção 4.4 funciona como descrito, sem risco de sobrescrita com estado defasado. Ver seção 4.4.
+- **V5** — confirmado: `escreverPergunta` em `pdf.js` (linha 187, filtro na linha 198) executa `itensRelacionados.filter(Boolean).forEach(...)`, descartando itens `undefined` sem escrever nada extra no PDF. Ver seção 7.2.
+
+A seção 8.1 foi corrigida (D2): a conclusão de que a edição do arquivo de especificação funcional seria "livre" foi substituída por um limite explícito — apenas o trecho da pergunta de tanque pode ser alterado, mantendo proibida a renumeração ou reorganização de qualquer outra parte do documento.
