@@ -1,8 +1,13 @@
 # Checklist Dinâmica — By Arabi Planejados
 
-Sistema web de coleta guiada de informações técnicas para liberação de projetos de móveis planejados. O cliente preenche o formulário através de um link enviado pelo vendedor, o sistema calcula um score de risco automático e gera um PDF estruturado para a equipe de liberação.
+Sistema web de coleta guiada de informações técnicas para liberação de projetos de móveis planejados. O sistema calcula um score de risco automático e gera um PDF estruturado para a equipe de liberação.
 
-## Fluxo Operacional
+A aplicação oferece **dois formulários** a partir da tela inicial de seleção de perfil:
+
+- **Cliente** — preenchido pelo cliente (sozinho ou com o vendedor presente), através de um link enviado pelo vendedor.
+- **Vendedor** (Checklist Técnica do Vendedor) — preenchido pela equipe, com foco em medidas e informações técnicas do projeto.
+
+## Fluxo Operacional (Cliente)
 
 1. Vendedor envia o link ao cliente
 2. Cliente preenche o formulário (sozinho ou com o vendedor presencialmente)
@@ -12,7 +17,9 @@ Sistema web de coleta guiada de informações técnicas para liberação de proj
 
 ## Como funciona o formulário
 
-O formulário é dividido em etapas sequenciais controladas por rota (`HashRouter`):
+A tela inicial (rota `/`) é a **seleção de perfil**, onde se escolhe entre o formulário do **Cliente** e o do **Vendedor**. Ambos são wizards com etapas sequenciais controladas por rota (`HashRouter`).
+
+### Formulário do Cliente
 
 1. **Identificação** — nome, contrato, CEP (autofill via ViaCEP), endereço, telefone
 2. **Ambientes** — seleção dos ambientes adquiridos e suas quantidades (cozinha, dormitórios, banheiro, home/sala/office, varanda, outros)
@@ -22,6 +29,18 @@ O formulário é dividido em etapas sequenciais controladas por rota (`HashRoute
 6. **Sucesso** — confirmação e download do PDF
 
 Cada etapa problemática pode gerar um **cliente ciente (CC)** — texto de responsabilidade que o cliente declara estar ciente — e contribui pontos para o **score de risco** (🟢 Baixo / 🟡 Médio / 🔴 Alto), calculado por ambiente e globalmente. As regras completas de perguntas, CCs e pontuação estão documentadas em [especificacao-checklist-dinamica.md](especificacao-checklist-dinamica.md).
+
+### Formulário do Vendedor
+
+Checklist técnica preenchida pela equipe, sob o prefixo de rota `/vendedor`:
+
+1. **Identificação** (`/vendedor/identificacao`)
+2. **Ambientes** (`/vendedor/ambientes`) — seleção dos ambientes do projeto
+3. **Perguntas por Ambiente** (`/vendedor/ambiente/:instanceId`) — uma etapa dinâmica por ambiente, com perguntas técnicas agrupadas (grupos A/B/C)
+4. **Revisão** (`/vendedor/revisao`) — inclui aviso de envio conjunto
+5. **Sucesso** (`/vendedor/sucesso`) — confirmação e download do PDF
+
+O fluxo do vendedor tem estado, schema e PDF próprios (arquivos com sufixo `Vendedor`), independentes do fluxo do cliente.
 
 ## Stack técnica
 
@@ -38,23 +57,28 @@ Cada etapa problemática pode gerar um **cliente ciente (CC)** — texto de resp
 
 ```
 src/
-├── App.jsx                    # rotas e layout (stepper + header)
-├── context/                   # FormProvider / FormContext (estado global do formulário)
+├── App.jsx                    # rotas e layout (stepper + header) dos dois perfis
+├── screens/SelecaoPerfil/     # tela inicial de escolha entre Cliente e Vendedor
+├── context/                   # FormProvider / FormContext (+ variantes *Vendedor)
 ├── domain/                    # regras de negócio: ambientes, score, clientes cientes, textos
 │   ├── ambientes.js
 │   ├── ccBuilder.js            # construção dos "clientes cientes"
 │   ├── scoreEngine.js          # cálculo do score de risco
+│   ├── schema.js               # estado inicial / defaults (schemaVendedor.js p/ o vendedor)
+│   ├── gruposPerguntasVendedor.js
 │   └── checklistTextos.js
 ├── services/
 │   ├── cep.js                  # integração ViaCEP
-│   └── pdf.js                  # geração do PDF final
-├── steps/                     # uma pasta por etapa do fluxo
+│   ├── pdf.js                  # geração do PDF do cliente
+│   └── pdfVendedor.js          # geração do PDF do vendedor
+├── steps/                     # uma pasta por etapa do fluxo do cliente
 │   ├── StepIdentificacao/
 │   ├── StepAmbientes/
 │   ├── StepPerguntasGlobais/
 │   ├── StepPerguntasPorAmbiente/  # formulários específicos por tipo de ambiente
 │   ├── StepRevisao/
-│   └── StepSucesso/
+│   ├── StepSucesso/
+│   └── vendedor/               # etapas do fluxo do vendedor (*Vendedor)
 └── components/                # componentes reutilizáveis (Header, Stepper, Modal, etc.)
 ```
 
@@ -73,4 +97,4 @@ O deploy é automático via GitHub Actions ao dar push na branch `main`, publica
 
 ## Roadmap
 
-A arquitetura é modular e escalável, preparada para futura adição de backend, login e banco de dados. A base de código foi desenhada para ser reutilizada também na **Checklist Técnica do Vendedor**, uma etapa futura do mesmo produto.
+A arquitetura é modular e escalável, preparada para futura adição de backend, login e banco de dados. A **Checklist Técnica do Vendedor** já está implementada (fluxo `/vendedor`), reaproveitando a base de código do formulário do cliente.
