@@ -361,11 +361,20 @@ export async function gerarPdf(state) {
         resp.tanque === true ? 'Sim' : resp.tanque === false ? 'Não' : '—'
       )
       if (resp.tanque === true) {
-        escreverPergunta(
-          'Haverá móveis na região do tanque?',
-          resp.tanqueMoveis === true ? 'Sim' : resp.tanqueMoveis === false ? 'Não' : '—',
-          [ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)]
-        )
+        const tipoTanqueRespondido = resp.tanqueEmbutido === true || resp.tanqueEmbutido === false
+        if (tipoTanqueRespondido) {
+          escreverPergunta(
+            'Qual o tipo de tanque?',
+            resp.tanqueEmbutido === true ? 'Embutido na bancada' : 'Tanque tradicional'
+          )
+          if (resp.tanqueEmbutido === false) {
+            escreverPergunta(
+              'Haverá móveis na região do tanque?',
+              resp.tanqueMoveis === true ? 'Sim' : resp.tanqueMoveis === false ? 'Não' : '—',
+              [ccPorId.get(`TANQUE_RETIRAR_${instanceId}`)]
+            )
+          }
+        }
       }
     }
 

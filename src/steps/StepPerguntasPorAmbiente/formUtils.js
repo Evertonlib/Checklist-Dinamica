@@ -126,8 +126,13 @@ export function validarFormularioAmbiente(formType, resp) {
 
   if (['cozinha', 'outros'].includes(formType)) {
     if (resp.tanque === null) erros.tanque = 'Selecione uma opção'
-    if (resp.tanque === true && resp.tanqueMoveis === null) {
-      erros.tanqueMoveis = 'Selecione uma opção'
+    if (resp.tanque === true) {
+      const tipoTanqueRespondido = resp.tanqueEmbutido === true || resp.tanqueEmbutido === false
+      if (!tipoTanqueRespondido) {
+        erros.tanqueEmbutido = 'Selecione uma opção'
+      } else if (resp.tanqueEmbutido === false && resp.tanqueMoveis === null) {
+        erros.tanqueMoveis = 'Selecione uma opção'
+      }
     }
     if (resp.eletrosDefined === null) erros.eletrosDefined = 'Selecione uma opção'
     if (resp.eletrosDefined === true) {

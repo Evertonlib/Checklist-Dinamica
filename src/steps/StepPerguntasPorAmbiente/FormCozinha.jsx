@@ -79,11 +79,38 @@ export function FormCozinha({ instanceId, erros = {} }) {
         {erros.tanque && <span className={`${styles.erro} erro-campo`}>{erros.tanque}</span>}
         {resp.tanque === true && (
           <>
-            <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
-            {simNao('tanqueMoveis')}
-            {erros.tanqueMoveis && <span className={`${styles.erro} erro-campo`}>{erros.tanqueMoveis}</span>}
-            {resp.tanqueMoveis === true && (
-              <p className={styles.aviso}>CC: {TEXTO_TANQUE_RETIRAR}</p>
+            <p className={styles.subpergunta}>Qual o tipo de tanque?</p>
+            <div className={styles.opcoesCama}>
+              <button
+                className={`${styles.opcaoCama} ${resp.tanqueEmbutido === false ? styles.ativo : ''}`}
+                onClick={() => {
+                  if (resp.tanqueEmbutido !== false) set('tanqueMoveis', null)
+                  set('tanqueEmbutido', false)
+                }}
+              >
+                Tanque tradicional (de porcelana ou plástico, apoiado no chão)
+              </button>
+              <button
+                className={`${styles.opcaoCama} ${resp.tanqueEmbutido === true ? styles.ativo : ''}`}
+                onClick={() => {
+                  if (resp.tanqueEmbutido !== true) set('tanqueMoveis', null)
+                  set('tanqueEmbutido', true)
+                }}
+              >
+                Tanque embutido na bancada de granito
+              </button>
+            </div>
+            {erros.tanqueEmbutido && <span className={`${styles.erro} erro-campo`}>{erros.tanqueEmbutido}</span>}
+
+            {resp.tanqueEmbutido === false && (
+              <>
+                <p className={styles.subpergunta}>Haverá móveis na região do tanque?</p>
+                {simNao('tanqueMoveis')}
+                {erros.tanqueMoveis && <span className={`${styles.erro} erro-campo`}>{erros.tanqueMoveis}</span>}
+                {resp.tanqueMoveis === true && (
+                  <p className={styles.aviso}>CC: {TEXTO_TANQUE_RETIRAR}</p>
+                )}
+              </>
             )}
           </>
         )}

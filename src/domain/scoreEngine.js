@@ -64,7 +64,7 @@ export function calcularScore(state) {
 
     // Tanque → Cozinha, Outros
     if (['cozinha', 'outros'].includes(formType)) {
-      if (resp.tanque === true && resp.tanqueMoveis === true) {
+      if (resp.tanque === true && resp.tanqueEmbutido === false && resp.tanqueMoveis === true) {
         gatilhosAtivados.push(`TANQUE_RETIRAR_${instanceId}`)
         gatilhosAmbiente.push({ id: `TANQUE_RETIRAR_${instanceId}`, nivel: 'Médio', pontos: 2 })
       }

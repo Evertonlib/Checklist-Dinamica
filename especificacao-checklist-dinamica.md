@@ -123,11 +123,13 @@ Cliente marca os ambientes adquiridos e define quantidades via setas ↕:
   🟡 Risco: Médio +2
 
 **P2 — Existe tanque no local?**
-- Se SIM → "Haverá móveis na região do tanque?"
-  - Se SIM:
-  > **CC:** CLIENTE CIENTE E DE ACORDO DE QUE DEVERÁ RETIRAR TANQUE EXISTENTE DO LOCAL ATÉ DIA DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO.
-  
-  🟡 Risco: Médio +2
+- Se SIM → **"Qual o tipo de tanque?"** (Tanque tradicional (de porcelana ou plástico, apoiado no chão) / Tanque embutido na bancada de granito)
+  - Se **Tanque tradicional** → "Haverá móveis na região do tanque?"
+    - Se SIM:
+    > **CC:** CLIENTE CIENTE E DE ACORDO DE QUE DEVERÁ RETIRAR TANQUE EXISTENTE DO LOCAL ATÉ DIA DA MONTAGEM PARA CORRETA ADEQUAÇÃO DO PROJETO.
+
+    🟡 Risco: Médio +2
+  - Se **Tanque embutido na bancada de granito** → a pergunta "Haverá móveis na região do tanque?" não é exibida; nenhum CC é gerado.
 
 **P3 — Eletrodomésticos definidos?**
 - "Já possui ou tem intenção de compra específica dos eletrodomésticos?"
