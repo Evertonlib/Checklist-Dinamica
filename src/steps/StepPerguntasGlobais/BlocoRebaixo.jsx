@@ -6,7 +6,11 @@ import styles from './StepPerguntasGlobais.module.css'
 
 export function BlocoRebaixo() {
   const { state, dispatch } = useFormContext()
-  const { g4_temRebaixo, g4_ambientes } = state.global
+  const { g4_temRebaixo, g4_ambientes, g4_rebaixoOpcao } = state.global
+
+  // Rascunhos salvos antes do botao "Ja rebaixado" nao tem g4_rebaixoOpcao:
+  // deriva do valor de negocio para nao perder o destaque do botao.
+  const opcaoAtiva = g4_rebaixoOpcao ?? (g4_temRebaixo === true ? 'sim' : g4_temRebaixo === false ? 'nao' : null)
   const ambientes = state.ambientesSelecionados
 
   const setGlobal = (campo, valor) => dispatch({ type: 'SET_GLOBAL', campo, valor })
@@ -31,18 +35,30 @@ export function BlocoRebaixo() {
   return (
     <FieldGroup titulo="G5 — Rebaixo de Teto">
       <p className={styles.pergunta}>Algum ambiente terá rebaixo de teto?</p>
-      <div className={styles.botoesSimNao}>
+      <div className={`${styles.botoesSimNao} ${styles.botoesRebaixo}`}>
         <button
-          className={g4_temRebaixo === true ? styles.ativo : ''}
-          onClick={() => setGlobal('g4_temRebaixo', true)}
+          className={opcaoAtiva === 'sim' ? styles.ativo : ''}
+          onClick={() => {
+            setGlobal('g4_temRebaixo', true)
+            setGlobal('g4_rebaixoOpcao', 'sim')
+          }}
         >Sim</button>
         <button
-          className={g4_temRebaixo === false ? styles.ativo : ''}
+          className={opcaoAtiva === 'nao' ? styles.ativo : ''}
           onClick={() => {
             setGlobal('g4_temRebaixo', false)
             setGlobal('g4_ambientes', [])
+            setGlobal('g4_rebaixoOpcao', 'nao')
           }}
         >Não</button>
+        <button
+          className={opcaoAtiva === 'ja_rebaixado' ? styles.ativo : ''}
+          onClick={() => {
+            setGlobal('g4_temRebaixo', false)
+            setGlobal('g4_ambientes', [])
+            setGlobal('g4_rebaixoOpcao', 'ja_rebaixado')
+          }}
+        >Já rebaixado</button>
       </div>
 
       {g4_temRebaixo === true && (

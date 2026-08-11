@@ -44,6 +44,17 @@
   color: #7a6030;
 }
 
+/* Bloco de rebaixo tem 3 opcoes; em tela estreita a terceira quebra para a linha de baixo
+   em vez de espremer o texto. Nao afeta os demais blocos Sim/Nao. */
+.botoesRebaixo {
+  flex-wrap: wrap;
+}
+
+.botoesRebaixo button {
+  flex: 1 1 30%;
+  min-width: 90px;
+}
+
 .subbloco {
   margin-top: 12px;
   padding-top: 12px;

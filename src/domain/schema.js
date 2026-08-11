@@ -111,6 +111,10 @@ export const estadoInicial = {
     g3_ambientesPendentes: [],
     g4_temRebaixo: null,
     g4_ambientes: [],
+    // Apenas visual: qual dos tres botoes ficou marcado ('sim' | 'nao' | 'ja_rebaixado').
+    // "Ja rebaixado" registra o mesmo g4_temRebaixo = false que "Nao"; nada em
+    // scoreEngine/ccBuilder/pdf le este campo.
+    g4_rebaixoOpcao: null,
   },
 
   respostasPorAmbiente: {},
