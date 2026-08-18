@@ -333,12 +333,23 @@ export async function gerarPdf(state) {
 
     for (const origem of PERGUNTAS_GLOBAIS) {
       const cc = ccs.find((c) => c.perguntaOrigem === origem && c.escopo === instanceId)
-      if (!cc) continue
-      escreverPergunta(
-        textoPerguntaGlobal(origem),
-        respostaGlobalPorAmbiente(origem, instanceId),
-        [cc]
-      )
+      if (cc) {
+        escreverPergunta(
+          textoPerguntaGlobal(origem),
+          respostaGlobalPorAmbiente(origem, instanceId),
+          [cc]
+        )
+        continue
+      }
+      // Sem CC, so G1 e G5 continuam aparecendo: a negativa do cliente precisa
+      // ficar registrada no documento como prova (se ele rebaixar o teto ou
+      // instalar iluminacao depois). Texto puro, sem CC, aviso ou pontuacao.
+      if (origem === 'G1' && global.g1_temIluminacaoExterna != null) {
+        escreverPergunta(textoPerguntaGlobal('G1'), 'Não')
+      }
+      if (origem === 'G5' && global.g4_temRebaixo != null) {
+        escreverPergunta(textoPerguntaGlobal('G5'), 'Não')
+      }
     }
 
     if (['cozinha', 'banheiro', 'outros'].includes(formType)) {
