@@ -46,6 +46,18 @@ function formatarListaRebaixo(ambientes, rebaixos) {
     .join(', ')
 }
 
+// Ordem de prioridade dos eletros na tabela do PDF. Tipos fora desta lista
+// vêm depois, preservando a ordem em que o cliente os adicionou.
+const ORDEM_ELETROS_PDF = ['Cooktop', 'Fogão', 'Refrigerador', 'Microondas', 'Forno', 'Depurador']
+
+function ordenarEletros(eletros) {
+  const prioridade = (eletro) => {
+    const posicao = ORDEM_ELETROS_PDF.indexOf(eletro.tipo)
+    return posicao === -1 ? ORDEM_ELETROS_PDF.length : posicao
+  }
+  return [...eletros].sort((a, b) => prioridade(a) - prioridade(b))
+}
+
 function descreverEletro(eletro) {
   const partes = [eletro.tipo]
 
@@ -451,7 +463,8 @@ export async function gerarPdf(state) {
       if (resp.eletrosDefined === true && resp.eletros?.length > 0) {
         escreverSubtituloSecao('Eletrodomésticos')
         garantirEspaco(20)
-        const eletrosBody = resp.eletros.map((eletro) => [
+        const eletrosOrdenados = ordenarEletros(resp.eletros)
+        const eletrosBody = eletrosOrdenados.map((eletro) => [
           descreverEletro(eletro) || '—',
           eletro.modelo || '—',
           eletro.largura_cm || '—',
@@ -459,7 +472,7 @@ export async function gerarPdf(state) {
           eletro.profundidade_cm || '—',
           eletro.link ? 'Ver link' : '—',
         ])
-        const eletrosUrls = resp.eletros.map((eletro) => eletro.link || null)
+        const eletrosUrls = eletrosOrdenados.map((eletro) => eletro.link || null)
         autoTable(doc, {
           startY: y,
           margin: { left: margemEsquerda, right: margemDireita },
