@@ -567,5 +567,5 @@ export async function gerarPdf(state) {
     }
   })
 
-  doc.save(`Checklist_ByArabi_${contrato}_${dataArquivo}.pdf`)
+  doc.save(`Checklist_Cliente_${contrato}_${dataArquivo}.pdf`)
 }
