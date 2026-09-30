@@ -1,0 +1,903 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Design System By Arabi</title>
+<style>
+:root{
+  --ba-gold:#e3b838; --ba-gold-soft:#f0d781; --ba-gold-hover:#edc94f;
+  --ba-gold-deep:#a77d0b; --ba-on-gold:#17140b;
+  --ba-ink:#101411; --ba-ink-soft:#1a201c; --ba-ink-deep:#080a09;
+  --ba-paper:#f5f0e6; --ba-paper-deep:#e9e1d2; --ba-white:#fffef9;
+  --ba-muted:#6d716d;
+
+  --bg:#f5f0e6; --band-b:#fffef9; --band-c:#e9e1d2;
+  --text:#101411; --text-muted:#5f635f;
+  --rule:rgba(16,20,17,.14); --rule-soft:rgba(16,20,17,.08);
+  --accent:#a77d0b; --accent-graphic:#e3b838;
+  --card:#fffef9; --card-border:rgba(16,20,17,.10);
+  --code-bg:rgba(16,20,17,.05);
+  --ok:#2f6b45; --warn:#9a5b1f; --danger:#a32f2b;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101411; --band-b:#0c0f0d; --band-c:#1a201c;
+    --text:#fffef9; --text-muted:rgba(255,255,255,.62);
+    --rule:rgba(255,255,255,.16); --rule-soft:rgba(255,255,255,.09);
+    --accent:#e3b838; --accent-graphic:#e3b838;
+    --card:#1a201c; --card-border:rgba(255,255,255,.12);
+    --code-bg:rgba(255,255,255,.06);
+    --ok:#5faa7c; --warn:#e2934a; --danger:#f0736d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101411; --band-b:#0c0f0d; --band-c:#1a201c;
+  --text:#fffef9; --text-muted:rgba(255,255,255,.62);
+  --rule:rgba(255,255,255,.16); --rule-soft:rgba(255,255,255,.09);
+  --accent:#e3b838; --accent-graphic:#e3b838;
+  --card:#1a201c; --card-border:rgba(255,255,255,.12);
+  --code-bg:rgba(255,255,255,.06);
+  --ok:#5faa7c; --warn:#e2934a; --danger:#f0736d;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; margin:0; line-height:1.6;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent-graphic);outline-offset:4px}
+
+.band{padding:clamp(52px,7vw,100px) max(22px,50vw - 560px);display:grid;gap:34px}
+.band-b{background:var(--band-b)}
+.band-c{background:var(--band-c)}
+.band-ink{background:#101411;color:#fffef9}
+.band-ink .lede,.band-ink .note{color:rgba(255,255,255,.66)}
+/* a faixa tinta é fixa nos dois temas: seus filhos não podem usar tokens de página */
+.band-ink pre{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.11);color:#fffef9}
+.band-ink p code,.band-ink li code,.band-ink td code{background:rgba(255,255,255,.1)}
+.band-ink .table-wrap{background:#1a201c;border-color:rgba(255,255,255,.16)}
+.band-ink th{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
+.band-ink td{border-bottom-color:rgba(255,255,255,.09)}
+.band-ink .faq-demo,.band-ink .faq-demo details{border-color:rgba(255,255,255,.16)}
+.band-ink .faq-demo summary i{color:#e3b838}
+.band-ink .faq-demo details p{color:rgba(255,255,255,.62)}
+
+.eyebrow{
+  color:var(--accent); letter-spacing:.18em; text-transform:uppercase;
+  font-size:11px; font-weight:800; margin:0;
+}
+.band-ink .eyebrow{color:var(--ba-gold)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;text-wrap:balance;margin:0}
+h1{font-size:clamp(42px,6vw,72px);letter-spacing:-.05em;line-height:1.0}
+h2{font-size:clamp(30px,3.6vw,46px);letter-spacing:-.04em;line-height:1.06}
+h3{font-size:22px;letter-spacing:-.02em;line-height:1.2}
+h1 em,h2 em{color:var(--accent);font-style:normal}
+.band-ink h2 em{color:var(--ba-gold)}
+.lede{color:var(--text-muted);font-size:16px;line-height:1.75;max-width:62ch;margin:0}
+p{margin:0;max-width:68ch}
+.note{color:var(--text-muted);font-size:13px;line-height:1.7;max-width:70ch;margin:0}
+.head{display:grid;gap:14px}
+.stack{display:grid;gap:18px}
+.stack-lg{display:grid;gap:30px}
+
+.tag{
+  display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+  padding:5px 11px;font-size:9px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;border:1px solid var(--rule);color:var(--text-muted);
+  white-space:nowrap;
+}
+.tag-measured{border-color:rgba(167,125,11,.45);color:var(--accent)}
+.band-ink .tag-measured{border-color:rgba(227,184,56,.5);color:var(--ba-gold)}
+
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:16px}
+
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:22px;display:grid;gap:10px;align-content:start}
+.card h3{font-size:19px}
+.card p{font-size:13.5px;line-height:1.7;color:var(--text-muted)}
+
+.swatch{border:1px solid var(--card-border);border-radius:12px;overflow:hidden;display:grid}
+.swatch-chip{height:80px}
+.swatch-body{padding:13px 14px;display:grid;gap:3px;background:var(--card)}
+.swatch-name{font-size:12.5px;font-weight:700}
+.swatch-hex{font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:11.5px;color:var(--text-muted);text-transform:uppercase}
+.swatch-use{font-size:11.5px;color:var(--text-muted);line-height:1.55}
+
+pre{
+  background:var(--code-bg);border:1px solid var(--rule-soft);border-radius:10px;
+  padding:16px 18px;overflow-x:auto;margin:0;
+  font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:12.5px;line-height:1.7;
+}
+code{font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:.92em}
+p code,li code,td code{background:var(--code-bg);border-radius:4px;padding:1px 5px}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:13px}
+th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+th{
+  font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;
+  color:var(--text-muted);background:var(--code-bg);
+}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Consolas,monospace;white-space:nowrap}
+
+.ctx{border-radius:14px;padding:26px;display:grid;gap:18px;border:1px solid transparent}
+.ctx-paper{background:#f5f0e6;color:#101411;border-color:rgba(16,20,17,.12)}
+.ctx-ink{background:#101411;color:#fffef9;border-color:rgba(255,255,255,.14)}
+.ctx-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;opacity:.6;margin:0}
+.ctx-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:18px;
+  border-radius:999px;min-height:54px;padding:0 24px;font-size:12px;font-weight:850;
+  letter-spacing:.03em;cursor:pointer;text-decoration:none;
+  border:1px solid transparent;font-family:inherit;
+  transition:transform .18s,box-shadow .18s,background .18s,color .18s;
+}
+.btn-primary{background:#e3b838;border-color:#e3b838;color:#17140b}
+.btn-primary:hover{background:#edc94f;transform:translateY(-3px);box-shadow:0 14px 34px rgba(227,184,56,.23)}
+.btn-outline{background:transparent;border-color:#e3b838;color:#e3b838}
+.btn-outline:hover{background:#e3b838;color:#17140b;transform:translateY(-2px)}
+.ctx-paper .btn-outline{border-color:#a77d0b;color:#a77d0b}
+.ctx-paper .btn-outline:hover{background:#a77d0b;color:#fffef9}
+.btn-dark{background:#101411;border-color:#101411;color:#fff}
+.btn-dark:hover{background:#1a201c;transform:translateY(-3px);box-shadow:0 14px 34px rgba(16,20,17,.2)}
+
+.field{display:grid;gap:6px;max-width:310px}
+.field span{font-size:11px;font-weight:750;opacity:.75}
+.field input{
+  height:48px;border-radius:9px;padding:0 13px;width:100%;font:inherit;font-size:14px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.ctx-ink .field input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff}
+.ctx-paper .field input{background:#fffef9;border:1px solid rgba(16,20,17,.16);color:#101411}
+.field input:focus{outline:none;border-color:#e3b838;box-shadow:0 0 0 3px rgba(227,184,56,.14)}
+.ctx-paper .field input:focus{border-color:#a77d0b;box-shadow:0 0 0 3px rgba(167,125,11,.16)}
+
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid;border-bottom:1px solid}
+.ctx-paper .metrics,.ctx-paper .metrics>div{border-color:rgba(16,20,17,.14)}
+.ctx-ink .metrics,.ctx-ink .metrics>div{border-color:rgba(255,255,255,.16)}
+.metrics>div{display:grid;gap:5px;padding:20px 16px;border-right:1px solid}
+.metrics,.metrics>div{border-color:var(--rule)}
+.metrics>div:first-child{padding-left:0}
+.metrics>div:last-child{border-right:0}
+.metrics strong{font-family:Georgia,serif;font-weight:400;font-size:34px;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.ctx-paper .metrics strong{color:#a77d0b}
+.ctx-ink .metrics strong{color:#e3b838}
+.metrics span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.65;line-height:1.4}
+
+.type-row{display:grid;gap:8px;padding:20px 0;border-bottom:1px solid var(--rule-soft)}
+.type-row:last-child{border-bottom:0}
+.type-meta{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--text-muted)}
+.t-h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(38px,5.2vw,68px);letter-spacing:-.05em;line-height:1.0}
+.t-h2{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,3.8vw,50px);letter-spacing:-.045em;line-height:1.02}
+.t-h3{font-family:Georgia,serif;font-weight:400;font-size:26px;letter-spacing:-.02em}
+.t-body{font-size:15px;line-height:1.8;max-width:62ch}
+.t-small{font-size:13px;line-height:1.7;color:var(--text-muted);max-width:66ch}
+.t-eyebrow{color:var(--accent);letter-spacing:.18em;text-transform:uppercase;font-size:11px;font-weight:800}
+
+.faq-demo{border-top:1px solid var(--rule)}
+.faq-demo details{border-bottom:1px solid var(--rule)}
+.faq-demo summary{
+  cursor:pointer;list-style:none;display:grid;grid-template-columns:1fr 30px;
+  align-items:center;gap:20px;min-height:70px;font-family:Georgia,serif;font-size:19px;
+}
+.faq-demo summary::-webkit-details-marker{display:none}
+.faq-demo summary i{
+  font-style:normal;color:var(--accent);justify-self:end;font-family:Arial,sans-serif;
+  font-size:22px;font-weight:300;transition:transform .18s;
+}
+.faq-demo details[open] summary i{transform:rotate(45deg)}
+.faq-demo details p{font-size:13.5px;line-height:1.7;color:var(--text-muted);margin:-4px 50px 24px 0}
+
+.sem{display:flex;align-items:center;gap:10px;font-size:13px}
+.sem-dot{width:12px;height:12px;border-radius:50%;flex:none}
+.status{
+  display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px;
+  font-size:11px;font-weight:750;border:1px solid;background:transparent;
+}
+.status-ok{color:var(--ok);border-color:var(--ok)}
+.status-warn{color:var(--warn);border-color:var(--warn)}
+.status-danger{color:var(--danger);border-color:var(--danger)}
+
+ul.clean{margin:0;padding:0;list-style:none;display:grid;gap:11px}
+ul.clean li{padding-left:20px;position:relative;font-size:14px;line-height:1.7;color:var(--text-muted);max-width:70ch}
+ul.clean li::before{content:"";position:absolute;left:0;top:12px;width:8px;height:1px;background:var(--accent-graphic)}
+ul.clean li strong{color:var(--text);font-weight:700}
+.band-ink ul.clean li{color:rgba(255,255,255,.66)}
+.band-ink ul.clean li strong{color:#fffef9}
+
+.doc-foot{font-size:11.5px;color:var(--text-muted);line-height:1.7}
+
+@media (max-width:640px){
+  .metrics{grid-template-columns:1fr}
+  .metrics>div{border-right:0;border-bottom:1px solid;padding-left:0}
+  .metrics>div:last-child{border-bottom:0}
+  .band{gap:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
+  .btn:hover{transform:none!important}
+}
+</style>
+
+<header class="band">
+  <div class="head">
+    <p class="eyebrow">Fundação visual · By Arabi Planejados</p>
+    <h1>Um sistema medido,<br>não <em>imaginado</em>.</h1>
+    <p class="lede">
+      Tudo que está aqui foi extraído do CSS de produção de
+      byarabiplanejados.com.br — não de impressão visual, não de captura de tela.
+      Os valores são os que o navegador realmente aplica no site.
+    </p>
+  </div>
+  <div class="metrics">
+    <div><strong>13</strong><span>tokens no :root do site</span></div>
+    <div><strong>0</strong><span>webfonts carregadas</span></div>
+    <div><strong>3</strong><span>breakpoints</span></div>
+  </div>
+  <p class="note">
+    <strong>Procedência.</strong> Folha analisada:
+    <code>/_next/static/css/index.Db73RJKz.css</code> (58.156 bytes), baixada em 19/08/2026.
+    Stack do site: Next.js + Tailwind v4 com uma camada de CSS autoral por cima —
+    é essa camada autoral que carrega a identidade e que este documento descreve.
+    Este documento usa o próprio sistema: as faixas alternam de fundo no mesmo ritmo do site.
+  </p>
+</header>
+
+<section class="band band-b stack-lg">
+  <div class="head">
+    <p class="eyebrow">Ponto de partida</p>
+    <h2>Cinco decisões que o <em>código</em> revela</h2>
+    <p class="lede">
+      Antes dos tokens, o que o CSS mostra sobre como a marca pensa. Estas são as
+      regras que fazem uma tela "parecer By Arabi" mesmo antes de acertar o hex.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>Serif leve, nunca negrito</h3>
+      <p>
+        Todo título é <code>Georgia, serif</code> com <code>font-weight: 400</code> e
+        <code>letter-spacing</code> negativo (−.045em a −.05em). O peso vem do tamanho,
+        não da espessura. Título em bold quebra a marca imediatamente.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>Zero dependência de fonte</h3>
+      <p>
+        Não existe um único <code>@font-face</code> nem link para Google Fonts na folha.
+        Georgia para títulos, <code>Helvetica Neue/Arial</code> para corpo — ambas do sistema.
+        Suas apps HTML sem build step herdam isso de graça: nada para carregar, nada para quebrar.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>O fundo alterna, sempre</h3>
+      <p>
+        Nenhuma seção repete o fundo da anterior. A sequência real é
+        papel → branco → papel fundo → tinta. É isso que dá ritmo à página sem
+        precisar de bordas, sombras ou cards decorativos.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>Imagem não tem canto arredondado</h3>
+      <p>
+        Cards de projeto, ambiente e vídeo usam <code>border-radius: 0</code>. O arredondamento
+        existe só em controles (pílulas de 999px) e em cartões de formulário (14–20px).
+        Foto é foto; interface é interface.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>Acessibilidade já estava lá</h3>
+      <p>
+        <code>:focus-visible</code> com contorno dourado de 3px e offset de 4px, e um bloco
+        <code>prefers-reduced-motion</code> que desliga todas as animações. Não é
+        enfeite do sistema — é comportamento existente que precisa ser mantido.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Medido</span>
+      <h3>Movimento curto e uniforme</h3>
+      <p>
+        Toda transição do site está entre <code>.15s</code> e <code>.18s</code>. Hover levanta o
+        elemento em 2–3px. Não há easing exótico nem duração longa em interface —
+        as animações lentas ficam só nas mídias de fundo.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="band stack-lg">
+  <div class="head">
+    <p class="eyebrow">Cor</p>
+    <h2>Ouro sobre <em>papel</em> e ouro sobre tinta</h2>
+    <p class="lede">
+      A paleta inteira do site tem duas famílias: um ouro e uma escala de neutros
+      quentes. Não há verde, azul ou vermelho em lugar nenhum — o site institucional
+      nunca precisou comunicar estado.
+    </p>
+  </div>
+
+  <div>
+    <p class="tag tag-measured" style="margin-bottom:16px">Medidos no :root do site</p>
+    <div class="grid-3">
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#e3b838"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Ouro</span>
+          <span class="swatch-hex">#e3b838</span>
+          <span class="swatch-use">Acento sobre fundo escuro. Botão primário, eyebrow, números.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#f0d781"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Ouro claro</span>
+          <span class="swatch-hex">#f0d781</span>
+          <span class="swatch-use">Variação suave. Uso raro no site.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#edc94f"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Ouro hover</span>
+          <span class="swatch-hex">#edc94f</span>
+          <span class="swatch-use">Estado hover do botão primário. Único uso.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#a77d0b"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Ouro profundo</span>
+          <span class="swatch-hex">#a77d0b</span>
+          <span class="swatch-use">Acento sobre fundo claro. Palavra destacada do título, ícones.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#101411"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Tinta</span>
+          <span class="swatch-hex">#101411</span>
+          <span class="swatch-use">Cor do texto em fundo claro e fundo das seções escuras.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#1a201c"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Tinta suave</span>
+          <span class="swatch-hex">#1a201c</span>
+          <span class="swatch-use">Elevação sobre tinta. Hover de botão escuro.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#f5f0e6"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Papel</span>
+          <span class="swatch-hex">#f5f0e6</span>
+          <span class="swatch-use">Fundo padrão do site. É o <code>background</code> do body.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#e9e1d2"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Papel fundo</span>
+          <span class="swatch-hex">#e9e1d2</span>
+          <span class="swatch-use">Faixa alternada mais quente. Seções de depoimento e história.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#fffef9;border-bottom:1px solid rgba(16,20,17,.1)"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Branco</span>
+          <span class="swatch-hex">#fffef9</span>
+          <span class="swatch-use">Faixa mais clara. Não é branco puro — tem 6 de amarelo.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#6d716d"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Neutro texto</span>
+          <span class="swatch-hex">#6d716d</span>
+          <span class="swatch-use">Texto secundário em fundo claro. Cinza com viés verde.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#17140b"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Sobre ouro</span>
+          <span class="swatch-hex">#17140b</span>
+          <span class="swatch-use">Cor do texto dentro do botão dourado. Não é preto.</span>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background:#080a09"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Tinta base</span>
+          <span class="swatch-hex">#080a09</span>
+          <span class="swatch-use">Rodapé e menus flutuantes. O escuro mais fundo.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="height:1px;background:var(--rule);border:0;margin:0">
+
+  <div class="stack">
+    <h3>O ouro tem dois valores, e essa é a regra que mais importa</h3>
+    <p class="note">
+      Sobre tinta, <code>#e3b838</code> tem contraste de 9,9:1 — folgado. Sobre papel, o mesmo
+      ouro fica praticamente ilegível, e por isso o site troca para <code>#a77d0b</code> nos
+      fundos claros. Só que <code>#a77d0b</code> sobre papel dá 3,3:1: passa para título grande,
+      <strong>não passa para texto pequeno</strong>. O site escapa disso porque só usa o ouro claro
+      em títulos e números grandes. Uma aplicação interna com rótulo dourado de 12px não escapa.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Combinação</th><th>Contraste</th><th>Serve para</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>#e3b838</code> sobre <code>#101411</code></td><td class="num">9,9:1</td><td>Qualquer texto, qualquer tamanho</td></tr>
+          <tr><td><code>#a77d0b</code> sobre <code>#f5f0e6</code></td><td class="num">3,3:1</td><td>Só título ≥24px ou ícone. Reprova em texto corrido</td></tr>
+          <tr><td><code>#6d716d</code> sobre <code>#f5f0e6</code></td><td class="num">4,4:1</td><td>Reprova AA por margem estreita (mínimo 4,5:1)</td></tr>
+          <tr><td><code>#8a6608</code> sobre <code>#f5f0e6</code></td><td class="num">4,6:1</td><td>Proposta: ouro para texto pequeno em fundo claro</td></tr>
+          <tr><td><code>#5f635f</code> sobre <code>#f5f0e6</code></td><td class="num">5,4:1</td><td>Proposta: neutro de texto secundário corrigido</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Contrastes calculados pela fórmula WCAG 2.1 sobre os hex medidos. As duas últimas
+      linhas são acréscimos meus, não valores do site — existem porque uma ferramenta
+      operacional tem muito mais texto pequeno do que um site institucional.
+      Uma inconsistência de origem, para registro: o site usa três ouros escuros diferentes
+      (<code>#a77d0b</code> em 6 lugares, <code>#9f7911</code> em 2, <code>#a47700</code> em 1).
+      O sistema adota <code>#a77d0b</code> e descarta os outros dois.
+    </p>
+  </div>
+</section>
+
+<section class="band band-c stack-lg">
+  <div class="head">
+    <p class="eyebrow">Tipografia</p>
+    <h2>A escala <em>real</em> do site</h2>
+    <p class="lede">
+      Tamanhos com <code>clamp()</code>, copiados como estão. Note que não há um único
+      peso acima de 400 nos títulos — e nada abaixo de 750 nos rótulos.
+    </p>
+  </div>
+
+  <div>
+    <div class="type-row">
+      <p class="type-meta">h1 · Georgia 400 · clamp(50px, 5.7vw, 80px) · tracking −.05em · leading .99</p>
+      <div class="t-h1">Espaços que acolhem</div>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">h2 · Georgia 400 · clamp(43px, 5vw, 68px) · tracking −.045em · leading 1.02</p>
+      <div class="t-h2">Planejar é entender como você vive</div>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">h3 · Georgia 400 · 27px · usado em itens de processo e FAQ</p>
+      <div class="t-h3">Medição técnica no local</div>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">eyebrow · Helvetica 800 · 11px · tracking .18em · caixa alta · cor de acento</p>
+      <div class="t-eyebrow">Nossa essência</div>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">corpo · Helvetica 400 · 15–17px · leading 1.68–1.8 · largura máx. ~62ch</p>
+      <p class="t-body">
+        Há 38 anos, a By Arabi transforma espaços em casas mais funcionais, acolhedoras e
+        bonitas. Essa mesma atenção continua em cada medida, escolha de acabamento e conversa
+        com quem vai viver o ambiente.
+      </p>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">apoio · Helvetica 400 · 13px · leading 1.65–1.7 · cor neutra</p>
+      <p class="t-small">
+        Texto de apoio dentro de cards, respostas de FAQ e legendas. É o tamanho mais usado
+        do site depois do corpo, e é exatamente onde o ouro claro não pode aparecer.
+      </p>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">rótulo · Helvetica 800 · 9–10px · tracking .08–.16em · caixa alta</p>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)">Anos de garantia · Lojas físicas · São Paulo</div>
+    </div>
+  </div>
+
+  <p class="note">
+    <strong>A escala de rótulos é agressiva de propósito.</strong> 8, 9 e 10px aparecem no site,
+    sempre em caixa alta, sempre com peso 800 e tracking largo — que é o que os torna legíveis
+    nesse tamanho. Em aplicação interna, 9px é o piso absoluto e só para rótulo de coluna;
+    nunca para dado que alguém precisa ler.
+  </p>
+</section>
+
+<section class="band band-ink stack-lg">
+  <div class="head">
+    <p class="eyebrow">Componentes</p>
+    <h2>Os mesmos elementos, nos <em>dois</em> modos</h2>
+    <p class="lede">
+      Cada bloco abaixo é código funcionando, não imagem. O par papel/tinta existe porque
+      as aplicações internas vão precisar dos dois — e porque quase todo componente muda
+      de ouro entre eles.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <div class="ctx ctx-ink">
+      <p class="ctx-label">Modo tinta</p>
+      <div class="ctx-row">
+        <button class="btn btn-primary" type="button">Solicitar orçamento <span aria-hidden="true">↗</span></button>
+        <button class="btn btn-outline" type="button">Ver projetos</button>
+      </div>
+      <label class="field">
+        <span>Número do contrato</span>
+        <input type="text" placeholder="SM02112" />
+      </label>
+      <div class="metrics">
+        <div><strong>38</strong><span>anos de experiência</span></div>
+        <div><strong>10</strong><span>anos de garantia</span></div>
+        <div><strong>5</strong><span>lojas físicas</span></div>
+      </div>
+    </div>
+
+    <div class="ctx ctx-paper">
+      <p class="ctx-label">Modo papel</p>
+      <div class="ctx-row">
+        <button class="btn btn-primary" type="button">Solicitar orçamento <span aria-hidden="true">↗</span></button>
+        <button class="btn btn-dark" type="button">Conheça nossa história</button>
+      </div>
+      <label class="field">
+        <span>Número do contrato</span>
+        <input type="text" placeholder="SM02112" />
+      </label>
+      <div class="metrics">
+        <div><strong>38</strong><span>anos de experiência</span></div>
+        <div><strong>10</strong><span>anos de garantia</span></div>
+        <div><strong>5</strong><span>lojas físicas</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <h3>Botões</h3>
+    <p class="note">
+      Três variantes, uma geometria só: pílula de <code>999px</code>, altura mínima
+      <code>54px</code>, peso <code>850</code>, e um <code>gap: 20px</code> entre rótulo e seta —
+      esse respiro largo é parte da assinatura. O botão dourado é o mesmo nos dois fundos;
+      o botão contornado troca de ouro; o botão escuro só existe em fundo claro.
+    </p>
+    <pre>.btn-primary{
+  background:#e3b838; border:1px solid #e3b838; color:#17140b;
+  border-radius:999px; min-height:54px; padding:0 24px;
+  font-size:12px; font-weight:850; letter-spacing:.03em;
+  display:inline-flex; align-items:center; gap:20px;
+  transition:transform .18s, box-shadow .18s, background .18s;
+}
+.btn-primary:hover{
+  background:#edc94f; transform:translateY(-3px);
+  box-shadow:0 14px 34px rgba(227,184,56,.23);
+}</pre>
+  </div>
+
+  <div class="stack">
+    <h3>Campo de formulário</h3>
+    <p class="note">
+      Altura <code>48px</code>, raio <code>9px</code> — e o detalhe que faz diferença: o foco
+      não troca só a borda, acrescenta um anel dourado translúcido de 3px. Em modo tinta o
+      campo é branco a 7% de opacidade, nunca um cinza sólido.
+    </p>
+    <pre>input{ height:48px; border-radius:9px; padding:0 13px; }
+input:focus{
+  outline:none; border-color:#e3b838;
+  box-shadow:0 0 0 3px rgba(227,184,56,.12);
+}</pre>
+  </div>
+
+  <div class="stack">
+    <h3>Lista expansível</h3>
+    <p class="note">
+      O FAQ do site é <code>&lt;details&gt;</code> nativo, sem JavaScript. O marcador é um
+      sinal de "+" que gira 45° ao abrir. Vale reaproveitar em qualquer lista de etapas
+      ou pendências das aplicações internas.
+    </p>
+    <div class="faq-demo">
+      <details open>
+        <summary>Como funciona a liberação técnica? <i aria-hidden="true">+</i></summary>
+        <p>Exemplo de conteúdo expansível usando o mesmo padrão do site: título em Georgia 19–20px, resposta em 13px na cor neutra, linha divisória de 1px entre itens.</p>
+      </details>
+      <details>
+        <summary>Qual o prazo de entrega? <i aria-hidden="true">+</i></summary>
+        <p>O marcador gira 45° via <code>transform: rotate(45deg)</code> em <code>details[open]</code>. Nenhum script envolvido.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="stack">
+    <h3>Geometria e sombra</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Uso</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Botão, pílula, tag</td><td class="num">999px</td></tr>
+          <tr><td>Cartão de formulário destacado</td><td class="num">20px</td></tr>
+          <tr><td>Cartão padrão</td><td class="num">14px · 16px</td></tr>
+          <tr><td>Painel de menu</td><td class="num">10px · 12px</td></tr>
+          <tr><td>Campo, item de lista</td><td class="num">7px · 8px · 9px</td></tr>
+          <tr><td>Imagem e mídia</td><td class="num">0</td></tr>
+          <tr><td>Elevação de cartão sobre claro</td><td class="num">0 28px 70px rgba(16,20,17,.18)</td></tr>
+          <tr><td>Elevação de cartão sobre escuro</td><td class="num">0 30px 90px rgba(0,0,0,.42)</td></tr>
+          <tr><td>Halo do botão dourado em hover</td><td class="num">0 14px 34px rgba(227,184,56,.23)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band band-b stack-lg">
+  <div class="head">
+    <p class="eyebrow">Layout e movimento</p>
+    <h2>Uma faixa, um <em>respiro</em>, três quebras</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="stack">
+      <h3>A técnica de faixa do site</h3>
+      <p class="note">
+        O site não usa container com <code>margin: auto</code>. Cada seção tem padding lateral
+        calculado, o que centraliza o conteúdo e garante margem mínima no celular em uma
+        linha só. Esta página inteira usa exatamente isso.
+      </p>
+      <pre>.section{
+  padding: 112px max(28px, 50vw - 620px);
+}
+/* ≤840px */  padding-block: 80px;
+/* ≤590px */  padding-inline: 19px;</pre>
+      <p class="note">
+        Conteúdo resultante: 1240px de largura máxima. Os breakpoints do site são
+        <strong>1080px, 840px e 590px</strong> — não os do Bootstrap ou do Tailwind padrão.
+      </p>
+    </div>
+
+    <div class="stack">
+      <h3>Movimento</h3>
+      <ul class="clean">
+        <li><strong>Transições de interface:</strong> .15s a .18s. Nada mais longo.</li>
+        <li><strong>Hover:</strong> <code>translateY(-2px)</code> em contornado, <code>-3px</code> em preenchido.</li>
+        <li><strong>Entrada na viewport:</strong> opacidade + <code>translateY(14–18px)</code>, via <code>animation-timeline: view()</code> — CSS puro, sem observer.</li>
+        <li><strong>Fundo de herói:</strong> zoom de 18s, único movimento longo do site.</li>
+        <li><strong>Redução:</strong> um bloco <code>prefers-reduced-motion</code> zera animação, transform e transição de tudo.</li>
+      </ul>
+      <pre>@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,::before,::after{
+    opacity:1!important; transition-duration:.01ms!important;
+    animation:none!important; transform:none!important;
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<section class="band stack-lg">
+  <div class="head">
+    <span class="tag">Proposta — não existe no site</span>
+    <h2>O que as aplicações <em>internas</em> precisam a mais</h2>
+    <p class="lede">
+      Um site institucional apresenta; uma ferramenta operacional informa estado. O site
+      não tem nenhuma cor semântica porque nunca precisou dizer "pendente", "liberado" ou
+      "com erro". Esta parte é acréscimo meu, construída para conviver com o ouro.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <div class="stack">
+      <h3>Cores de estado</h3>
+      <p class="note">
+        A restrição difícil: o ouro já ocupa a faixa do âmbar, então "atenção" não pode ser
+        amarelo — ficaria indistinguível do acento da marca. Por isso o aviso vai para
+        terracota queimada, que dialoga com a madeira sem competir com o ouro.
+      </p>
+      <div class="stack" style="gap:12px">
+        <div class="sem"><span class="sem-dot" style="background:var(--ok)"></span> <span><strong>Liberado</strong> — <code>#2f6b45</code> claro · <code>#5faa7c</code> escuro · 5,6:1</span></div>
+        <div class="sem"><span class="sem-dot" style="background:var(--warn)"></span> <span><strong>Pendência</strong> — <code>#9a5b1f</code> claro · <code>#e2934a</code> escuro · 4,8:1</span></div>
+        <div class="sem"><span class="sem-dot" style="background:var(--danger)"></span> <span><strong>Bloqueado</strong> — <code>#a32f2b</code> claro · <code>#f0736d</code> escuro · 6,2:1</span></div>
+      </div>
+      <div class="ctx-row" style="margin-top:4px">
+        <span class="status status-ok">Liberado</span>
+        <span class="status status-warn">Pendência</span>
+        <span class="status status-danger">Bloqueado</span>
+      </div>
+      <p class="note">
+        Regra de ouro literal: <strong>estado nunca é dourado.</strong> O ouro é identidade e
+        ação principal. Se um status usar ouro, o operador perde a única pista visual
+        confiável de "isto é o botão que resolve".
+      </p>
+    </div>
+
+    <div class="stack">
+      <h3>O que mais falta mapear</h3>
+      <ul class="clean">
+        <li><strong>Tabela densa.</strong> O site tem uma linha de loja de 102px de altura — generosa demais para uma lista de 200 contratos. Precisa de uma variante compacta.</li>
+        <li><strong>Estado vazio e carregando.</strong> Inexistentes no site.</li>
+        <li><strong>Densidade de formulário.</strong> O campo de 48px é confortável para 4 campos, cansativo para 40.</li>
+        <li><strong>Impressão e PDF.</strong> O checklist gera PDF; papel de verdade não é <code>#f5f0e6</code>.</li>
+        <li><strong>Gráfico e indicador.</strong> Nenhuma referência no site.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stack">
+    <h3>Bloco de tokens para colar</h3>
+    <pre>:root{
+  /* ---- Marca — medidos no site ---- */
+  --ba-gold:        #e3b838;  /* acento sobre escuro */
+  --ba-gold-hover:  #edc94f;
+  --ba-gold-soft:   #f0d781;
+  --ba-gold-deep:   #a77d0b;  /* acento sobre claro — só título/ícone */
+  --ba-on-gold:     #17140b;  /* texto dentro do botão dourado */
+  --ba-ink:         #101411;
+  --ba-ink-soft:    #1a201c;
+  --ba-ink-deep:    #080a09;
+  --ba-paper:       #f5f0e6;
+  --ba-paper-deep:  #e9e1d2;
+  --ba-white:       #fffef9;
+  --ba-muted:       #6d716d;
+  --ba-line:        rgba(16,20,17,.14);
+  --ba-line-dark:   rgba(255,255,255,.16);
+
+  /* ---- Acréscimos para aplicação interna ---- */
+  --ba-gold-text:   #8a6608;  /* ouro legível em texto pequeno sobre papel */
+  --ba-muted-aa:    #5f635f;  /* neutro de texto que passa AA sobre papel */
+  --ba-ok:          #2f6b45;
+  --ba-warn:        #9a5b1f;
+  --ba-danger:      #a32f2b;
+
+  /* ---- Tipografia ---- */
+  --ba-font-display: Georgia, "Times New Roman", serif;
+  --ba-font-body:    "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* ---- Geometria ---- */
+  --ba-radius-pill: 999px;
+  --ba-radius-card: 14px;
+  --ba-radius-field: 9px;
+  --ba-speed: .18s;
+}</pre>
+  </div>
+</section>
+
+<section class="band band-c stack-lg">
+  <div class="head">
+    <p class="eyebrow">Situação atual</p>
+    <h2>A distância entre o que existe e o <em>alvo</em></h2>
+    <p class="lede">
+      Medido em Processos-liberação/index.html — o arquivo que está no ar hoje.
+      Não há sobreposição com a marca: nem uma cor, nem uma fonte.
+    </p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Papel</th><th>Hoje</th><th>Alvo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Fundo</td><td><code>#0f0e17</code> roxo-escuro</td><td><code>#101411</code> tinta ou <code>#f5f0e6</code> papel</td></tr>
+        <tr><td>Superfície</td><td><code>#1a1826</code> / <code>#231f35</code></td><td><code>#1a201c</code> / <code>#fffef9</code></td></tr>
+        <tr><td>Acento</td><td><code>#f4a261</code> laranja</td><td><code>#e3b838</code> ouro</td></tr>
+        <tr><td>Acento 2 e 3</td><td><code>#e76f51</code>, <code>#457b9d</code></td><td>Não existem. O sistema tem um acento só</td></tr>
+        <tr><td>Texto</td><td><code>#fffffe</code> / <code>#a7a3c0</code> lilás</td><td><code>#fffef9</code> / branco a 62%</td></tr>
+        <tr><td>Display</td><td>Syne (Google Fonts)</td><td>Georgia, peso 400</td></tr>
+        <tr><td>Corpo</td><td>DM Sans (Google Fonts)</td><td>Helvetica Neue / Arial</td></tr>
+        <tr><td>Etapas 1–5</td><td>5 cores distintas</td><td>Decisão pendente — ver abaixo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    <strong>O ponto sensível é a escala de etapas.</strong> As cinco cores de passo
+    (<code>--step1</code> a <code>--step5</code>) carregam informação real na tela de processos, e a
+    marca não tem cinco cores para oferecer. Trocar isso não é substituição de token: é
+    redesenho de como a etapa é comunicada — provavelmente por numeração serif e peso de
+    linha, como o site faz na lista de processo, em vez de matiz.
+  </p>
+</section>
+
+<section class="band band-ink stack-lg">
+  <div class="head">
+    <p class="eyebrow">Logo</p>
+    <h2>Só existe versão para fundo <em>escuro</em></h2>
+    <p class="lede">
+      O site publica dois arquivos de logo. Nos dois, as palavras "BY" e "ARABI" são
+      brancas — só a curva, o "Y" e "PLANEJADOS" são dourados. Não há versão para
+      fundo claro, que é justamente o modo padrão da marca.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <div class="ctx ctx-ink">
+      <p class="ctx-label">Sobre tinta — funciona</p>
+      <img src="data:image/png;base64,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" alt="Logo By Arabi Planejados sobre fundo escuro" style="max-width:300px">
+    </div>
+    <div class="ctx ctx-paper">
+      <p class="ctx-label">Sobre papel — o nome desaparece</p>
+      <img src="data:image/png;base64,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" alt="O mesmo logo sobre fundo claro, com o nome ilegível" style="max-width:300px">
+    </div>
+  </div>
+
+  <p class="note">
+    Os dois quadros acima carregam exatamente o mesmo arquivo
+    (<code>by-arabi-logo-horizontal.png</code>, 532×220, RGBA). A diferença é só o fundo.
+    Enquanto não existir uma versão do logo para fundo claro, telas em modo papel
+    devem usar a curva dourada com o nome em Georgia — nunca o PNG.
+  </p>
+
+  <p class="note">
+    A curva com a esfera é o gesto central da marca e funciona nos dois fundos, porque
+    é dourada. O site usa uma redução dela: um filete de 70×1px em
+    <code>#e3b838</code> como assinatura sob o herói.
+  </p>
+</section>
+
+<section class="band stack-lg">
+  <div class="head">
+    <p class="eyebrow">Estado</p>
+    <h2>O que já foi <em>decidido</em></h2>
+  </div>
+
+  <div class="grid-2">
+    <article class="card">
+      <span class="tag tag-measured">Decidido</span>
+      <h3>Papel é o padrão</h3>
+      <p>
+        Ferramentas internas, páginas de cliente e relatórios nascem em modo papel,
+        como o site. Tinta passa a ser variante para telas de destaque e seções de
+        contraste dentro de uma página clara.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-measured">Feito</span>
+      <h3>A skill foi reescrita</h3>
+      <p>
+        <code>byarabi-design</code> existia com valores que não batiam com o site —
+        nenhuma das cores era igual, e o ouro do tema claro dela dava 1,84:1, ilegível.
+        Agora carrega os valores medidos e a regra dos três ouros.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag">Aberto</span>
+      <h3>Escala de etapas</h3>
+      <p>
+        Continua sendo o problema difícil: telas de processo precisam distinguir 4–6
+        passos e a marca tem um acento só. Os tons de madeira e verde são paliativo,
+        não solução.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag">Aberto</span>
+      <h3>Ordem de migração</h3>
+      <p>
+        Checklist Dinâmica prevê a skill em PRD e Spec e ainda não foi estilizada — é o
+        candidato natural para estrear o sistema sem retrabalho.
+      </p>
+    </article>
+  </div>
+
+  <hr style="height:1px;background:var(--rule);border:0;margin:0">
+
+  <p class="doc-foot">
+    Documento gerado em 19 de agosto de 2026 a partir de
+    <code>index.Db73RJKz.css</code> e do HTML de byarabiplanejados.com.br.
+    Tudo marcado como <em>medido</em> foi lido diretamente da folha de estilo em produção;
+    tudo marcado como <em>proposta</em> é acréscimo para uso interno e ainda não foi validado
+    com a marca. Contrastes calculados pela fórmula WCAG 2.1.
+  </p>
+</section>
+
+</body></html>

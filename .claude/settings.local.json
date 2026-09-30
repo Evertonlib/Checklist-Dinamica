@@ -7,7 +7,11 @@
       "Bash(Select-Object FullName)",
       "PowerShell(head -150)",
       "PowerShell(tree \"c:\\\\Users\\\\Windows 10\\\\AUTOMACOES\\\\Checklist-Dinamica\" -L 3 -I \"node_modules|dist\" 2>$null)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell(Copy-Item -LiteralPath \"C:\\\\Users\\\\maste\\\\.claude\\\\projects\\\\c--Users-maste-Github-Checklist-Dinamica\\\\9e56e494-451e-44ce-93de-3e8e6f288722\\\\tool-results\\\\artifact-239ce575-1788460170-68b9.html\" -Destination \"c:\\\\Users\\\\maste\\\\Github\\\\Checklist-Dinamica\\\\PRDS_E_SPECS\\\\REFERENCIA_DESIGN_SYSTEM_BY_ARABI.html\"; \\(Get-Item \"c:\\\\Users\\\\maste\\\\Github\\\\Checklist-Dinamica\\\\PRDS_E_SPECS\\\\REFERENCIA_DESIGN_SYSTEM_BY_ARABI.html\"\\).Length)",
+      "Bash(awk '{ print length, NR }' PRDS_E_SPECS/REFERENCIA_DESIGN_SYSTEM_BY_ARABI.html)",
+      "Bash(cd \"C:\\\\Users\\\\maste\\\\Github\\\\Checklist-Dinamica\" && grep -n \"python3\\\\|python\" -c /dev/null 2>/dev/null; echo ok)",
+      "Read(//dev/**)"
     ]
   }
 }
