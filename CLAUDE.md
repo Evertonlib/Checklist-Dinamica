@@ -12,6 +12,8 @@ Guia para o Claude Code (claude.ai/code) ao trabalhar neste repositório.
 
 SPA React (Vite) de coleta guiada de informações técnicas para liberação de projetos de móveis planejados da By Arabi. O usuário preenche um formulário em etapas (wizard), o sistema calcula um **score de risco**, gera **Clientes Cientes (CCs)** — textos de responsabilidade — e produz um **PDF** 100% client-side. Sem backend: hospedado em GitHub Pages.
 
+**Venda futura (planejada, card Trello `CHECKLIST_VENDA_FUTURA`):** cliente compra hoje para encomendar daqui a anos, como uma carta de crédito. Não tem ambientes, eletros, score nem CCs. Fluxo de uma etapa só: Identificação (página 1 do Cliente) → Revisão própria → um PDF com os dados cadastrais (`Checklist_Futura_*.pdf`). Entra como terceira opção dentro do botão Projetista.
+
 Veja `README.md` para a descrição funcional completa e `especificacao-checklist-dinamica.md` para as regras de perguntas/CCs/pontuação — não repetir aqui.
 
 ## Comandos
