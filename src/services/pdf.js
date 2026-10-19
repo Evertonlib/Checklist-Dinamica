@@ -239,7 +239,9 @@ export async function gerarPdf(state) {
   const linhasTabela = state.ambientesSelecionados
     .filter((instancia) => {
       const score = scorePorAmbiente[instancia.instanceId]
-      return score && score.gatilhos.length > 0
+      if (!score) return false
+      // O aviso de rodapé existente não é gatilho de score, mas entra na tabela mesmo sozinho
+      return score.gatilhos.length > 0 || ccs.some((c) => c.id === `RODAPE_EXISTENTE_${instancia.instanceId}`)
     })
     .map((instancia) => {
       const { instanceId } = instancia
@@ -510,7 +512,7 @@ export async function gerarPdf(state) {
       )
 
       if (resp.eletronicos === true && resp.eletronicosList?.length > 0) {
-        if (formType === 'home' && resp.eletronicosList.some((e) => e.tipo === 'TV')) {
+        if (resp.eletronicosList.some((e) => e.tipo === 'TV')) {
           escreverPergunta(
             'O ponto elétrico da TV já está na posição final?',
             resp.tvPontoFinal === true ? 'Sim' : resp.tvPontoFinal === false ? 'Não' : '—',

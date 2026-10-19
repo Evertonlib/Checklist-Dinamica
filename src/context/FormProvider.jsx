@@ -111,9 +111,24 @@ function reducer(state, action) {
         }
       }
       // Remove instâncias excluídas
-      for (const old of existentes) {
-        if (!novas.find((n) => n.instanceId === old.instanceId)) {
-          delete novasRespostas[old.instanceId]
+      const removidos = existentes
+        .map((old) => old.instanceId)
+        .filter((id) => !novas.find((n) => n.instanceId === id))
+      for (const id of removidos) {
+        delete novasRespostas[id]
+      }
+
+      // Tira as instâncias excluídas das listas das perguntas gerais (G1-G5)
+      let novoGlobal = state.global
+      if (removidos.length > 0) {
+        const semRemovidos = (lista) => (lista ?? []).filter((id) => !removidos.includes(id))
+        novoGlobal = {
+          ...state.global,
+          g1_ambientes: semRemovidos(state.global.g1_ambientes),
+          g2_ambientesSemReboco: semRemovidos(state.global.g2_ambientesSemReboco),
+          g3_ambientesSemRevestimento: semRemovidos(state.global.g3_ambientesSemRevestimento),
+          g3_ambientesPendentes: semRemovidos(state.global.g3_ambientesPendentes),
+          g4_ambientes: (state.global.g4_ambientes ?? []).filter((a) => !removidos.includes(a.instanceId)),
         }
       }
 
@@ -121,6 +136,7 @@ function reducer(state, action) {
         ...state,
         ambientesSelecionados: novaLista,
         respostasPorAmbiente: novasRespostas,
+        global: novoGlobal,
         _meta: { ...state._meta, atualizadoEm: now },
       }
     }
