@@ -13,7 +13,8 @@
       "Bash(cd \"C:\\\\Users\\\\maste\\\\Github\\\\Checklist-Dinamica\" && grep -n \"python3\\\\|python\" -c /dev/null 2>/dev/null; echo ok)",
       "Read(//dev/**)",
       "mcp__claude_ai_Trello__trelloSearch",
-      "mcp__claude_ai_Trello__trelloReadCard"
+      "mcp__claude_ai_Trello__trelloReadCard",
+      "PowerShell($k = [Environment]::GetEnvironmentVariable\\('JULES_API_KEY','User'\\); $p = [IO.File]::ReadAllText\\('C:\\\\Users\\\\maste\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-maste-Github-Checklist-Dinamica\\\\0fc29ce1-6502-4037-a27f-f194383832aa\\\\scratchpad\\\\r2\\\\prompt.txt', [Text.Encoding]::UTF8\\); $body = @{ prompt = $p; title = 'Replay eletros - ordem fixa no PDF'; sourceContext = @{ source = 'sources/github/Evertonlib/Checklist-Dinamica-replay'; githubRepoContext = @{ startingBranch = 'lab/jules-replay-eletros' } }; requirePlanApproval = $true; automationMode = 'AUTO_CREATE_PR' } | ConvertTo-Json -Depth 5; $r = Invoke-RestMethod -Method Post -Uri 'https://jules.googleapis.com/v1alpha/sessions' -Headers @{ 'X-Goog-Api-Key' = $k } -ContentType 'application/json; charset=utf-8' -Body \\([Text.Encoding]::UTF8.GetBytes\\($body\\)\\); $r | Select-Object id, state, url, createTime | Format-List)"
     ]
   }
 }
