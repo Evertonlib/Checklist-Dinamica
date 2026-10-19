@@ -3,7 +3,7 @@
 **Card Trello:** #130 TESTES_REGRESSAO_CHECKLIST_DINAMICA
 **Data:** 2026-10-19
 **Base medida:** `main` em `1a6022d` (correções dos cards #131, #132 e #135 sobre o inventário medido em `60152e9`)
-**Status:** Aguardando aprovação
+**Status:** Aprovado (Everton, 19/10/2026), com as decisões 7 a 11 da seção 4
 **Fonte principal:** `PRDS_E_SPECS/INVENTARIO_FEATURES_CHECKLIST_DINAMICA.md` (IDs S-, P-, F-, C-, V-, D-, K-, H-). Os IDs do inventário são usados aqui para rastreabilidade. Todo `arquivo:linha` citado neste PRD foi aberto e conferido no código de `1a6022d`. O inventário foi medido em `60152e9`; onde ele diverge do código de `1a6022d` (K-02, K-03, K-04 e linhas de `pdf.js`), vale este PRD.
 
 ---
@@ -52,12 +52,17 @@ Motivo: esses pontos decidem sozinhos o que chega impresso no documento que o cl
 
 ## 4. Decisões fechadas (Everton)
 
-1. **Ferramenta:** executor de testes nativo do Node (`node --test`, módulos `node:test` e `node:assert`). Nenhuma dependência nova. É **exceção consciente** à regra global "só pytest": o código é JavaScript e pytest chamando Node seria dois idiomas.
-2. **PDF testado com a função real**, empacotada para Node com o esbuild que já vem com o Vite. Este PRD define **o que** conferir; o **como** capturar (intermediário que grava as chamadas de texto, tabela, link e `save`, sem ler PDF) fica para o Spec. Exigências já fixadas: nada é gravado fora de pasta temporária e nenhum PDF é baixado no repo.
+1. **Ferramenta:** executor de testes nativo do Node (`node --test`, módulos `node:test` e `node:assert`). Nenhuma dependência de teste nova (o esbuild é declarado só para empacotar o PDF, decisão 7). É **exceção consciente** à regra global "só pytest": o código é JavaScript e pytest chamando Node seria dois idiomas.
+2. **PDF testado com a função real**, empacotada para Node com o esbuild, declarado em `devDependencies` (decisão 7). Este PRD define **o que** conferir; o **como** capturar (intermediário que grava as chamadas de texto, tabela, link e `save`, sem ler PDF) fica para o Spec. Exigências já fixadas: nada é gravado fora de pasta temporária e nenhum PDF é baixado no repo.
 3. **Revestimento (S-03, H-02):** ambiente MÉDIO +4 com CC de nível ALTO é **intencional** (Everton, 19/10/2026). Vira teste assim.
 4. **K-01 é bug confirmado e não vira teste** (card #133, ainda aberto; a correção chega com o próprio teste). **K-02, K-03 e K-04 foram corrigidos em `1a6022d`** (cards #131, #132, #135). K-02 e K-03 passam a ser **regra viva e entram na suíte** no comportamento corrigido (T-P27, T-P37); K-04 foi corrigido no reducer (`.jsx`) e segue sem teste (lista N).
 5. **Regras que só existem dentro de `.jsx`** (reducers não exportados, validações de tela) ficam na **lista N**, sem refatorar.
-6. Comando: script `npm test` em `package.json` chamando `node --test`. Mudança em `package.json` só para isso.
+6. Comando: script `npm test` em `package.json` chamando `node --test`. Mudança em `package.json` só para isso e para declarar o esbuild (decisão 7).
+7. **esbuild declarado** (Everton, 19/10/2026): entra em `devDependencies` com a versão exata já instalada (`0.21.5`), como exceção à regra de zero dependências, para a suíte não depender de uma dependência transitiva do Vite (resolve o R-1).
+8. **T-P34 a T-P36 mantidos** (Everton, 19/10/2026).
+9. **CEP inválido (T-A04) fora** (Everton, 19/10/2026).
+10. **Provas H-12 a H-22 fora** (Everton, 19/10/2026): os casos T-P já cobrem; a lista de provas fica em H-01, H-02, H-03, H-04, H-07, H-08, H-23 e H-24.
+11. **CLAUDE.md** (Everton, 19/10/2026): troca da frase da linha 28 autorizada conforme a seção 12.
 
 ## 5. Regras de construção dos testes
 
@@ -154,7 +159,7 @@ Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma respos
 | V-06 capa (contratos) | Sim | Sim | Sim | — | T-V07, T-V08 |
 | V-07 nome do arquivo | Sim | Sim | Sim | — | T-V08, T-V09 |
 | V-08 observações | Sim | Sim | Sim | — | T-V10 |
-| `buscarCep`, ramo "CEP inválido" (`cep.js:8`) | Sim | **Não**: só afeta o preenchimento automático; o PDF imprime o que foi digitado | Sim (não usa rede) | — | **Não entra.** Falha na 2 e testá-lo exigiria um `fetch` falso que falhe se for chamado, para valer 1 caso. Reversível: se Everton quiser, vira o caso T-A04 |
+| `buscarCep`, ramo "CEP inválido" (`cep.js:8`) | Sim | **Não**: só afeta o preenchimento automático; o PDF imprime o que foi digitado | Sim (não usa rede) | — | **Não entra.** Falha na 2 e testá-lo exigiria um `fetch` falso que falhe se for chamado, para valer 1 caso. Fica de fora por decisão do Everton (Everton, 19/10/2026) |
 | Reducers de `FormProvider*.jsx`, validações de identificação e do Projetista em `.jsx`, limpeza de Sim/Não nos blocos | Sim | Sim | **Não** (dentro de componente, não exportado) | #99 e #121 podem exportar/unificar | **Lista N** |
 | K-01 | Sim | Sim | — | #133 (aberto) | **Lista K** (sem teste) |
 | K-02, K-03 | Sim | Sim | Sim | corrigidos em #131/#132, `1a6022d` | **Entram**: T-P27 e T-P37 |
@@ -311,7 +316,7 @@ Todos com a identificação fictícia e relógio fixo em 19/10/2026, salvo indic
 | T-P36 | lacuna | Home: rodapé Não; `eletronicos` falso | "Existe rodapé…?" "Não" com o CC de rodapé abaixo (com prefixo "CC: "); "Possui ou pretende adquirir eletrônicos…?" "Não" com o CC de eletrônicos abaixo |
 | T-P37 | P-03, P-04, K-03 | Dormitório com `rodape` verdadeiro e **nenhum outro gatilho** (sem cortineiro, sem G1-G5, sem TV) | Resumo Executivo com tabela de uma linha: "Dormitório Casal" · "Roupeiro sobre rodapé" · "BAIXO" (`pdf.js:240-245`); na checklist, "RISCO BAIXO (0 pts)" e o aviso do roupeiro sob "Existe rodapé na região dos móveis?" |
 
-Os casos T-P34 a T-P36 não estão no inventário (e T-P37 vem da correção K-03): nascem do critério 2 (CC que some do documento assinado). Se Everton preferir enxugar, são os primeiros a sair.
+Os casos T-P34 a T-P36 não estão no inventário (e T-P37 vem da correção K-03): nascem do critério 2 (CC que some do documento assinado). Mantidos na suíte por decisão do Everton (Everton, 19/10/2026).
 
 ### 7.6 Grupo V — PDF do Projetista
 
@@ -357,7 +362,7 @@ As regras do Projetista que só existem em `.jsx` (obrigatoriedade por grupo, al
 - H-05 e H-06: só conferidos pelo diff (nunca rodados); o conserto é uma condição simples e os casos negativos T-S19 e T-S21/T-C13 já a exercitam diretamente; a prova acrescentaria pouco.
 - H-09 e H-10: o "antes" tinha outro modelo de dados (score global somado); desfazer exige reescrever, não tirar uma linha. Protegidos por T-S05, T-C04 e T-C15.
 - H-11 (acentuação): o "antes" é texto corrompido; os 13 textos literais e o nível "MÉDIO" com acento nos casos C já falham com qualquer corrupção.
-- H-12 a H-22 (PDF): conferidos pelo diff; os casos T-P citados na seção 7 cobrem cada um. Podem entrar na lista depois, se Everton quiser.
+- H-12 a H-22 (PDF): conferidos pelo diff; os casos T-P citados na seção 7 cobrem cada um. Ficam fora da lista de provas por decisão do Everton (Everton, 19/10/2026): os casos T-P já fazem a cobertura.
 
 ## 9. Lista K — comportamento aberto (não vira teste)
 
@@ -401,7 +406,8 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 | Arquivo | O que acontece |
 |---|---|
 | `testes/` (pasta nova, nome sugerido; arquivos `*.test.js` e eventuais auxiliares) | **Adicionado** — contém a suíte e o intermediário de captura do PDF. Nomes e divisão por arquivo: Spec |
-| `package.json` | **Alterado** — apenas o script `test`, chamando `node --test` (sem pasta como argumento). Nenhuma dependência nova; `package-lock.json` não muda |
+| `package.json` | **Alterado** — apenas o script `test`, chamando `node --test` (sem pasta como argumento), e o `esbuild` em `devDependencies` na versão **exata já instalada** (0.21.5, decisão 7). Nenhuma outra dependência |
+| `package-lock.json` | **Alterado** — só pela declaração do esbuild na raiz; nenhum pacote muda de versão (a 0.21.5 já está no lock como dependência do Vite) |
 | `CLAUDE.md` | **Alterado** — a frase atual "Não há suíte de testes automatizada…" (linha 28) é **trocada** (não se acrescenta linha solta) por: rodar `npm test` antes de qualquer commit ou merge na `main` que altere código em `src/`; vermelho ou pulado bloqueia; manter a menção a `npm run build` e ao teste manual no `npm run dev`; `replay_jules/` continua como conferência manual separada. O arquivo hoje tem 75 linhas e deve ficar abaixo de ~100. Por regra do projeto, o Everton aprova essa troca ao fim do ciclo |
 
 **Removido:** apenas a frase antiga do `CLAUDE.md`.
@@ -412,7 +418,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 
 **Premissas**
 1. `npm ci` já foi executado (existe `node_modules`).
-2. O esbuild 0.21.5 de `node_modules/.bin/esbuild` está disponível como dependência transitiva do Vite.
+2. O esbuild 0.21.5 é declarado em `devDependencies` (decisão 7) e continua sendo a mesma versão que o Vite usa.
 3. Node 24 local roda a suíte. Node 20 (deploy) não executa a suíte: o deploy só faz `npm run build`.
 4. As entradas do inventário e as tabelas desta seção 7 são a fonte do esperado; onde o valor foi conferido rodando a função real, está indicado.
 
@@ -420,7 +426,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 
 | ID | Risco | Mitigação |
 |---|---|---|
-| R-1 | O esbuild é dependência **transitiva** (`package-lock.json:1919`), não declarada. Uma troca de versão do Vite pode removê-lo ou mudar o caminho do executável | A suíte falha alto, com mensagem pedindo `npm ci` / conferência do esbuild (regra 12). Declarar o esbuild em `devDependencies` seria a saída, mas é dependência nova (decisão 1): só com aprovação do Everton |
+| R-1 | O esbuild é dependência **transitiva** (`package-lock.json:1919`), não declarada. Uma troca de versão do Vite pode removê-lo ou mudar o caminho do executável | A suíte falha alto, com mensagem pedindo `npm ci` / conferência do esbuild (regra 12). **Resolvido** (Everton, 19/10/2026): o esbuild é declarado em `devDependencies` na versão 0.21.5 (decisão 7). A falha alta continua valendo se ele faltar |
 | R-2 | **Relógio:** a data do arquivo e da capa vem de `new Date()` na hora local | Data fixa ao meio-dia local, sem tocar produção (regra 9). Mecanismo no Spec: o recurso de relógio falso do `node:test` (medido no Node 24; no Node 20 a doc cita `Date`, mas a versão mínima não está clara, então o Spec confirma) ou substituição temporária de `Date` (também medida) |
 | R-3 | **Embrulho do `jsPDF`:** precisa envolver cada instância (herdar da classe não funciona) e exige formato `cjs`; depende do caminho dos arquivos em `node_modules/jspdf` e `node_modules/jspdf-autotable`. Troca de versão maior dessas bibliotecas pode quebrar o embrulho | Falha alta e clara. Como o embrulho usa o `jsPDF` real, métodos novos que o card #99 chame continuam existindo |
 | R-4 | **Texto quebrado em linhas:** perguntas e CCs passam pela quebra automática do PDF; comparar linha a linha é frágil | Reunir as linhas de um mesmo bloco antes de comparar (Spec). Layout, cor e fonte não são conferidos |
@@ -449,8 +455,8 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 | CA-10 | Conferir os testes contra a lista K (só K-01 aberto) e os casos T-P27 e T-P37 | Nenhum caso afirma o comportamento de K-01 (nem o "certo", nem o "errado"); K-02 e K-03 **são** testados no comportamento corrigido (T-P27, T-P37); nenhum caso depende de ambiente removido (K-04) |
 | CA-11 | `git diff` de `src/` depois do ciclo | Vazio |
 | CA-12 | Rodar `npm run build` depois do ciclo | Compila como antes; `dist/` não contém arquivos de teste |
-| CA-13 | Conferir `deploy.yml`, `vite.config.js`, `replay_jules/`, `package-lock.json` | Sem alteração |
-| CA-14 | Conferir `package.json` | Diferença = apenas o script `test`; nenhuma dependência nova |
+| CA-13 | Conferir `deploy.yml`, `vite.config.js`, `replay_jules/` e o `package-lock.json` | Os três primeiros sem alteração; no lock, só a entrada do esbuild na raiz, sem nenhuma versão de pacote trocada |
+| CA-14 | Conferir `package.json` | Diferença = o script `test` e `"esbuild": "0.21.5"` em `devDependencies`; nenhuma outra dependência |
 | CA-15 | Procurar dado real nos testes: contratos fora de `TA9xxx`/`SM9xxx`, nomes ou telefones reais, links fora de `.invalid` | Nenhum |
 | CA-16 | **Erro:** renomear uma função interna testada (numa cópia) | Suíte falha por import; corrigir o import na mesma tarefa deixa tudo verde **sem** mudar nenhum valor esperado |
 | CA-17 | Conferir `CLAUDE.md` | A frase "Não há suíte de testes automatizada" não existe mais; no lugar, a regra de rodar `npm test` antes de commit/merge que altere `src/` (vermelho ou pulado bloqueia), com `npm run build`, `npm run dev` e `replay_jules/` mantidos; arquivo abaixo de ~100 linhas |
@@ -464,7 +470,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 - CI automático e qualquer mudança no deploy.
 - Correção do bug K-01 (card #133, único aberto; K-02, K-03 e K-04 já foram corrigidos em `1a6022d`); refatoração para tornar testáveis os itens da lista N; remoção de código morto.
 - Testes de comportamento ainda não implementado (venda futura, importação do PDF, design system).
-- Qualquer dependência nova, inclusive declarar o esbuild.
+- Qualquer dependência nova além do esbuild (decisão 7).
 
 ## 16. Pesquisa de padrões externos (resumo)
 
