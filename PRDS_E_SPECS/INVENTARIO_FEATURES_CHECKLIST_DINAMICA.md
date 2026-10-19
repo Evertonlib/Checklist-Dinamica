@@ -156,6 +156,8 @@ Regras do Projetista que só existem em `.jsx` (lista N): obrigatoriedade por gr
 
 ## 6. Comportamentos em aberto (candidatos à lista K — não viram teste)
 
+**Atualização 19/10/2026:** K-02 (#131), K-03 (#132) e K-04 (#135) foram corrigidos no commit `1a6022d`, sem desvio dos cards. O comportamento corrigido passa a ser regra viva (P-03, P-04 e P-12 valem como corrigidos; D-04 e D-05 resolvidos). As linhas de `pdf.js` a partir da 240 andaram +2 (ex.: `pdf.js:513` → `515`). **K-01 (#133) continua aberto.**
+
 Decisão do Everton em 19/10/2026: **K-01, K-02 e K-03 são bugs.** Não viram teste neste ciclo (o teste seguiria o comportamento errado). Cards: K-01 → #133 TV_FANTASMA_ELETRONICOS (Backlog, ciclo SDD, porque muda score/CC); K-02 → #131 e K-03 → #132 (Pronto para o Loop, só PDF). A correção de cada um chega com o teste junto. O K-04 não foi perguntado; a decisão fica para o PRD.
 
 | ID | Situação | Efeito medido | Fonte |

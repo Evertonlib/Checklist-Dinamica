@@ -2,9 +2,9 @@
 
 **Card Trello:** #130 TESTES_REGRESSAO_CHECKLIST_DINAMICA
 **Data:** 2026-10-19
-**Base medida:** `main` em `60152e9`
+**Base medida:** `main` em `1a6022d` (correções dos cards #131, #132 e #135 sobre o inventário medido em `60152e9`)
 **Status:** Aguardando aprovação
-**Fonte principal:** `PRDS_E_SPECS/INVENTARIO_FEATURES_CHECKLIST_DINAMICA.md` (IDs S-, P-, F-, C-, V-, D-, K-, H-). Os IDs do inventário são usados aqui para rastreabilidade. Todo `arquivo:linha` citado neste PRD foi aberto e conferido no código de `60152e9`.
+**Fonte principal:** `PRDS_E_SPECS/INVENTARIO_FEATURES_CHECKLIST_DINAMICA.md` (IDs S-, P-, F-, C-, V-, D-, K-, H-). Os IDs do inventário são usados aqui para rastreabilidade. Todo `arquivo:linha` citado neste PRD foi aberto e conferido no código de `1a6022d`. O inventário foi medido em `60152e9`; onde ele diverge do código de `1a6022d` (K-02, K-03, K-04 e linhas de `pdf.js`), vale este PRD.
 
 ---
 
@@ -31,10 +31,10 @@ Motivo: esses pontos decidem sozinhos o que chega impresso no documento que o cl
 | Fato | Evidência |
 |---|---|
 | Score e CCs são funções puras em `.js`, sem React | `scoreEngine.js:6`, `ccBuilder.js:19`; `package.json` tem `"type": "module"`, então o Node as importa direto (medido: `calcularScore`, `construirCCs` e `validarFormularioAmbiente` rodaram em Node 24 fora do repo) |
-| `gerarPdf` calcula score e CCs, lê o relógio e chama `doc.save` | `pdf.js:91-97`, `pdf.js:570` |
+| `gerarPdf` calcula score e CCs, lê o relógio e chama `doc.save` | `pdf.js:91-97`, `pdf.js:572` |
 | `gerarPdfVendedor` idem | `pdfVendedor.js:50-54`, `pdfVendedor.js:146` |
 | A data entra em dois lugares: "Data:" na capa e no nome do arquivo | `pdf.js:96-97` e `pdfVendedor.js:53-54` (hora local da máquina) |
-| O PDF liga cada CC à sua pergunta pelo código do gatilho e pela origem G1-G5 | `pdf.js:108` (mapa por id), `pdf.js:289-309` e `pdf.js:346-365` |
+| O PDF liga cada CC à sua pergunta pelo código do gatilho e pela origem G1-G5 | `pdf.js:108` (mapa por id), `pdf.js:291-311` e `pdf.js:348-367` |
 | Armadilha de nomes: a pergunta **G4** (pontos indefinidos) grava em `g3_ambientesPendentes`; a pergunta **G5** (rebaixo) grava em `g4_temRebaixo` e `g4_ambientes` | `scoreEngine.js:14,43`, `scoreEngine.js:49-51`, `schema.js:108-113` |
 | `calcularScore` quebra se `global.g4_ambientes` não existir | `scoreEngine.js:51` (sem valor reserva). Toda entrada de teste parte do `estadoInicial` completo |
 | Node local 24.15.0; deploy usa Node 20 | medido; `deploy.yml` (`node-version: 20`) |
@@ -42,19 +42,20 @@ Motivo: esses pontos decidem sozinhos o que chega impresso no documento que o cl
 | Empacotar para Node exige formato `cjs`; em `esm` falha com "Dynamic require of fs" | medido na pesquisa deste PRD; igual ao `replay_jules/LEIAME.md` passo 4 |
 | Para capturar o que o `jsPDF` escreve, é preciso embrulhar **cada instância** (`text`, `link`, `save`); estender a classe não funciona, porque os métodos nascem na instância | medido: com a classe estendida o `save` real foi chamado e tentou gravar arquivo |
 | Medido com embrulho sobre o `jsPDF` real e o `jspdf-autotable` real: capturou textos, cabeçalho e corpo das tabelas, URL dos links e o nome `Checklist_Cliente_TA9001_2026-10-19.pdf`; nenhum arquivo apareceu na pasta | execução de teste fora do repo (pasta temporária da sessão) |
-| `node --test` sem argumento acha `*.test.js`, `test-*.js`, `*-test.js` e pastas `test/`; **nenhum arquivo do repo hoje casa** (não varre `replay_jules/` nem `dist/`) | busca feita em `60152e9` |
+| `node --test` sem argumento acha `*.test.js`, `test-*.js`, `*-test.js` e pastas `test/`; **nenhum arquivo do repo hoje casa** (não varre `replay_jules/` nem `dist/`) | busca feita em `60152e9` e repetida em `1a6022d` (`1a6022d` só altera `src/`) |
 | `node --test <pasta>/` **falhou** no Node 24 (a pasta foi tratada como arquivo); a documentação do Node 20 diz que aceita | medido; doc do Node 20 consultada |
 | `mock.timers` com `Date` funciona no Node 24 (data fixada 19/10/2026 devolveu "19/10/2026"); a doc do Node 20 lista `Date` entre as opções, sem dizer desde qual versão | medido (Node 24); doc do Node 20 |
 | Wizard não deixa avançar sem ambiente | `StepAmbientes.jsx:21,93` |
-| Wizard não deixa avançar com `cm` do rebaixo vazio; o campo de ambiente removido some da tela | `StepPerguntasGlobais.jsx:33-37`, `BlocoRebaixo.jsx:79-81` |
+| Wizard não deixa avançar com `cm` do rebaixo vazio; o campo de ambiente removido some da tela. Desde `1a6022d` o reducer também tira o ambiente removido das listas G1-G5 (`FormProvider.jsx:113-133`), então o travamento não ocorre mais | `StepPerguntasGlobais.jsx:33-37`, `BlocoRebaixo.jsx:79-81`, `FormProvider.jsx:113-133` |
 | Funções mortas no PDF do Cliente | `pdf.js:27-47` (confirmado: ninguém chama `formatarListaAmbientes` nem `formatarListaRebaixo`) |
+| O commit `1a6022d` (cards #131, #132, #135) alterou só `src/services/pdf.js` e `src/context/FormProvider.jsx`; `scoreEngine.js`, `ccBuilder.js`, `checklistTextos.js` e `formUtils.js` ficaram intocados. Deslocou `pdf.js` em +2 linhas a partir da 240; não mudam `pdf.js:27-47`, `91-97`, `93-94`, `96-97`, `108`, `126-127` | `git show 1a6022d --stat` e `git show 1a6022d -- src` |
 
 ## 4. Decisões fechadas (Everton)
 
 1. **Ferramenta:** executor de testes nativo do Node (`node --test`, módulos `node:test` e `node:assert`). Nenhuma dependência nova. É **exceção consciente** à regra global "só pytest": o código é JavaScript e pytest chamando Node seria dois idiomas.
 2. **PDF testado com a função real**, empacotada para Node com o esbuild que já vem com o Vite. Este PRD define **o que** conferir; o **como** capturar (intermediário que grava as chamadas de texto, tabela, link e `save`, sem ler PDF) fica para o Spec. Exigências já fixadas: nada é gravado fora de pasta temporária e nenhum PDF é baixado no repo.
 3. **Revestimento (S-03, H-02):** ambiente MÉDIO +4 com CC de nível ALTO é **intencional** (Everton, 19/10/2026). Vira teste assim.
-4. **K-01, K-02, K-03 são bugs confirmados e não viram teste** (cards #133, #131, #132). A correção de cada um chega com o próprio teste. **K-04** foi decidido em 19/10/2026: é bug, vai para o Loop no card #135 (seção 9); também não vira teste neste ciclo.
+4. **K-01 é bug confirmado e não vira teste** (card #133, ainda aberto; a correção chega com o próprio teste). **K-02, K-03 e K-04 foram corrigidos em `1a6022d`** (cards #131, #132, #135). K-02 e K-03 passam a ser **regra viva e entram na suíte** no comportamento corrigido (T-P27, T-P37); K-04 foi corrigido no reducer (`.jsx`) e segue sem teste (lista N).
 5. **Regras que só existem dentro de `.jsx`** (reducers não exportados, validações de tela) ficam na **lista N**, sem refatorar.
 6. Comando: script `npm test` em `package.json` chamando `node --test`. Mudança em `package.json` só para isso.
 
@@ -65,7 +66,7 @@ Motivo: esses pontos decidem sozinhos o que chega impresso no documento que o cl
 3. **Texto completo dos CCs.** O texto completo é conferido **só no grupo C**, porque ali o texto jurídico assinado é o próprio objeto da regra (13 textos: 11 CCs e 2 avisos). Nos demais grupos (S, P) basta o código, o nível, a pontuação e, no PDF, um trecho de identificação do CC. Justificativa: conferir tudo em todo lugar multiplicaria o custo de manutenção sem proteger mais; conferir só trecho nos CCs seria deixar passar justamente o incidente H-11 (acentuação). Cada texto é transcrito do código **uma única vez** pelo Spec, com conferência mecânica de transcrição na tarefa (fora da suíte); depois disso o teste passa a ser a fonte da regra. Mudar a redação de um CC exige atualizar o teste com registro no Spec do card que mudou.
 4. **Comportamento aberto (possível bug)** não vira teste: vai para a lista K.
 5. **Regra que não dá para testar sem refatorar:** lista N.
-6. **Entradas escolhidas para sobreviver aos cards planejados.** Ex.: os casos de TV de Home/Outros usam "eletrônicos = Sim" com TV na lista (o card #133 só muda o caso "Não"); os casos de dormitório com rodapé existente sempre trazem outro gatilho (o card #132 só muda o caso "rodapé sozinho").
+6. **Entradas escolhidas para sobreviver aos cards planejados.** Ex.: os casos de TV de Home/Outros usam "eletrônicos = Sim" com TV na lista (o card #133 só muda o caso "Não"); os casos de TV não usam "eletrônicos = Não" com TV residual (K-01 aberto). Os cards #131 e #132 já foram corrigidos em `1a6022d`, então não há mais cuidado especial com Outros nem com rodapé existente.
 7. **Renomear função interna** = corrigir o import do teste na mesma tarefa. O valor esperado só muda com registro no Spec do card que mudou a regra.
 8. **Dados 100% fictícios, série reservada:** contratos `TA9xxx` / `SM9xxx`, nomes claramente falsos (ex.: "CLIENTE FICTICIO TESTE"), links em domínio `.invalid`. Nenhum dado real, nenhum `localStorage` salvo, nenhum PDF de cliente.
 9. **Relógio controlado.** A data do nome do arquivo e da capa depende da hora da máquina. O teste fixa a data (sem alterar produção); mecanismo no Spec. A data fixa deve ser meio-dia no horário local, para não virar o dia por fuso. Dois valores: 19/10/2026 e 05/03/2026 (confere o zero à esquerda).
@@ -78,7 +79,7 @@ Motivo: esses pontos decidem sozinhos o que chega impresso no documento que o cl
 ## 6. Filtro regra a regra
 
 Perguntas: **(1)** existe no código de hoje? **(2)** erro nela afeta dado impresso no PDF que o cliente assina ou que vai à fábrica e passaria em silêncio? **(3)** dá para testar sem mexer em produção? **(4)** muda por card planejado?
-Resultado da pergunta 1 para todas as regras vivas: **Sim**, conferido no código de `60152e9`. Os três documentos NAO IMPLEMENTADO do inventário (venda futura, importação, design system) falham na 1 e ficam fora.
+Resultado da pergunta 1 para todas as regras vivas: **Sim**, conferido no código de `1a6022d`. Os três documentos NAO IMPLEMENTADO do inventário (venda futura, importação, design system) falham na 1 e ficam fora.
 
 Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma resposta vazia que o PDF imprime como "—", ou altera o texto digitado que vai ao PDF).
 
@@ -107,7 +108,7 @@ Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma respos
 | S-19 classificação (limiares 4 e 8) | Sim | Sim | Sim | — | T-S23, T-S24 |
 | S-20 global = pior ambiente | Sim | Sim (capa do PDF) | Sim | — | T-S25 a T-S28 |
 | S-21 sem ambientes | Sim | **Não**: o wizard não deixa chegar ao PDF sem ambiente (`StepAmbientes.jsx:21,93`) | Sim | — | T-S29. **Entra por ser barata e estável** (guarda contra erro de máximo em lista vazia) |
-| S-22 escopo dos CCs | Sim | Sim (o PDF casa CC com ambiente por `escopo`, `pdf.js:347`; escopo errado some com todos os CCs do ambiente) | Sim | — | T-C15 |
+| S-22 escopo dos CCs | Sim | Sim (o PDF casa CC com ambiente por `escopo`, `pdf.js:349`; escopo errado some com todos os CCs do ambiente) | Sim | — | T-C15 |
 
 ### 6.2 PDF do Cliente
 
@@ -115,8 +116,8 @@ Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma respos
 |---|---|---|---|---|---|
 | P-01 nome do arquivo | Sim | Sim | Sim (com relógio controlado) | — | T-P01, T-P02 |
 | P-02 capa | Sim | Sim | Sim | — | T-P03, T-P04, T-P05 |
-| P-03 Resumo Executivo | Sim | Sim | Sim | #132 | T-P06, T-P07 |
-| P-04 rodapé existente no resumo | Sim | Sim | Sim | #132 (só o caso "rodapé sozinho", que **não** é testado) | T-P08 |
+| P-03 Resumo Executivo | Sim | Sim | Sim | corrigido em #132, `1a6022d` | T-P06, T-P07, T-P37 |
+| P-04 rodapé existente no resumo | Sim | Sim | Sim | corrigido em #132, `1a6022d` (o caso "rodapé sozinho" agora **é** testado) | T-P08, T-P37 |
 | P-05 globais dentro do ambiente | Sim | Sim | Sim | — | T-P09, T-P10 |
 | P-06 G1/G5 sem CC (#107) | Sim | Sim (prova que o cliente negou) | Sim | — | T-P11 a T-P15 |
 | P-07 risco por ambiente | Sim | Sim | Sim | — | T-P10, T-P16 |
@@ -124,12 +125,12 @@ Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma respos
 | P-09 ordem dos eletros (#110) | Sim | Sim (vão errado na fábrica) | Sim | — | T-P19, T-P20, T-P21 |
 | P-10 tabela de eletros | Sim | Sim | Sim | — | T-P22, T-P23 |
 | P-11 tabela de eletrônicos | Sim | Sim | Sim | — | T-P24, T-P25 |
-| P-12 ponto da TV na Sala (#85) | Sim | Sim | Sim | #131 (Outros passa a imprimir; caso novo vem com o card) | T-P26, T-P27 |
+| P-12 ponto da TV na Sala (#85) | Sim | Sim | Sim | corrigido em #131, `1a6022d` (Outros agora imprime; testado) | T-P26, T-P27 |
 | P-13 TV do dormitório | Sim | Sim | Sim | — | T-P28, T-P29 |
 | P-14 cama | Sim | Sim | Sim | — | T-P30, T-P31 |
 | P-15 cuba | Sim | Sim | Sim | — | T-P32 |
 | P-16 observações | Sim | Sim | Sim | — | T-P33 |
-| (lacuna do inventário) CC de granito, eletros, eletrônicos, rodapé e cortineiro impressos sob a pergunta certa | Sim (`pdf.js:376,460,509,445,452`) | **Sim**: se o vínculo se perder, o CC some do documento assinado sem aviso | Sim | — | T-P34, T-P35, T-P36 |
+| (lacuna do inventário) CC de granito, eletros, eletrônicos, rodapé e cortineiro impressos sob a pergunta certa | Sim (`pdf.js:378,462,511,447,454`) | **Sim**: se o vínculo se perder, o CC some do documento assinado sem aviso | Sim | — | T-P34, T-P35, T-P36 |
 
 ### 6.3 Validação, compartilhado e Projetista
 
@@ -155,7 +156,9 @@ Legenda: **Sim** / **Não** / **Ind.** (indireto: o erro deixa passar uma respos
 | V-08 observações | Sim | Sim | Sim | — | T-V10 |
 | `buscarCep`, ramo "CEP inválido" (`cep.js:8`) | Sim | **Não**: só afeta o preenchimento automático; o PDF imprime o que foi digitado | Sim (não usa rede) | — | **Não entra.** Falha na 2 e testá-lo exigiria um `fetch` falso que falhe se for chamado, para valer 1 caso. Reversível: se Everton quiser, vira o caso T-A04 |
 | Reducers de `FormProvider*.jsx`, validações de identificação e do Projetista em `.jsx`, limpeza de Sim/Não nos blocos | Sim | Sim | **Não** (dentro de componente, não exportado) | #99 e #121 podem exportar/unificar | **Lista N** |
-| K-01 a K-04 | Sim | Sim | — | #133, #131, #132, #135 | **Lista K** |
+| K-01 | Sim | Sim | — | #133 (aberto) | **Lista K** (sem teste) |
+| K-02, K-03 | Sim | Sim | Sim | corrigidos em #131/#132, `1a6022d` | **Entram**: T-P27 e T-P37 |
+| K-04 | Sim | Não (sem efeito no PDF) | Não (reducer em `.jsx`) | corrigido em #135, `1a6022d` | **Lista N** |
 
 ## 7. Grupos de teste
 
@@ -167,10 +170,10 @@ Convenção: o **ID do caso** é `T-<grupo><número>` (ex.: T-S03). A coluna "Re
 | C | CCs e avisos (`construirCCs`): tipo, nível, escopo, origem, texto completo | 16 |
 | A | Ambientes compartilhados (`formatarNomeAmbiente`, catálogo) | 3 |
 | F | Validação por ambiente e `limitarCm` | 16 |
-| P | PDF do Cliente | 36 |
+| P | PDF do Cliente | 37 |
 | V | PDF do Projetista e grupos | 10 |
-| H | Prova dos consertos (procedimento, não são casos novos; seção 8) | 6 provas |
-| | **Total de casos novos** | **110** |
+| H | Prova dos consertos (procedimento, não são casos novos; seção 8) | 8 provas |
+| | **Total de casos novos** | **111** |
 
 Nos grupos S e C, a entrada de cada caso parte do `estadoInicial` completo e dos `defaultsPorFormType`; o grupo C usa como entrada a saída real de `calcularScore`, igual ao PDF (`pdf.js:93-94`). Nomes de campo seguem o código (ver armadilha G4/G5 na seção 3). Abreviações: "dorm." = formType dormitório; ambientes de exemplo `cozinha-0`, `dormitorio_casal-0`, `home-0`, `outros-0`, `banheiro-0`.
 
@@ -276,7 +279,7 @@ Todos com a identificação fictícia e relógio fixo em 19/10/2026, salvo indic
 | T-P04 | P-02, H-12 | mesma identificação (logradouro "Rua Ficticia", número "100", bairro "Bairro Ficticio", cidade "Cidade Ficticia", UF "SP") sem CEP, sem telefone e sem complemento | linha 1: "Rua Ficticia, 100" (perde só o " — Fundos"); linha 2 **continua** "Bairro Ficticio — Cidade Ficticia/SP" (`pdf.js:126-127`); **nenhuma** linha "CEP:" nem "Telefone:"; "Data:" presente |
 | T-P05 | P-02, H-01 | cenário de T-S26 (Outros 9 pts, Home 5 pts) | capa com "RISCO ALTO", sem "(… pts)" |
 | T-P06 | P-03 | Cozinha com G1 + granito retirar + eletros indefinidos (5 pts); Dormitório "Suíte" com rebaixo de 12 cm + cortineiro não instalado (2 pts); Banheiro sem gatilho | tabela com cabeçalho `Ambiente / Ações e pontos de atenção / Risco`; duas linhas, nessa ordem: "Cozinha / Área de Serviço" · "Iluminação por conta do cliente — Remover granito — Eletros indefinidos" · "MÉDIO"; "Dormitório Casal — Suíte" · "Rebaixo de 12cm — Cortineiro 150mm" · "BAIXO"; o Banheiro **não** aparece |
-| T-P07 | P-03 | todos os ambientes sem gatilho | título "Resumo Executivo" sem nenhuma tabela de resumo |
+| T-P07 | P-03 | todos os ambientes sem gatilho **e sem** dormitório com `rodape` verdadeiro (rodapé existente entra no resumo, ver T-P37) | título "Resumo Executivo" sem nenhuma tabela de resumo |
 | T-P08 | P-04 | Dormitório com `rodape` verdadeiro **e** cortineiro não instalado | linha do resumo "Cortineiro 150mm — Roupeiro sobre rodapé" · "BAIXO" |
 | T-P09 | P-05 | Cozinha em G1, G2, G4 e G5 (`cm` "12"); G3 vazio | na seção da Cozinha, nesta ordem, cada uma com pergunta, resposta e CC logo abaixo: G1 "Resposta: Sim"; G2 "Resposta: Não"; G4 "Resposta: Não"; G5 "Resposta: Sim — 12 cm"; cada CC com o prefixo "CC: " e trecho que o identifica (iluminação, reboco, pontos, "REBAIXO DE TETO EM 12CM"); G3 não aparece; "RISCO ALTO (5 pts)" |
 | T-P10 | P-05, P-07 | Dormitório só em G3 | pergunta G3, "Resposta: Não", CC de revestimento ("CC: CLIENTE CIENTE E DE ACORDO QUE A MEDIÇÃO TÉCNICA FOI REALIZADA SEM O REVESTIMENTO FINAL…"); cabeçalho "RISCO MÉDIO (4 pts)" |
@@ -296,7 +299,7 @@ Todos com a identificação fictícia e relógio fixo em 19/10/2026, salvo indic
 | T-P24 | P-11, H-14 | Home, `eletronicos` verdadeiro: TV 55" modelo "TV-9001" com link; Home Theater sem modelo | Tipo `TV — 55"` · Modelo "TV-9001" · Link "Ver link"; Tipo "Home Theater" · Modelo "—"; polegadas só na TV; subtítulo "Eletrônicos" |
 | T-P25 | P-11 | Home com `eletronicos` falso e lista residual **sem TV** (um Videogame) | pergunta "Não" + CC de eletrônicos indefinidos; sem subtítulo "Eletrônicos" e sem tabela (a lista residual com TV é o K-01 e não entra) |
 | T-P26 | P-12, H-15, H-16 | Home, `eletronicos` verdadeiro, lista com TV, ponto "Não" | pergunta "Possui ou pretende adquirir eletrônicos…?" Sim; depois "O ponto elétrico da TV já está na posição final?" "Resposta: Não" com o CC de TV abaixo; depois a tabela; a pergunta "Terá TV neste ambiente?" **não** aparece |
-| T-P27 | P-12, H-15 | Home com lista sem TV; Outros com TV na lista | Home: pergunta do ponto da TV ausente; Home e Outros: "Terá TV neste ambiente?" ausente. **Nada** é afirmado sobre o ponto da TV em Outros (K-02) |
+| T-P27 | P-12, H-15, K-02 | (a) Outros com `eletronicos` verdadeiro, lista com TV, ponto "Não"; (b) Outros com `eletronicos` verdadeiro e lista sem TV (um Videogame); (c) Home com lista sem TV | (a) "O ponto elétrico da TV já está na posição final?" "Resposta: Não" com o CC de TV abaixo (`pdf.js:515`, condição sem restrição a Home, dentro do bloco `pdf.js:507`); (b) e (c) pergunta do ponto da TV **ausente**; em Home e Outros "Terá TV neste ambiente?" ausente |
 | T-P28 | P-13, H-13 | Dorm.: TV Sim, ponto "Não", polegadas "50", modelo, largura, altura, profundidade e link preenchidos | em ordem: "Terá TV neste ambiente?" Sim; ponto "Não" + CC; "Polegadas" 50; "Modelo"; "Largura (cm)"; "Altura (cm)"; "Profundidade (cm)"; "Link" com "Ver link" (nunca a URL crua); um link gravado com a URL de entrada |
 | T-P29 | P-13 | Dorm.: TV Sim, ponto "Sim", só polegadas | "Polegadas" presente; Modelo, Largura, Altura, Profundidade e Link **ausentes**; nenhum CC de TV |
 | T-P30 | P-14, H-13 | Dorm. com cama solteiro, padrao, queen e king (um PDF cada, no mesmo teste) | "Solteiro (0,88 × 1,88 m)"; "Padrão (1,38 × 1,88 m)"; "Queen (1,58 × 1,98 m)"; "King (2,00 × 2,03 m)" |
@@ -306,8 +309,9 @@ Todos com a identificação fictícia e relógio fixo em 19/10/2026, salvo indic
 | T-P34 | lacuna | Cozinha: granito Sim, adaptar Não; `eletrosDefined` falso | "Os móveis serão adaptados?" "Não" com o CC de granito abaixo; "Já possui ou tem intenção de compra específica dos eletrodomésticos?" "Não" com o CC de eletros abaixo |
 | T-P35 | lacuna | Dorm.: cortineiro Sim e não instalado; rodapé Sim | "O cortineiro já está instalado?" "Não" com o aviso de 150MM abaixo; "Existe rodapé na região dos móveis?" "Sim" com o aviso do roupeiro abaixo; os dois avisos **sem** o prefixo "CC: " |
 | T-P36 | lacuna | Home: rodapé Não; `eletronicos` falso | "Existe rodapé…?" "Não" com o CC de rodapé abaixo (com prefixo "CC: "); "Possui ou pretende adquirir eletrônicos…?" "Não" com o CC de eletrônicos abaixo |
+| T-P37 | P-03, P-04, K-03 | Dormitório com `rodape` verdadeiro e **nenhum outro gatilho** (sem cortineiro, sem G1-G5, sem TV) | Resumo Executivo com tabela de uma linha: "Dormitório Casal" · "Roupeiro sobre rodapé" · "BAIXO" (`pdf.js:240-245`); na checklist, "RISCO BAIXO (0 pts)" e o aviso do roupeiro sob "Existe rodapé na região dos móveis?" |
 
-Os casos T-P34 a T-P36 não estão no inventário: nascem do critério 2 (CC que some do documento assinado). Se Everton preferir enxugar, são os primeiros a sair.
+Os casos T-P34 a T-P36 não estão no inventário (e T-P37 vem da correção K-03): nascem do critério 2 (CC que some do documento assinado). Se Everton preferir enxugar, são os primeiros a sair.
 
 ### 7.6 Grupo V — PDF do Projetista
 
@@ -332,9 +336,9 @@ As regras do Projetista que só existem em `.jsx` (obrigatoriedade por grupo, al
 
 **Para que serve:** garantir que o teste não passa "sempre". Em uma **cópia da árvore, numa pasta temporária fora do repositório**, desfaz-se só aquele conserto, roda-se a suíte e confere-se que os casos indicados ficam **vermelhos**. A cópia é descartada. O repositório não é alterado. Se nenhum caso ficar vermelho, o teste não protege e deve ser corrigido antes de aceitar o ciclo. O resultado de cada prova é registrado no Spec (seção "Desvios" ou relatório de execução).
 
-**Como desfazer:** em cópia fora do repositório, desfazer **somente o trecho do conserto sobre o código atual**, com a mudança mínima indicada na tabela abaixo. **Não** restaurar o arquivo do commit pai: o pai de `934e18c`, `c50efc4` e `0aa8d85` é anterior a `e039db7` e ainda tem score global somado e gatilhos G1-G4 globais (`git show e039db7 -- src/domain/scoreEngine.js` remove `GATILHOS_DEF` e o bloco "Gatilhos globais"; conferido: `e039db7` não é ancestral de `934e18c`). Restaurar esses arquivos derrubaria dezenas de casos por outro motivo e a prova passaria mesmo com teste inútil. **Critério:** ficam vermelhos os casos listados; outros vermelhos só são aceitos se explicados no relatório de execução. Linhas conferidas em `60152e9`.
+**Como desfazer:** em cópia fora do repositório, desfazer **somente o trecho do conserto sobre o código atual**, com a mudança mínima indicada na tabela abaixo. **Não** restaurar o arquivo do commit pai: o pai de `934e18c`, `c50efc4` e `0aa8d85` é anterior a `e039db7` e ainda tem score global somado e gatilhos G1-G4 globais (`git show e039db7 -- src/domain/scoreEngine.js` remove `GATILHOS_DEF` e o bloco "Gatilhos globais"; conferido: `e039db7` não é ancestral de `934e18c`). Restaurar esses arquivos derrubaria dezenas de casos por outro motivo e a prova passaria mesmo com teste inútil. **Critério:** ficam vermelhos os casos listados; outros vermelhos só são aceitos se explicados no relatório de execução. Linhas de `scoreEngine.js` conferidas em `1a6022d` (o commit não toca esse arquivo).
 
-**Lista proposta** — só consertos que mexem em dado **impresso** de score ou CC e que o inventário já **rodou** nas duas versões:
+**Lista proposta** — consertos que mexem em dado **impresso** de score ou CC. Os seis primeiros o inventário já **rodou** nas duas versões; H-23 e H-24 são acrescentados por este PRD (commit `1a6022d`, diff conhecido, reversão de uma linha):
 
 | Prova | Commit | Conserto desfeito | Casos que devem ficar vermelhos |
 |---|---|---|---|
@@ -344,6 +348,10 @@ As regras do Projetista que só existem em `.jsx` (obrigatoriedade por grupo, al
 | H-04 | `c50efc4` | idem para Outros: sai do bloco `scoreEngine.js:85` (que fica só com Home) e entra no bloco `scoreEngine.js:77` (Dormitório e Outros), como antes de `c50efc4` | T-S15, T-C09 |
 | H-07 | `0aa8d85` | remover `resp.tanqueEmbutido === false &&` de `scoreEngine.js:67` (diff de `0aa8d85`) | T-S12, T-C08, T-P18 |
 | H-08 | `e039db7` | `scoreEngine.js:74` vira `const div07Ativo = g3_ambientesPendentes.length > 0` (comportamento global de antes de `e039db7`) | T-S16 |
+| H-23 | `1a6022d` (card #131) | `pdf.js:515` volta a `if (formType === 'home' && resp.eletronicosList.some((e) => e.tipo === 'TV')) {` | T-P27 (a) |
+| H-24 | `1a6022d` (card #132) | `pdf.js:240-245`: o filtro volta a só devolver `score && score.gatilhos.length > 0` (sem a alternativa do aviso de rodapé) | T-P37 |
+
+**Por que H-23 e H-24 entram:** o critério é dado impresso de CC no documento assinado. H-23 é o CC de TV de Outros que antes não saía na checklist; H-24 é o aviso do roupeiro que antes sumia do resumo. As duas reversões são de uma linha, o "antes" e o "depois" são conhecidos pelo diff e cada uma tem um caso próprio e único. **H-25 (card #135) não entra:** a correção é do reducer em `.jsx` (lista N), sem caso na suíte para ficar vermelho.
 
 **Fora da lista, com motivo:**
 - H-05 e H-06: só conferidos pelo diff (nunca rodados); o conserto é uma condição simples e os casos negativos T-S19 e T-S21/T-C13 já a exercitam diretamente; a prova acrescentaria pouco.
@@ -353,32 +361,34 @@ As regras do Projetista que só existem em `.jsx` (obrigatoriedade por grupo, al
 
 ## 9. Lista K — comportamento aberto (não vira teste)
 
+Só o **K-01** continua aberto. K-02, K-03 e K-04 ficam na tabela como registro do que foi corrigido.
+
 | ID | Situação | Decisão |
 |---|---|---|
-| K-01 | Home/Outros: eletrônicos "Sim", TV adicionada, ponto "Não", depois eletrônicos "Não": a lista não é limpa e o score ainda conta a TV (`FormHomeSalaOffice.jsx:64`, `FormOutros.jsx:396`) | **Bug confirmado → card #133** (Backlog, ciclo SDD). O teste chega com a correção. Nenhum caso deste ciclo usa lista com TV e `eletronicos` falso (ver T-P25) |
-| K-02 | Outros com TV: CC só no resumo, sem a pergunta do ponto na checklist (`pdf.js:513`) | **Bug confirmado → card #131** (Loop). T-P27 nada afirma sobre o ponto da TV em Outros |
-| K-03 | Dormitório só com rodapé existente: o aviso some do resumo (`pdf.js:240-243`) | **Bug confirmado → card #132** (Loop). Nenhum caso usa dormitório com rodapé existente **sem** outro gatilho; T-P07 e T-P06 usam ambientes sem rodapé existente |
-| K-04 | Ambiente removido continua nas listas globais G1-G5 (`FormProvider.jsx:113-118` não limpa `global`). Sem efeito no score/PDF; se o ambiente volta, reaparece marcado; e um rebaixo com `cm` vazio de ambiente removido **trava o avanço** do G5, sem campo visível para corrigir (`StepPerguntasGlobais.jsx:33-37`; o campo some em `BlocoRebaixo.jsx:79-81`) | **Decidido (Everton, 19/10/2026): é bug → card #135** "ambiente removido deve sair das perguntas gerais (G1-G5)", lista Pronto para o Loop (https://trello.com/c/47LVWZCs). Sem teste neste ciclo: a correção mora no reducer (`.jsx`, lista N). Nenhum caso deste ciclo depende de ambiente removido |
+| K-01 | Home/Outros: eletrônicos "Sim", TV adicionada, ponto "Não", depois eletrônicos "Não": a lista não é limpa e o score ainda conta a TV (`FormHomeSalaOffice.jsx:64`, `FormOutros.jsx:396`) | **Bug confirmado, aberto → card #133** (Backlog, ciclo SDD). O teste chega com a correção. Nenhum caso deste ciclo usa lista com TV e `eletronicos` falso (ver T-P25) |
+| K-02 | Outros com TV: CC só no resumo, sem a pergunta do ponto na checklist (`pdf.js:513` em `60152e9`) | **Corrigido em `1a6022d` (card #131).** Agora é regra viva, testada em T-P27 (`pdf.js:515`) |
+| K-03 | Dormitório só com rodapé existente: o aviso sumia do resumo (`pdf.js:240-243` em `60152e9`) | **Corrigido em `1a6022d` (card #132).** Agora é regra viva, testada em T-P37 (`pdf.js:240-245`) |
+| K-04 | Ambiente removido continuava nas listas globais G1-G5 e podia travar o avanço do G5 com `cm` vazio | **Corrigido em `1a6022d` (card #135)**: o reducer tira as instâncias removidas de G1-G5 (`FormProvider.jsx:113-133`). Sem teste neste ciclo: a correção mora no reducer (`.jsx`, lista N). Nenhum caso depende de ambiente removido |
 
 ## 10. Lista N — não testável sem refatorar (fica de fora)
 
 | Item | Onde mora | Observação |
 |---|---|---|
-| Criação de instâncias, remoção de contrato, `normalizarEstadoSalvo`, descarte de rascunho antigo (`g2_temReforma`) | reducers e provider em `FormProvider.jsx` / `FormProviderVendedor.jsx` (`FormProvider.jsx:281-283`) | O card #99 deve exportar `normalizarEstadoSalvo`; vira testável então |
+| Criação de instâncias, remoção de contrato, `normalizarEstadoSalvo`, descarte de rascunho antigo (`g2_temReforma`) | reducers e provider em `FormProvider.jsx` / `FormProviderVendedor.jsx` (`FormProvider.jsx:297-299`) e limpeza do `global` ao reduzir ambientes (`FormProvider.jsx:113-133`, corrigida em `1a6022d`, #135) | O card #99 deve exportar `normalizarEstadoSalvo`; vira testável então |
 | Validação de identificação: regex de contrato, telefone, CEP, UF | `StepIdentificacao.jsx`, `StepIdentificacaoVendedor.jsx` | O card #121 pode unificar as siglas de contrato |
 | Validação do Projetista: obrigatoriedade por grupo, altura > 0, primeiro contrato não removível | `StepPerguntasAmbienteVendedor.jsx:23-27` e `StepIdentificacaoVendedor.jsx` | — |
 | Limpeza de respostas ao trocar Sim/Não nos blocos G1-G5 e formulários | handlers dos `Form*.jsx` e `Bloco*.jsx` | Origem do K-01; a correção do #133 traz o teste dela |
-| Validação "pode avançar" do G1-G5 (inclui `cm` obrigatório) | `StepPerguntasGlobais.jsx:33-37` | ligada ao K-04 |
+| Validação "pode avançar" do G1-G5 (inclui `cm` obrigatório) | `StepPerguntasGlobais.jsx:33-37` | ligada ao K-04 (corrigido em #135) |
 | Consertos só de tela (seção 8.3 do inventário): máscara de telefone, G3 sem ambientes do G2, CC visível no G3, nome do ambiente Outros, botão "Já rebaixado", "Iniciar novo preenchimento" | componentes `.jsx` | `d87f38e` tem a função `limitarCm` coberta por T-F16 |
 
 ## 11. Mapa do futuro
 
 | Card | O que muda | Efeito nesta suíte |
 |---|---|---|
-| #131 (Loop) | Outros imprime a pergunta do ponto da TV com CC | Nenhum caso existente quebra (T-P26 é Home; T-P27 não afirma nada sobre Outros). O card acrescenta o caso de Outros e o teste do K-02 |
-| #132 (Loop) | "Roupeiro sobre rodapé" entra no resumo mesmo sozinho | T-P06/T-P07/T-P08 seguem válidos. O card acrescenta o caso "rodapé sozinho" (K-03) |
-| #135 (Loop) | ambiente removido sai das listas G1-G5 (K-04), corrigido no reducer | Nenhum efeito nos casos existentes (nenhum usa ambiente removido). Item da lista N; sem teste |
-| #133 (SDD) | eletrônicos "Não" deixa de contar TV da lista | T-S14, T-S15, T-F13, T-P26 usam "eletrônicos Sim" e seguem válidos. O card acrescenta o caso "eletrônicos Não com TV residual" (K-01) |
+| #131 (feito, `1a6022d`) | Outros imprime a pergunta do ponto da TV com CC | Já refletido: T-P27 afirma a pergunta e o CC em Outros |
+| #132 (feito, `1a6022d`) | "Roupeiro sobre rodapé" entra no resumo mesmo sozinho | Já refletido: T-P37; T-P06, T-P07 e T-P08 seguem válidos |
+| #135 (feito, `1a6022d`) | ambiente removido sai das listas G1-G5 (K-04), corrigido no reducer | Nenhum efeito nos casos (nenhum usa ambiente removido). Item da lista N; sem teste |
+| #133 (SDD, único aberto) | eletrônicos "Não" deixa de contar TV da lista | T-S14, T-S15, T-F13, T-P26, T-P27 usam "eletrônicos Sim" e seguem válidos. O card acrescenta o caso "eletrônicos Não com TV residual" (K-01) |
 | #99 | `gerarPdf` grava respostas nas propriedades do PDF; `normalizarEstadoSalvo` provavelmente exportada | O texto impresso "não deve mudar": os casos P devem continuar verdes sem alteração. O embrulho sobre o `jsPDF` real aceita chamadas novas sem mudar. O card acrescenta testes do que for novo |
 | #117 | nova rota e novo PDF `Checklist_Futura_*` | Nenhum efeito; testes do novo PDF só depois de implementado |
 | #114 | só CSS | Nenhum |
@@ -419,7 +429,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 | R-7 | **"Pulado bloqueia" só funciona se pulado for visível:** o próprio Node conta `skipped` no resumo | Proibido `skip`/`todo`/`only` (regra 12); o relato do resultado cita passou/pulou/falhou, com os três números |
 | R-8 | **Armadilha de nomes G4/G5** (seção 3) e **estado parcial** (`g4_ambientes` ausente quebra `scoreEngine.js:51`) levam o implementador a montar entrada errada | Entradas sempre a partir do `estadoInicial`; tabela da seção 7 usa a pergunta, e o Spec deve listar o campo exato de cada caso |
 | R-9 | **Caminho com espaço** (`C:\Users\Windows 10\...`) | Medido: o empacotamento e a execução funcionaram nesse caminho; o Spec evita montar comandos por concatenação de texto |
-| R-10 | **Manutenção:** 110 casos, texto jurídico travado | Construtores pequenos de estado no Spec (parte do `estadoInicial`), um comportamento por caso; mudar redação de CC exige atualizar o teste (atrito desejado) |
+| R-10 | **Manutenção:** 111 casos, texto jurídico travado | Construtores pequenos de estado no Spec (parte do `estadoInicial`), um comportamento por caso; mudar redação de CC exige atualizar o teste (atrito desejado) |
 | R-11 | Sem CI: o bloqueio depende de a IA rodar a suíte | Linha no `CLAUDE.md` (seção 12). Risco aceito nesta fase (decisão do Everton) |
 | R-12 | Arquivos temporários do empacotamento não limpos | Tudo na pasta temporária do sistema, removida ao final; `git status` limpo depois da suíte (critério CA-05) |
 
@@ -427,8 +437,8 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 
 | ID | Cenário (entrada) | Resultado esperado |
 |---|---|---|
-| CA-01 | Rodar `npm test` na `main` limpa, offline | Termina com código 0; resumo mostra todos os casos da seção 7 como passou, `fail 0`, `skipped 0`; os 110 casos aparecem pelo nome com seu ID `T-` |
-| CA-02 | Em cópia fora do repo, aplicar sobre o código atual a mudança mínima de cada prova da seção 8 (H-01, H-02, H-03, H-04, H-07, H-08), uma por vez, e rodar a suíte | Em cada cópia ficam vermelhos os casos listados na tabela da seção 8; outros vermelhos só são aceitos se explicados no relatório; código de saída diferente de 0 |
+| CA-01 | Rodar `npm test` na `main` limpa, offline | Termina com código 0; resumo mostra todos os casos da seção 7 como passou, `fail 0`, `skipped 0`; os 111 casos aparecem pelo nome com seu ID `T-` |
+| CA-02 | Em cópia fora do repo, aplicar sobre o código atual a mudança mínima de cada prova da seção 8 (H-01, H-02, H-03, H-04, H-07, H-08, H-23, H-24), uma por vez, e rodar a suíte | Em cada cópia ficam vermelhos os casos listados na tabela da seção 8; outros vermelhos só são aceitos se explicados no relatório; código de saída diferente de 0 |
 | CA-03 | **Erro:** alterar na cópia um limiar (ALTO a partir de 9 em vez de 8) | T-S24 fica vermelho; mensagem mostra esperado e obtido |
 | CA-04 | **Erro:** alterar na cópia o texto de um CC (tirar um acento) | O caso do grupo C daquele CC fica vermelho |
 | CA-05 | Rodar `npm test` e olhar `git status` e buscar `*.pdf` e `*.cjs` no repo | Nenhum arquivo novo ou alterado fora dos listados na seção 12; nenhum PDF no repo; nenhum `localStorage` tocado |
@@ -436,7 +446,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 | CA-07 | Rodar a suíte com o relógio do sistema em outro dia (ou na virada do dia) | Resultado idêntico; os nomes de arquivo esperados continuam `…_2026-10-19.pdf` e `…_2026-03-05.pdf` |
 | CA-08 | Buscar nos arquivos de teste os nomes proibidos da regra 2 (`ORDEM_ELETROS_PDF`, `GATILHO_TEXTO`, `PERGUNTAS_POR_GRUPO`, `GRUPO_POR_AMBIENTE`, `TAMANHOS_CAMA`, `ELETROS_CONFIG`, `ELETRONICOS_CONFIG`, `TIPOS_CUBA`, `COR_NIVEL`, `TEXTO_`) | Nenhuma ocorrência (exceção única: `AMBIENTES_DISPONIVEIS` no T-A03, comparado com lista por extenso) |
 | CA-09 | Buscar nos testes por `skip`, `todo` e `only` | Nenhuma ocorrência |
-| CA-10 | Conferir os testes contra a lista K | Nenhum caso afirma o comportamento de K-01, K-02 ou K-03 (nem o "certo", nem o "errado"), e nenhum caso depende de ambiente removido (K-04) |
+| CA-10 | Conferir os testes contra a lista K (só K-01 aberto) e os casos T-P27 e T-P37 | Nenhum caso afirma o comportamento de K-01 (nem o "certo", nem o "errado"); K-02 e K-03 **são** testados no comportamento corrigido (T-P27, T-P37); nenhum caso depende de ambiente removido (K-04) |
 | CA-11 | `git diff` de `src/` depois do ciclo | Vazio |
 | CA-12 | Rodar `npm run build` depois do ciclo | Compila como antes; `dist/` não contém arquivos de teste |
 | CA-13 | Conferir `deploy.yml`, `vite.config.js`, `replay_jules/`, `package-lock.json` | Sem alteração |
@@ -452,7 +462,7 @@ Quem corrigir um desses cards roda a suíte **antes** (para ver o que é regra v
 - Navegador, layout, cores, fontes, quebra de página, telas React.
 - Leitura de PDF real (continua em `replay_jules/`).
 - CI automático e qualquer mudança no deploy.
-- Correção dos bugs K-01, K-02, K-03 e K-04 (cards #133, #131, #132 e #135); refatoração para tornar testáveis os itens da lista N; remoção de código morto.
+- Correção do bug K-01 (card #133, único aberto; K-02, K-03 e K-04 já foram corrigidos em `1a6022d`); refatoração para tornar testáveis os itens da lista N; remoção de código morto.
 - Testes de comportamento ainda não implementado (venda futura, importação do PDF, design system).
 - Qualquer dependência nova, inclusive declarar o esbuild.
 
