@@ -25,7 +25,7 @@ npm run build     # build de produção (saída em dist/) — use para validar q
 npm run preview   # preview do build de produção
 ```
 
-Não há suíte de testes automatizada. A validação é feita rodando `npm run build` (garante que compila) e testando o fluxo no `npm run dev`.
+Antes de qualquer commit ou merge na `main` que altere `src/`, rodar `npm test` (suíte de regressão em `testes/`): vermelho ou pulado bloqueia. Continua valendo `npm run build` (garante que compila) e o teste manual no `npm run dev`; `replay_jules/` segue como conferência manual separada.
 
 ## Deploy
 
