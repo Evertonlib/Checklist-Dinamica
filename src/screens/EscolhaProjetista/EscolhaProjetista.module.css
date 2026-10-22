@@ -1,0 +1,16 @@
+.opcao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.apoio {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.voltar {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 0.95rem;
+}

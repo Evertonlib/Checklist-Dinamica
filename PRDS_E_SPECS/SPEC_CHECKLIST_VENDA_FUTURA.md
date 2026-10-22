@@ -200,19 +200,19 @@ O PRD diz que a identificação "não pode ler ou gravar estado através do `use
 
 ## Plano de Execução
 
-- [ ] Task 1 — Criar `src/context/FormProviderFutura.jsx` (provider em memória, `FormContext` existente, ações `SET_IDENTIFICACAO`, `SET_META` e `RESET_STATE_FUTURA`, sem `localStorage`).
-- [ ] Task 2 — Ajustar `src/steps/StepIdentificacao/StepIdentificacao.jsx`: props `rotaAvancar`, `rotaRevisao`, `rotaVoltar` e `mostrarBotaoVendedor`, com defaults que preservam o Cliente. Conferir com `npm run dev` que `/identificacao` não mudou (sem "Voltar", botão "Vendedor" presente, avançar para `/ambientes`, edição volta para `/revisao`).
-- [ ] Task 3 — Criar `src/services/pdfFutura.js` (`gerarPdfFutura`, capa no padrão dos outros PDFs, só dados cadastrais, arquivo `Checklist_Futura_{contrato}_{data}.pdf`).
-- [ ] Task 4 — Testes do `pdfFutura.js` (seção 6, item 4): exportar `gerarPdfFutura` em `testes/auxiliares/entrada_pdf.js`, adicionar `futura` em `testes/auxiliares/carregar_pdf.js` e criar `testes/Q_pdf_futura.test.js` com os 5 casos. Rodar `npm test`: os testes novos e os do Cliente e do Projetista passam.
-- [ ] Task 5 — Criar `src/steps/futura/StepRevisaoFutura/StepRevisaoFutura.jsx` (dados cadastrais, "Editar identificação", "Gerar PDF", tratamento de erro).
-- [ ] Task 6 — Criar `src/steps/futura/StepSucessoFutura/StepSucessoFutura.jsx` (reset em memória e `navigate('/')`).
-- [ ] Task 7 — Criar `src/screens/EscolhaProjetista/EscolhaProjetista.jsx` e `.module.css` (reuso de `.btnPerfil`, linhas de apoio e link "Voltar" para `/`).
-- [ ] Task 8 — Alterar `src/App.jsx`: `FuturaLayoutRoute` sem `Stepper`, rotas `/projetista` e `/futura/*`. Alterar o botão "Projetista" em `SelecaoPerfil.jsx` para `/projetista`.
-- [ ] Task 9 — Validação manual no `npm run dev`: CA-01 a CA-10, incluindo as regressões de rascunho do Cliente e do Projetista (CA-08 e CA-09), com a aba Application do navegador mostrando que as chaves de `localStorage` não mudam durante a Venda Futura.
-- [ ] Task 10 — Rodar `npm run build` (CA-11) e `npm test` (CA-12, tudo verde e nada pulado).
+- [x] Task 1 — Criar `src/context/FormProviderFutura.jsx` (provider em memória, `FormContext` existente, ações `SET_IDENTIFICACAO`, `SET_META` e `RESET_STATE_FUTURA`, sem `localStorage`).
+- [x] Task 2 — Ajustar `src/steps/StepIdentificacao/StepIdentificacao.jsx`: props `rotaAvancar`, `rotaRevisao`, `rotaVoltar` e `mostrarBotaoVendedor`, com defaults que preservam o Cliente. Conferir com `npm run dev` que `/identificacao` não mudou (sem "Voltar", botão "Vendedor" presente, avançar para `/ambientes`, edição volta para `/revisao`).
+- [x] Task 3 — Criar `src/services/pdfFutura.js` (`gerarPdfFutura`, capa no padrão dos outros PDFs, só dados cadastrais, arquivo `Checklist_Futura_{contrato}_{data}.pdf`).
+- [x] Task 4 — Testes do `pdfFutura.js` (seção 6, item 4): exportar `gerarPdfFutura` em `testes/auxiliares/entrada_pdf.js`, adicionar `futura` em `testes/auxiliares/carregar_pdf.js` e criar `testes/Q_pdf_futura.test.js` com os 5 casos. Rodar `npm test`: os testes novos e os do Cliente e do Projetista passam.
+- [x] Task 5 — Criar `src/steps/futura/StepRevisaoFutura/StepRevisaoFutura.jsx` (dados cadastrais, "Editar identificação", "Gerar PDF", tratamento de erro).
+- [x] Task 6 — Criar `src/steps/futura/StepSucessoFutura/StepSucessoFutura.jsx` (reset em memória e `navigate('/')`).
+- [x] Task 7 — Criar `src/screens/EscolhaProjetista/EscolhaProjetista.jsx` e `.module.css` (reuso de `.btnPerfil`, linhas de apoio e link "Voltar" para `/`).
+- [x] Task 8 — Alterar `src/App.jsx`: `FuturaLayoutRoute` sem `Stepper`, rotas `/projetista` e `/futura/*`. Alterar o botão "Projetista" em `SelecaoPerfil.jsx` para `/projetista`.
+- [x] Task 9 — Validação manual no `npm run dev`: CA-01 a CA-10, incluindo as regressões de rascunho do Cliente e do Projetista (CA-08 e CA-09), com a aba Application do navegador mostrando que as chaves de `localStorage` não mudam durante a Venda Futura.
+- [x] Task 10 — Rodar `npm run build` (CA-11) e `npm test` (CA-12, tudo verde e nada pulado).
 
 ---
 
 ## Desvios
 
-*(Seção vazia — será preenchida durante a implementação.)*
+1. **Layout do corpo do PDF (Everton, 22/10/2026, após ver o PDF gerado).** O Spec (3.7) previa o endereço numa linha só (`Endereço: ...`) e `Telefone` antes dele. Ficou ilegível. O corpo agora copia o PDF do Cliente (`pdf.js:123-134`), na ordem: `Cliente`, `Contrato`, linha 1 (`logradouro, número — complemento`), linha 2 (`bairro — cidade/UF`), `CEP: ...`, `Telefone: ...`, `Data`. Os testes T-Q03 e T-Q04 foram ajustados a esse layout. A tela de Revisão (3.5) também passou a mostrar o endereço nesse mesmo formato (duas linhas, CEP e Telefone separados), em vez de "endereço completo" numa linha só.

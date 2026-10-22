@@ -15,7 +15,7 @@ export function SelecaoPerfil() {
           <button className={styles.btnPerfil} onClick={() => navigate('/identificacao')}>
             Cliente
           </button>
-          <button className={styles.btnPerfil} onClick={() => navigate('/vendedor/identificacao')}>
+          <button className={styles.btnPerfil} onClick={() => navigate('/projetista')}>
             Projetista
           </button>
         </div>

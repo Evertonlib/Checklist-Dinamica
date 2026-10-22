@@ -7,7 +7,11 @@ import { useFormContextVendedor } from './context/FormContextVendedor.js'
 import { formatarNomeAmbiente } from './domain/ambientes.js'
 import { Header } from './components/Header/Header.jsx'
 import { Stepper } from './components/Stepper/Stepper.jsx'
+import { FormProviderFutura } from './context/FormProviderFutura.jsx'
 import { SelecaoPerfil } from './screens/SelecaoPerfil/SelecaoPerfil.jsx'
+import { EscolhaProjetista } from './screens/EscolhaProjetista/EscolhaProjetista.jsx'
+import { StepRevisaoFutura } from './steps/futura/StepRevisaoFutura/StepRevisaoFutura.jsx'
+import { StepSucessoFutura } from './steps/futura/StepSucessoFutura/StepSucessoFutura.jsx'
 import { StepIdentificacao } from './steps/StepIdentificacao/StepIdentificacao.jsx'
 import { StepAmbientes } from './steps/StepAmbientes/StepAmbientes.jsx'
 import { StepPerguntasGlobais } from './steps/StepPerguntasGlobais/StepPerguntasGlobais.jsx'
@@ -128,6 +132,29 @@ function VendedorLayoutRoute() {
   )
 }
 
+function AppLayoutFutura() {
+  const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
+  return (
+    <div>
+      <Header />
+      <Outlet />
+    </div>
+  )
+}
+
+function FuturaLayoutRoute() {
+  return (
+    <FormProviderFutura>
+      <AppLayoutFutura />
+    </FormProviderFutura>
+  )
+}
+
 export default function App() {
   return (
     <HashRouter>
@@ -149,6 +176,24 @@ export default function App() {
           <Route path="ambiente/:instanceId" element={<StepPerguntasAmbienteVendedor />} />
           <Route path="revisao" element={<StepRevisaoVendedor />} />
           <Route path="sucesso" element={<StepSucessoVendedor />} />
+        </Route>
+
+        <Route path="projetista" element={<EscolhaProjetista />} />
+
+        <Route path="futura" element={<FuturaLayoutRoute />}>
+          <Route
+            path="identificacao"
+            element={
+              <StepIdentificacao
+                rotaAvancar="/futura/revisao"
+                rotaRevisao="/futura/revisao"
+                rotaVoltar="/projetista"
+                mostrarBotaoVendedor={false}
+              />
+            }
+          />
+          <Route path="revisao" element={<StepRevisaoFutura />} />
+          <Route path="sucesso" element={<StepSucessoFutura />} />
         </Route>
       </Routes>
     </HashRouter>

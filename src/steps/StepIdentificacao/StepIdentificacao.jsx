@@ -46,7 +46,12 @@ function obterErrosIdentificacao(identificacao) {
   return erros
 }
 
-export function StepIdentificacao() {
+export function StepIdentificacao({
+  rotaAvancar = '/ambientes',
+  rotaRevisao = '/revisao',
+  rotaVoltar,
+  mostrarBotaoVendedor = true,
+}) {
   const { state, dispatch } = useFormContext()
   const navigate = useNavigate()
   const id = state.identificacao
@@ -112,12 +117,12 @@ export function StepIdentificacao() {
     if (state._meta.origemNavegacao === 'revisao') {
       dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'revisao' })
       dispatch({ type: 'SET_META', campo: 'origemNavegacao', valor: null })
-      navigate('/revisao')
+      navigate(rotaRevisao)
       return
     }
 
     dispatch({ type: 'SET_META', campo: 'etapaAtual', valor: 'ambientes' })
-    navigate('/ambientes')
+    navigate(rotaAvancar)
   }
 
   const campo = (label, campoNome, props = {}) => (
@@ -200,7 +205,9 @@ export function StepIdentificacao() {
 
       <div className={styles.espacoBar} />
       <BottomBar
-        semVoltar
+        semVoltar={!rotaVoltar}
+        onVoltar={() => navigate(rotaVoltar)}
+        mostrarBotaoVendedor={mostrarBotaoVendedor}
         onAvancar={avancar}
         avancarDisabled={false}
         avancarLabel={avancarLabel}

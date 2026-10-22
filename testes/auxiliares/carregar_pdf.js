@@ -63,5 +63,6 @@ export async function carregarPdf() {
   return {
     cliente: (estado, data = DATA_19_10_2026) => rodar(pacote.gerarPdf, estado, data),
     projetista: (estado, data = DATA_19_10_2026) => rodar(pacote.gerarPdfVendedor, estado, data),
+    futura: (estado, data = DATA_19_10_2026) => rodar(pacote.gerarPdfFutura, estado, data),
   }
 }
