@@ -126,7 +126,7 @@ Não há dependência de bloqueio dura entre os dois PRDs — podem ser aprovado
 | `src/screens/SelecaoPerfil/SelecaoPerfil.jsx` | O botão "Projetista" deixa de navegar direto para `/vendedor/identificacao` e passa a navegar para a nova tela de escolha |
 | `src/steps/StepIdentificacao/StepIdentificacao.jsx` | Ajuste mínimo (destino do "Avançar", fonte de estado e botão "Voltar" exclusivo da Venda Futura), descrito acima — aparência, campos e validações não mudam |
 | `src/App.jsx` | Novas rotas para a tela de escolha e para as três telas da Venda Futura, com um layout próprio (sem a numeração "etapa X de Y" dos layouts do Cliente/Projetista) |
-| Arquivos novos (nomes exatos a definir no Spec) | Tela de escolha intermediária; Context/Provider/reducer isolados da Venda Futura (chave de `localStorage` própria); tela de Revisão própria; tela de Sucesso própria; gerador de PDF próprio (`services/pdfFutura.js` ou equivalente) |
+| Arquivos novos (nomes exatos a definir no Spec) | Tela de escolha intermediária; Context isolado da Venda Futura, em memória (sem `localStorage`, ver Premissa 7); tela de Revisão própria; tela de Sucesso própria; gerador de PDF próprio (`services/pdfFutura.js` ou equivalente) |
 
 Nenhum arquivo do fluxo Cliente (além do ajuste mínimo acima) ou do fluxo Projetista normal é alterado. Nenhum arquivo de `src/domain/` é alterado.
 
@@ -195,7 +195,7 @@ Nada é removido. Esta é uma feature aditiva: nenhuma tela, rota, texto, valida
 
 ## Critérios de aceitação
 
-Cada critério é verificável rodando `npm run dev` e navegando manualmente — não há suíte de testes automatizada neste projeto. A validação de compilação continua sendo `npm run build`.
+Cada critério é verificável rodando `npm run dev` e navegando manualmente. A validação de compilação é `npm run build` e a suíte de regressão em `testes/` (`npm test`) deve continuar verde (ver CA-12).
 
 ---
 
@@ -284,3 +284,11 @@ Cada critério é verificável rodando `npm run dev` e navegando manualmente —
 **Cenário:** Rodar `npm run build` após a implementação.
 
 **Esperado:** O build termina sem erro, gerando `dist/` normalmente — igual ao comportamento de hoje, incluindo os dois fluxos existentes e o novo fluxo de Venda Futura.
+
+---
+
+### CA-12 — Suíte de regressão continua verde
+
+**Cenário:** Rodar `npm test` após a implementação.
+
+**Esperado:** Todos os testes passam, sem nenhum pulado, comprovando que os fluxos do Cliente e do Projetista normal não regrediram. O Spec avalia se o ajuste em `StepIdentificacao.jsx` ganha casos de teste novos.
