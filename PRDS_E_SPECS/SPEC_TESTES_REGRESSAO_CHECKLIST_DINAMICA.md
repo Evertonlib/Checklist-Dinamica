@@ -4,7 +4,7 @@
 **PRD aprovado:** `PRDS_E_SPECS/PRD_TESTES_REGRESSAO_CHECKLIST_DINAMICA.md` (Everton, 19/10/2026, decisões 7 a 11 da seção 4)
 **Base do código:** `main` em `1a6022d`
 **Data:** 2026-10-19
-**Status:** Aguardando aprovação. Nada foi implementado.
+**Status:** Aprovado (Everton, 21/10/2026). Em implementação.
 **Prevalência:** durante a implementação este Spec prevalece sobre o PRD e sobre o inventário (`INVENTARIO_FEATURES_CHECKLIST_DINAMICA.md`, só apoio). Onde o código de `1a6022d` difere do PRD, vale o código e a diferença está na seção 2.
 
 ---
@@ -429,51 +429,51 @@ Regras valem para todas as tasks:
 
 **Passo 0 (antes da Task 1; não é task) — ponto de partida**
 
-- [ ] Passo 0 — Rodar `git status --short` e `git log -1 --format=%h` na raiz e **guardar a saída** no relatório (no início desta tarefa o status trazia ` M PRDS_E_SPECS/PRD_TESTES_REGRESSAO_CHECKLIST_DINAMICA.md`; este Spec aparecerá como novo). Todos os critérios "nada mudou" (CA-05, CA-11, CA-13) comparam com **esse** estado, não exigem árvore limpa. Conferir também que `node --version` mostra Node 24 e que `node_modules/esbuild` existe.
+- [x] Passo 0 — Rodar `git status --short` e `git log -1 --format=%h` na raiz e **guardar a saída** no relatório (no início desta tarefa o status trazia ` M PRDS_E_SPECS/PRD_TESTES_REGRESSAO_CHECKLIST_DINAMICA.md`; este Spec aparecerá como novo). Todos os critérios "nada mudou" (CA-05, CA-11, CA-13) comparam com **esse** estado, não exigem árvore limpa. Conferir também que `node --version` mostra Node 24 e que `node_modules/esbuild` existe.
 
 **Bloco 1 — Infraestrutura (um commit só, ao fim da Task 8)**
 
-- [ ] Task 1 — **Única task com rede.** Rodar `npm install --save-dev --save-exact esbuild@0.21.5`; escrever à mão o script `"test": "node --test"` em `package.json`. Conferir: `git diff package.json` mostra só o script e `"esbuild": "0.21.5"` em `devDependencies` (CA-14); `git diff package-lock.json` mostra só a entrada do esbuild em `packages[""].devDependencies` (CA-13); `node_modules/esbuild/package.json` continua 0.21.5. Se o lock mudar além disso, parar e registrar em Desvios.
-- [ ] Task 2 — Criar `testes/auxiliares/travas.js` (seção 4.4: rede, localStorage, `garantirForaDoRepo` com `fileURLToPath`, `assertSemRede`). Testar com um script descartável **fora do repo** (pasta do scratchpad): (a) `fetch` lança erro e é registrado; (b) `garantirForaDoRepo` aceita uma pasta de `os.tmpdir()` e **rejeita** uma pasta dentro do repositório; (c) funciona com o caminho do repositório que tem espaço.
-- [ ] Task 3 — Criar `testes/auxiliares/relogio.js` (seção 4.5). Testar com script descartável: dentro de `comRelogio` com a data de 19/10/2026, `new Date().getTime()` é **igual ao instante exato** pedido (12:00:00.000), `toLocaleDateString('pt-BR')` dá `19/10/2026` e os getters dão 2026-10-19; com a de 05/03/2026 dá `05/03/2026` e `2026-03-05`; **depois** da chamada o relógio voltou ao real; vale também com `TZ` diferente. Provar que a autoconferência pega o mock desligado (comparando o instante, não o dia). Se `mock.timers` não suportar `Date` no ambiente, a falha tem de ser alta e clara. Reconfirma o item 3 da seção 8.
-- [ ] Task 4 — Criar `testes/auxiliares/construtores.js` (seção 4.6). Testar com script descartável: para cada `formType` (cozinha, dormitorio, home, banheiro, outros) o estado montado sem `resp` passa por `calcularScore` sem erro, devolve 0 ponto e lista de gatilhos vazia; a mutação de um estado não vaza para outro (cópias independentes); o estado do Projetista tem `contratos` e grupos A/B/C com os campos de `defaultsPorGrupo`.
-- [ ] Task 5 — Criar o conjunto que entra no pacote do PDF: `captura_registro.js`, `captura_jspdf.js`, `captura_autotable.js`, `entrada_pdf.js` (seção 4.3). Só criação; a prova vem na Task 6.
-- [ ] Task 6 — Criar `testes/auxiliares/carregar_pdf.js` (com `fileURLToPath`/`pathToFileURL`) e provar o conjunto da Task 5 com script descartável fora do repo: (a) empacota e carrega, inclusive com `os.tmpdir()` em formato curto (`WINDOW~1`) e repositório com espaço; (b) `gerarPdf` com um estado de uma cozinha e `gerarPdfVendedor` com um ambiente rodam sem exceção; (c) cada chamada gera **exatamente um** `save` com o nome esperado (`Checklist_Cliente_TA9001_2026-10-19.pdf` com o relógio da Task 3) e **nenhum arquivo** aparece no repositório (`git status` igual ao do Passo 0) nem sobra a pasta temporária; (d) o texto de uma pergunta longa (G1) aparece como **um único** evento de texto igual à frase inteira, e `Resposta: …` idem; (e) a tabela do Resumo Executivo e a tabela de eletros aparecem como eventos de tabela (e o texto das células **não** vira evento de texto); (f) o `link` de um eletro com `link` é registrado, na ordem [B, A] do T-P21; (g) com o relógio de 05/03/2026 o nome tem `2026-03-05`. Reconfirma os itens 1 a 3, 6 e 7 da seção 8; qualquer divergência vai para Desvios.
-- [ ] Task 7 — Criar `testes/auxiliares/leitura_pdf.js` (seção 4.7). Provar com script descartável sobre uma captura real da Task 6: acha a seção de um ambiente; acha uma sequência contígua; **falha mostrando o trecho** quando a sequência não existe; a ausência funciona.
-- [ ] Task 8 — Criar `testes/auxiliares/textos_cc.js` com os 13 textos da seção 4.8 e fazer a **conferência mecânica da transcrição, fora da suíte**: script descartável fora do repo que (a) importa `textos_cc.js` (por `pathToFileURL`); (b) lê `src/domain/checklistTextos.js` e `src/domain/ccBuilder.js` como **texto** (e, para os quatro textos do `ccBuilder.js`, extrai os literais pelas linhas 43-44, 55-56, 78-79 e 92); (c) compara os 13 caractere por caractere, na forma NFC, sem BOM e sem CR/LF dentro do texto; (d) confirma que `textos_cc.js` não importa nada de `src/`. Relatório: tabela de 13 linhas igual/diferente. Qualquer "diferente" = corrigir a transcrição (nunca o `src/`) e repetir.
+- [x] Task 1 — **Única task com rede.** Rodar `npm install --save-dev --save-exact esbuild@0.21.5`; escrever à mão o script `"test": "node --test"` em `package.json`. Conferir: `git diff package.json` mostra só o script e `"esbuild": "0.21.5"` em `devDependencies` (CA-14); `git diff package-lock.json` mostra só a entrada do esbuild em `packages[""].devDependencies` (CA-13); `node_modules/esbuild/package.json` continua 0.21.5. Se o lock mudar além disso, parar e registrar em Desvios.
+- [x] Task 2 — Criar `testes/auxiliares/travas.js` (seção 4.4: rede, localStorage, `garantirForaDoRepo` com `fileURLToPath`, `assertSemRede`). Testar com um script descartável **fora do repo** (pasta do scratchpad): (a) `fetch` lança erro e é registrado; (b) `garantirForaDoRepo` aceita uma pasta de `os.tmpdir()` e **rejeita** uma pasta dentro do repositório; (c) funciona com o caminho do repositório que tem espaço.
+- [x] Task 3 — Criar `testes/auxiliares/relogio.js` (seção 4.5). Testar com script descartável: dentro de `comRelogio` com a data de 19/10/2026, `new Date().getTime()` é **igual ao instante exato** pedido (12:00:00.000), `toLocaleDateString('pt-BR')` dá `19/10/2026` e os getters dão 2026-10-19; com a de 05/03/2026 dá `05/03/2026` e `2026-03-05`; **depois** da chamada o relógio voltou ao real; vale também com `TZ` diferente. Provar que a autoconferência pega o mock desligado (comparando o instante, não o dia). Se `mock.timers` não suportar `Date` no ambiente, a falha tem de ser alta e clara. Reconfirma o item 3 da seção 8.
+- [x] Task 4 — Criar `testes/auxiliares/construtores.js` (seção 4.6). Testar com script descartável: para cada `formType` (cozinha, dormitorio, home, banheiro, outros) o estado montado sem `resp` passa por `calcularScore` sem erro, devolve 0 ponto e lista de gatilhos vazia; a mutação de um estado não vaza para outro (cópias independentes); o estado do Projetista tem `contratos` e grupos A/B/C com os campos de `defaultsPorGrupo`.
+- [x] Task 5 — Criar o conjunto que entra no pacote do PDF: `captura_registro.js`, `captura_jspdf.js`, `captura_autotable.js`, `entrada_pdf.js` (seção 4.3). Só criação; a prova vem na Task 6.
+- [x] Task 6 — Criar `testes/auxiliares/carregar_pdf.js` (com `fileURLToPath`/`pathToFileURL`) e provar o conjunto da Task 5 com script descartável fora do repo: (a) empacota e carrega, inclusive com `os.tmpdir()` em formato curto (`WINDOW~1`) e repositório com espaço; (b) `gerarPdf` com um estado de uma cozinha e `gerarPdfVendedor` com um ambiente rodam sem exceção; (c) cada chamada gera **exatamente um** `save` com o nome esperado (`Checklist_Cliente_TA9001_2026-10-19.pdf` com o relógio da Task 3) e **nenhum arquivo** aparece no repositório (`git status` igual ao do Passo 0) nem sobra a pasta temporária; (d) o texto de uma pergunta longa (G1) aparece como **um único** evento de texto igual à frase inteira, e `Resposta: …` idem; (e) a tabela do Resumo Executivo e a tabela de eletros aparecem como eventos de tabela (e o texto das células **não** vira evento de texto); (f) o `link` de um eletro com `link` é registrado, na ordem [B, A] do T-P21; (g) com o relógio de 05/03/2026 o nome tem `2026-03-05`. Reconfirma os itens 1 a 3, 6 e 7 da seção 8; qualquer divergência vai para Desvios.
+- [x] Task 7 — Criar `testes/auxiliares/leitura_pdf.js` (seção 4.7). Provar com script descartável sobre uma captura real da Task 6: acha a seção de um ambiente; acha uma sequência contígua; **falha mostrando o trecho** quando a sequência não existe; a ausência funciona.
+- [x] Task 8 — Criar `testes/auxiliares/textos_cc.js` com os 13 textos da seção 4.8 e fazer a **conferência mecânica da transcrição, fora da suíte**: script descartável fora do repo que (a) importa `textos_cc.js` (por `pathToFileURL`); (b) lê `src/domain/checklistTextos.js` e `src/domain/ccBuilder.js` como **texto** (e, para os quatro textos do `ccBuilder.js`, extrai os literais pelas linhas 43-44, 55-56, 78-79 e 92); (c) compara os 13 caractere por caractere, na forma NFC, sem BOM e sem CR/LF dentro do texto; (d) confirma que `textos_cc.js` não importa nada de `src/`. Relatório: tabela de 13 linhas igual/diferente. Qualquer "diferente" = corrigir a transcrição (nunca o `src/`) e repetir.
   - **Commit sugerido do Bloco 1 (só quando o Everton pedir):** `test: adiciona infraestrutura da suíte de regressão (esbuild declarado, npm test e auxiliares de captura do PDF)` — arquivos: `package.json`, `package-lock.json`, `testes/auxiliares/*`.
 
 **Bloco 2 — Grupo A**
 
-- [ ] Task 9 — Criar `testes/A_ambientes.test.js` (T-A01 a T-A03, seção 7.3). Rodar `node --test testes/A_ambientes.test.js`: 3 passam, `fail 0`, `skipped 0`. Conferir que o arquivo começa importando `auxiliares/travas.js` e que `AMBIENTES_DISPONIVEIS` é a única constante importada.
+- [x] Task 9 — Criar `testes/A_ambientes.test.js` (T-A01 a T-A03, seção 7.3). Rodar `node --test testes/A_ambientes.test.js`: 3 passam, `fail 0`, `skipped 0`. Conferir que o arquivo começa importando `auxiliares/travas.js` e que `AMBIENTES_DISPONIVEIS` é a única constante importada.
   - **Commit sugerido:** `test: adiciona testes dos ambientes compartilhados (T-A01 a T-A03)`.
 
 **Bloco 3 — Grupo F**
 
-- [ ] Task 10 — Criar `testes/F_validacao.test.js` (T-F01 a T-F16, seção 7.4). Rodar o arquivo: 16 passam, 0 falham, 0 pulados.
+- [x] Task 10 — Criar `testes/F_validacao.test.js` (T-F01 a T-F16, seção 7.4). Rodar o arquivo: 16 passam, 0 falham, 0 pulados.
   - **Commit sugerido:** `test: adiciona testes da validação por ambiente e do limitarCm (T-F01 a T-F16)`.
 
 **Bloco 4 — Grupo S**
 
-- [ ] Task 11 — Criar `testes/S_score.test.js` (T-S01 a T-S29, seção 7.1). Rodar o arquivo: 29 passam. Os valores de T-S23, T-S24, T-S27 e T-S28 já estão medidos (seção 8); se algum diferir na suíte real, é caso de Desvios (não ajustar). T-S16 (2 e 2) e T-S26 seguem "PRD diz medido".
+- [x] Task 11 — Criar `testes/S_score.test.js` (T-S01 a T-S29, seção 7.1). Rodar o arquivo: 29 passam. Os valores de T-S23, T-S24, T-S27 e T-S28 já estão medidos (seção 8); se algum diferir na suíte real, é caso de Desvios (não ajustar). T-S16 (2 e 2) e T-S26 seguem "PRD diz medido".
   - **Commit sugerido:** `test: adiciona testes do score por ambiente e global (T-S01 a T-S29)`.
 
 **Bloco 5 — Grupo C**
 
-- [ ] Task 12 — Criar `testes/C_ccs.test.js` (T-C01 a T-C16, seção 7.2), importando só `auxiliares/textos_cc.js` para os textos. Rodar o arquivo: 16 passam. Conferir que nenhum outro arquivo de teste importa `textos_cc.js`.
+- [x] Task 12 — Criar `testes/C_ccs.test.js` (T-C01 a T-C16, seção 7.2), importando só `auxiliares/textos_cc.js` para os textos. Rodar o arquivo: 16 passam. Conferir que nenhum outro arquivo de teste importa `textos_cc.js`.
   - **Commit sugerido:** `test: adiciona testes dos CCs e avisos com texto completo (T-C01 a T-C16)`.
 
 **Bloco 6 — Grupo P (um arquivo, quatro tasks; um commit ao fim da Task 16)**
 
-- [ ] Task 13 — Criar `testes/P_pdf_cliente.test.js` com a abertura (travas, `await carregarPdf()` no topo, `assertSemRede` no `after`) e os casos T-P01 a T-P08 (capa e resumo). Rodar o arquivo: 8 passam.
-- [ ] Task 14 — Acrescentar T-P09 a T-P16 (perguntas globais dentro do ambiente). Rodar: 16 passam no acumulado.
-- [ ] Task 15 — Acrescentar T-P17 a T-P25 (tanque, eletros, eletrônicos). Rodar: 25 passam no acumulado. Reconfirmar a ordem dos links do T-P21 (seção 8, item 2).
-- [ ] Task 16 — Acrescentar T-P26 a T-P37 (TV, cama, cuba, observações, CCs sob a pergunta). Rodar: 37 passam, 0 falham, 0 pulados.
+- [x] Task 13 — Criar `testes/P_pdf_cliente.test.js` com a abertura (travas, `await carregarPdf()` no topo, `assertSemRede` no `after`) e os casos T-P01 a T-P08 (capa e resumo). Rodar o arquivo: 8 passam.
+- [x] Task 14 — Acrescentar T-P09 a T-P16 (perguntas globais dentro do ambiente). Rodar: 16 passam no acumulado.
+- [x] Task 15 — Acrescentar T-P17 a T-P25 (tanque, eletros, eletrônicos). Rodar: 25 passam no acumulado. Reconfirmar a ordem dos links do T-P21 (seção 8, item 2).
+- [x] Task 16 — Acrescentar T-P26 a T-P37 (TV, cama, cuba, observações, CCs sob a pergunta). Rodar: 37 passam, 0 falham, 0 pulados.
   - **Commit sugerido:** `test: adiciona testes do PDF do Cliente (T-P01 a T-P37)`.
 
 **Bloco 7 — Grupo V**
 
-- [ ] Task 17 — Criar `testes/V_pdf_projetista.test.js` (T-V01 a T-V10, seção 7.6), com `await carregarPdf()` no topo. Rodar o arquivo: 10 passam, 0 falham, 0 pulados.
+- [x] Task 17 — Criar `testes/V_pdf_projetista.test.js` (T-V01 a T-V10, seção 7.6), com `await carregarPdf()` no topo. Rodar o arquivo: 10 passam, 0 falham, 0 pulados.
   - **Commit sugerido:** `test: adiciona testes do PDF do Projetista e dos grupos de perguntas (T-V01 a T-V10)`.
 
 **Conferências (sem commit)**
@@ -490,7 +490,7 @@ Procedimento comum às provas H (seção 8 do PRD, "Prova dos consertos"). **Por
 
 Para cada prova há uma cópia nova (partir sempre do código intacto).
 
-- [ ] Task 18 — Provas H sobre `scoreEngine.js` (uma cópia por prova; linhas de `1a6022d`, o commit não toca esse arquivo). Registrar no relatório uma tabela "prova · vermelhos obtidos · vermelhos esperados · extras explicados".
+- [x] Task 18 — Provas H sobre `scoreEngine.js` (uma cópia por prova; linhas de `1a6022d`, o commit não toca esse arquivo). Registrar no relatório uma tabela "prova · vermelhos obtidos · vermelhos esperados · extras explicados".
 
 | Prova | Mudança mínima na cópia | Vermelhos exigidos (PRD) | Extras previstos pela leitura do código |
 |---|---|---|---|
@@ -501,14 +501,14 @@ Para cada prova há uma cópia nova (partir sempre do código intacto).
 | H-07 | `scoreEngine.js:67`: remover `resp.tanqueEmbutido === false &&` | T-S12, T-C08, T-P18 | nenhum |
 | H-08 | `scoreEngine.js:74`: `const div07Ativo = g3_ambientesPendentes.length > 0` | T-S16 | nenhum |
 
-- [ ] Task 19 — Provas H sobre `pdf.js` (mesmo procedimento, uma cópia por prova).
+- [x] Task 19 — Provas H sobre `pdf.js` (mesmo procedimento, uma cópia por prova).
 
 | Prova | Mudança mínima na cópia | Vermelhos exigidos (PRD) | Extras previstos |
 |---|---|---|---|
 | H-23 | `pdf.js:515` volta a `if (formType === 'home' && resp.eletronicosList.some((e) => e.tipo === 'TV')) {` | T-P27 (a) | nenhum |
 | H-24 | `pdf.js:240-245`: o filtro volta a só devolver `score && score.gatilhos.length > 0` (sem a alternativa do aviso de rodapé) | T-P37 | nenhum |
 
-- [ ] Task 20 — Provas de erro (mesmo procedimento de cópia, uma por cenário):
+- [x] Task 20 — Provas de erro (mesmo procedimento de cópia, uma por cenário):
 
 | Critério | Cenário | Esperado |
 |---|---|---|
@@ -525,7 +525,7 @@ Para cada prova há uma cópia nova (partir sempre do código intacto).
 
 **Task final**
 
-- [ ] Task 22 — Fechamento. (a) Rodar `npm test` na raiz, offline, e **reportar os três números** do resumo do Node (`pass`, `fail`, `skipped`; e `todo`): esperado `tests 111`, `pass 111`, `fail 0`, `skipped 0`, código de saída 0; **teste pulado por falta de material não conta como passou**. (b) Rodar `npm run build` e conferir que compila e que `dist/` não contém arquivos de teste (busca por `travas`, `captura_`, `testes` em `dist/`). (c) Conferir os critérios do PRD, um a um, no relatório:
+- [x] Task 22 — Fechamento. (a) Rodar `npm test` na raiz, offline, e **reportar os três números** do resumo do Node (`pass`, `fail`, `skipped`; e `todo`): esperado `tests 111`, `pass 111`, `fail 0`, `skipped 0`, código de saída 0; **teste pulado por falta de material não conta como passou**. (b) Rodar `npm run build` e conferir que compila e que `dist/` não contém arquivos de teste (busca por `travas`, `captura_`, `testes` em `dist/`). (c) Conferir os critérios do PRD, um a um, no relatório:
   - CA-01: os 111 casos aparecem no resumo pelo ID `T-` (contagem de IDs distintos em `testes/*.test.js` = 111, com 29 S, 16 C, 3 A, 16 F, 37 P, 10 V).
   - CA-02: resultado das Tasks 18 e 19.
   - CA-03, CA-04, CA-06, CA-07, CA-16: resultado da Task 20.
@@ -544,3 +544,46 @@ Para cada prova há uma cópia nova (partir sempre do código intacto).
 **Total: 22 tasks numeradas (mais o Passo 0).**
 
 ## 10. Desvios
+
+Implementação em 21/10/2026, em outra máquina (Windows 11, Node 24.20.0, repositório em `C:\Users\maste\Github\Checklist-Dinamica`). Nenhum valor esperado do PRD ou deste Spec precisou mudar; nenhum arquivo de `src/` foi tocado.
+
+| # | Desvio | Motivo e evidência |
+|---|---|---|
+| DV-1 | `npm ci` rodado **antes** do Passo 0 (segunda ida à rede além da Task 1) | A máquina não tinha `node_modules`. Aprovado pelo Everton em 21/10/2026. O npm desta versão avisa que não roda scripts de instalação sem aprovação (`allowScripts`); o esbuild funciona mesmo assim (binário `@esbuild/win32-x64` instalado; `build` testado, versão 0.21.5). `npm audit fix` **não** foi rodado (mudaria o lock, CA-13) |
+| DV-2 | Passo 0 partiu de árvore **limpa** em `dee69a5`, não do status descrito no texto do Passo 0 | O commit `dee69a5` já trazia PRD e Spec. A comparação "nada mudou" usou esse estado limpo |
+| DV-3 | Tasks 2(c) e 6(a): caminho com espaço e pasta temporária curta foram **simulados** | O caminho desta máquina não tem espaço e o `os.tmpdir()` não é curto. Simulação: cópia de `src/`, `testes/` e `package.json` em `%TEMP%\prova espaco task6` (com junção `node_modules`) e `TMP`/`TEMP` = `C:\Users\maste\AppData\Local\Temp\TMPCOM~1` (8.3 de uma pasta com espaço). Empacotou, capturou e gerou o `save` igual ao repositório; `garantirForaDoRepo` rejeitou `...\prova espaco 2c\src` |
+| DV-4 | CA-07: o fuso foi forçado com `node --import <arquivo que define process.env.TZ> --test`, e não com a variável de ambiente `TZ` | Medido: no Windows o Node **ignora** `TZ` vinda do ambiente (deslocamento 180, horário do Brasil, nos dois fusos). Definido por dentro do processo, vale: cada um dos 6 processos de teste registrou o fuso (Kiritimati deslocamento −840; Pago Pago 660) e a suíte deu 111/111 nos dois |
+| DV-5 | Provas das Tasks 18-20 executadas por um script Node descartável (scratchpad), que cria a cópia com `mkdtemp` em `%TEMP%`, cria a junção com `fs.symlinkSync(..., 'junction')` e a remove com `fs.unlinkSync` (só o link) antes de apagar a cópia. CA-16 usou `mklink /J` e `rmdir` | Mesmo procedimento da seção 9, automatizado para as 11 cópias. Depois de cada uma: `node_modules\esbuild` e `node_modules\jspdf` do repositório existem e não sobrou nenhuma pasta `prova-*` nem `checklist-testes-*` |
+| DV-6 | Acréscimos pequenos nos auxiliares, sem mudar o contrato: guarda de reentrada nos embrulhos de `text`/`splitTextToSize`/`link` (chamada interna da biblioteca não vira evento); `leitura_pdf.js` aceita `{ tabela: { cabecalhoComeca } }` e exporta `tabelasCom` (para "tabela iniciada por `Tipo`") | Proteção contra evento duplicado; leitura direta dos casos T-P23, T-P25, T-P26 |
+| DV-7 | Tasks 13 a 16 feitas de uma vez (um único arquivo P), com uma rodada no fim | Resultado: 37/37 de primeira; nenhuma divergência para isolar |
+
+## 11. Relatório de execução (21/10/2026)
+
+**Suíte (`npm test`, offline):** `tests 111`, `pass 111`, `fail 0`, `skipped 0`, `todo 0`, código de saída 0. Por grupo: S 29, C 16, A 3, F 16, P 37, V 10.
+
+**Conferência dos 13 textos (Task 8):** os 13 iguais caractere por caractere (NFC, sem BOM, sem CR/LF); `textos_cc.js` não importa nada.
+
+**Provas H (Tasks 18 e 19)** — mudança mínima numa cópia fora do repositório; saída diferente de 0 em todas:
+
+| Prova | Vermelhos obtidos | Vermelhos exigidos | Extras |
+|---|---|---|---|
+| H-01 | T-P05, T-S26 | T-S26, T-P05 | nenhum |
+| H-02 | T-P10, T-S03, T-S05, T-S23, T-S27 | T-S03, T-P10 | T-S05, T-S23, T-S27 — os previstos pela leitura (G3 sozinho vira ALTO 3) |
+| H-03 | T-C09, T-P26, T-S14 | T-S14, T-C09, T-P26 | nenhum |
+| H-04 | T-C09, T-P27, T-S15 | T-S15, T-C09 | T-P27 — o previsto (Outros perde o CC de TV) |
+| H-07 | T-C08, T-P18, T-S12 | T-S12, T-C08, T-P18 | nenhum |
+| H-08 | T-S16 | T-S16 | nenhum |
+| H-23 | T-P27 | T-P27 (a) | nenhum |
+| H-24 | T-P37 | T-P37 | nenhum |
+
+**Provas de erro (Task 20):**
+
+| Critério | Resultado |
+|---|---|
+| CA-03 | só T-S24 vermelho (110/111); mensagem mostra esperado `classificacao: 'ALTO'` e obtido `'MÉDIO'` com 8 pontos |
+| CA-04 | só T-C01 vermelho (110/111); mensagem mostra `SERVIÇOS` esperado e `SERVICOS` obtido |
+| CA-06 | P e V falham ao carregar com "esbuild não encontrado: rode `npm ci`…"; A, F, S e C passam (64); `fail 2`, `skipped 0`, saída 1 |
+| CA-07 | 111/111 em Kiritimati (UTC+14) e em Pago Pago (UTC−11), ver DV-4; nenhum teste lê `Date` fora do `relogio.js` (busca) |
+| CA-16 | `calcularScore` → `calcularPontuacao` em `scoreEngine.js`, `pdf.js` e `StepRevisao.jsx`: só `S_score` e `C_ccs` falham por import; trocar só os dois imports dos testes volta a 111/111, sem mudar valor esperado |
+
+**Fechamento (Task 22):** `npm run build` compila; `dist/` sem arquivo de teste. CA-01: 111 IDs distintos. CA-05: `git status` = Spec, `package.json`, `package-lock.json` e `testes/`; nenhum `.pdf`/`.cjs` fora de `node_modules`/`dist`; nenhuma pasta temporária sobrando. CA-08, CA-09 e CA-15: buscas vazias; `AMBIENTES_DISPONIVEIS` só em `A_ambientes.test.js`; `textos_cc.js` só em `C_ccs.test.js`. CA-10: nenhum caso com TV e `eletronicos` falso; T-P27 e T-P37 verdes. CA-11 e CA-13: `src/`, `deploy.yml`, `vite.config.js` e `replay_jules/` sem diferença; lock só com a linha do esbuild. CA-14: `package.json` só com o script `test` e `"esbuild": "0.21.5"`. CA-17: pendente da Task 21 (aguarda o Everton).
