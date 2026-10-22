@@ -1,6 +1,6 @@
 # SPEC — Checklist Venda Futura
 
-**Status:** Aguardando aprovação
+**Status:** Aprovado (Everton, 22/10/2026)
 **PRD de origem:** `PRDS_E_SPECS/PRD_CHECKLIST_VENDA_FUTURA.md` (aprovado, já corrigido: Context isolado em memória, sem `localStorage`; CA-12 com `npm test`)
 **Critério de decisão (Everton, 02/10/2026):** a forma mais simples de implementar.
 
@@ -121,7 +121,7 @@ Conforme 2.2. Alteração mínima (assinatura da função, duas chamadas `naviga
 
 - Mesma estrutura de `StepSucessoVendedor`: ícone, título "PDF gerado com sucesso!", texto e botão "Iniciar novo preenchimento".
 - O botão despacha `RESET_STATE_FUTURA` e depois `navigate('/')` (CA-10; sem limpeza de `localStorage`).
-- Texto de orientação (proposto, o Everton confirma na aprovação): "Encaminhe o arquivo à equipe responsável pela capa, planta e vistas do projeto executivo." O PRD pede um texto "orientando o próximo passo operacional" sem fixar a redação.
+- Texto de orientação (aprovado pelo Everton): "Encaminhe este arquivo ao e-mail da liberação com cópia ao seu gerente". O PRD pede um texto "orientando o próximo passo operacional" sem fixar a redação.
 
 ### 3.7 `src/services/pdfFutura.js` (novo)
 
@@ -146,7 +146,7 @@ Exporta `async function gerarPdfFutura(state)` com `jsPDF` (`import jsPDF from '
 
 ## 4. Arquivos que NÃO mudam
 
-`FormProvider.jsx`, `FormProviderVendedor.jsx`, `FormContext.js`, `FormContextVendedor.js`, `StepIdentificacao.module.css`, `pdf.js`, `pdfVendedor.js`, `cep.js`, `BottomBar`, `Header`, `FieldGroup`, `Modal`, `Stepper`, todo `src/domain/`, `package.json` e `testes/`.
+`FormProvider.jsx`, `FormProviderVendedor.jsx`, `FormContext.js`, `FormContextVendedor.js`, `StepIdentificacao.module.css`, `pdf.js`, `pdfVendedor.js`, `cep.js`, `BottomBar`, `Header`, `FieldGroup`, `Modal`, `Stepper`, todo `src/domain/`, e `package.json`. Em `testes/`, só mudam os três arquivos da seção 6, item 4; os testes existentes não são alterados.
 
 ---
 
@@ -161,7 +161,7 @@ Exporta `async function gerarPdfFutura(state)` com `jsPDF` (`import jsPDF from '
 | CA-06, CA-07 | Reuso do componente sem mudança de lógica |
 | CA-08, CA-09 | Isolamento da 2.1 (rotas fora dos providers do Cliente e do Projetista; sem escrita em `localStorage`) |
 | CA-10 | 3.6 |
-| CA-11, CA-12 | Tarefas finais do plano |
+| CA-11, CA-12 | Tasks 4 e 10 do plano |
 
 ---
 
@@ -172,7 +172,14 @@ Exporta `async function gerarPdfFutura(state)` com `jsPDF` (`import jsPDF from '
 1. A suíte (`node --test`) só exercita módulos de lógica pura e os PDFs empacotados via esbuild. Nenhum teste importa `.jsx` (verificado por busca em `testes/`). Testar o componente exigiria jsdom e testing-library, ou um empacotador com mock de React Router. Isso pede dependência nova em `package.json`, que o PRD veda (seção "O que NÃO será tocado").
 2. O ajuste é só de props com default e de dois `navigate`. Não há lógica extraída que dê para testar isoladamente. A validação (`obterErrosIdentificacao`) não é alterada e não é exportada.
 3. A garantia de "Cliente não regride" vem de três coisas: os defaults reproduzem o comportamento atual; `npm test` verde (CA-12) prova que o domínio e os dois PDFs não mudaram; e a conferência manual do CA-05 (sem "Voltar" no Cliente) e do CA-08 fecha o resto.
-4. **Fora do escopo do PRD, para decisão do Everton:** um teste do `pdfFutura.js` (nome do arquivo e conteúdo da capa) seria viável com a infraestrutura atual, mas exigiria alterar `testes/auxiliares/entrada_pdf.js` e `carregar_pdf.js`. O PRD só mandou avaliar a identificação, então isso **não entra no plano**.
+4. **Decisão do Everton (22/10/2026): o `pdfFutura.js` ganha testes.** O PRD é anterior à suíte e não previu isso. A mudança é só em `testes/` e aditiva: uma linha de `export` em `testes/auxiliares/entrada_pdf.js`, uma linha `futura` em `testes/auxiliares/carregar_pdf.js` e um arquivo novo `testes/Q_pdf_futura.test.js`, no padrão de `V_pdf_projetista.test.js`. Nenhuma dependência nova. Casos (Task 4 do plano):
+   1. O nome do arquivo sai `Checklist_Futura_{contrato}_{data}.pdf`.
+   2. A capa tem "By Arabi Planejados" e "Checklist Venda Futura".
+   3. O corpo traz nome, contrato, telefone e endereço, e a data não tem hora.
+   4. Com complemento vazio, o endereço sai sem o complemento.
+   5. O PDF não contém ambiente, score, eletro nem CC.
+
+   Cuidado: o pacote dos PDFs é montado de uma vez, então erro de sintaxe no `pdfFutura.js` derruba também os testes do Cliente e do Projetista. Por isso a Task 4 vem logo depois da Task 3.
 
 ---
 
@@ -196,12 +203,13 @@ O PRD diz que a identificação "não pode ler ou gravar estado através do `use
 - [ ] Task 1 — Criar `src/context/FormProviderFutura.jsx` (provider em memória, `FormContext` existente, ações `SET_IDENTIFICACAO`, `SET_META` e `RESET_STATE_FUTURA`, sem `localStorage`).
 - [ ] Task 2 — Ajustar `src/steps/StepIdentificacao/StepIdentificacao.jsx`: props `rotaAvancar`, `rotaRevisao`, `rotaVoltar` e `mostrarBotaoVendedor`, com defaults que preservam o Cliente. Conferir com `npm run dev` que `/identificacao` não mudou (sem "Voltar", botão "Vendedor" presente, avançar para `/ambientes`, edição volta para `/revisao`).
 - [ ] Task 3 — Criar `src/services/pdfFutura.js` (`gerarPdfFutura`, capa no padrão dos outros PDFs, só dados cadastrais, arquivo `Checklist_Futura_{contrato}_{data}.pdf`).
-- [ ] Task 4 — Criar `src/steps/futura/StepRevisaoFutura/StepRevisaoFutura.jsx` (dados cadastrais, "Editar identificação", "Gerar PDF", tratamento de erro).
-- [ ] Task 5 — Criar `src/steps/futura/StepSucessoFutura/StepSucessoFutura.jsx` (reset em memória e `navigate('/')`).
-- [ ] Task 6 — Criar `src/screens/EscolhaProjetista/EscolhaProjetista.jsx` e `.module.css` (reuso de `.btnPerfil`, linhas de apoio e link "Voltar" para `/`).
-- [ ] Task 7 — Alterar `src/App.jsx`: `FuturaLayoutRoute` sem `Stepper`, rotas `/projetista` e `/futura/*`. Alterar o botão "Projetista" em `SelecaoPerfil.jsx` para `/projetista`.
-- [ ] Task 8 — Validação manual no `npm run dev`: CA-01 a CA-10, incluindo as regressões de rascunho do Cliente e do Projetista (CA-08 e CA-09), com a aba Application do navegador mostrando que as chaves de `localStorage` não mudam durante a Venda Futura.
-- [ ] Task 9 — Rodar `npm run build` (CA-11) e `npm test` (CA-12, tudo verde e nada pulado).
+- [ ] Task 4 — Testes do `pdfFutura.js` (seção 6, item 4): exportar `gerarPdfFutura` em `testes/auxiliares/entrada_pdf.js`, adicionar `futura` em `testes/auxiliares/carregar_pdf.js` e criar `testes/Q_pdf_futura.test.js` com os 5 casos. Rodar `npm test`: os testes novos e os do Cliente e do Projetista passam.
+- [ ] Task 5 — Criar `src/steps/futura/StepRevisaoFutura/StepRevisaoFutura.jsx` (dados cadastrais, "Editar identificação", "Gerar PDF", tratamento de erro).
+- [ ] Task 6 — Criar `src/steps/futura/StepSucessoFutura/StepSucessoFutura.jsx` (reset em memória e `navigate('/')`).
+- [ ] Task 7 — Criar `src/screens/EscolhaProjetista/EscolhaProjetista.jsx` e `.module.css` (reuso de `.btnPerfil`, linhas de apoio e link "Voltar" para `/`).
+- [ ] Task 8 — Alterar `src/App.jsx`: `FuturaLayoutRoute` sem `Stepper`, rotas `/projetista` e `/futura/*`. Alterar o botão "Projetista" em `SelecaoPerfil.jsx` para `/projetista`.
+- [ ] Task 9 — Validação manual no `npm run dev`: CA-01 a CA-10, incluindo as regressões de rascunho do Cliente e do Projetista (CA-08 e CA-09), com a aba Application do navegador mostrando que as chaves de `localStorage` não mudam durante a Venda Futura.
+- [ ] Task 10 — Rodar `npm run build` (CA-11) e `npm test` (CA-12, tudo verde e nada pulado).
 
 ---
 
