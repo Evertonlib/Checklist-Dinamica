@@ -1,9 +1,11 @@
 # PRD — Importação do PDF do Cliente
 
 **Status:** Aguardando aprovação
-**Data:** 2026-10-15
+**Data:** 2026-10-15 (atualizado em 2026-10-23)
 **Projeto:** Checklist Dinâmica — By Arabi Planejados
-**Origem:** card Trello #99 "IMPORTACAO_PDF_CLIENTE" (board "Projetos automação"), decisões fechadas pelo Everton em 10/10/2026.
+**Origem:** card Trello #99 "IMPORTACAO_PDF_CLIENTE" (board "Projetos automação"), decisões fechadas pelo Everton em 10/10/2026 e atualização do card em 22/10/2026 (novos leitores dos dados escondidos).
+
+**Atualização de 23/10/2026.** Incorpora: (a) o novo uso dos dados escondidos por outros módulos (Assistente de E-mail, ficha do contrato #126, Conferência Preventiva #119) — ver a seção "Contrato do formato com outros módulos"; (b) o conteúdo do payload fechado pelo Everton (só respostas, sem score nem CCs); (c) o texto do botão ("Importar PDF") e sua posição; (d) a regra de testes automatizados (`npm test`), criada depois da primeira versão deste PRD.
 
 ---
 
@@ -14,11 +16,13 @@ Hoje, quando o cliente erra alguma informação na checklist (um eletro errado, 
 Este PRD cria uma forma de **reabrir um PDF já gerado pelo Cliente e corrigi-lo**:
 
 1. **Na geração (sem mudança visível):** todo PDF do Cliente passa a carregar, escondido dentro das propriedades do próprio arquivo, uma cópia completa das respostas que o geraram, marcada com uma versão ("V1"). O conteúdo impresso do PDF — capa, resumo, CCs, tabelas, nome do arquivo `Checklist_Cliente_{contrato}_{data}.pdf` — não muda em nada.
-2. **Na importação (novo):** a tela inicial (`SelecaoPerfil`) ganha um botão "Importar PDF do cliente". O usuário escolhe o arquivo, o app lê as respostas escondidas, preenche o formulário do Cliente com elas e leva o usuário **direto para a tela de revisão do Cliente** (`/revisao`), de onde ele já consegue editar a identificação, os ambientes, as perguntas gerais ou qualquer ambiente pelos botões de edição que já existem ali, e gerar um PDF novo, corrigido.
+2. **Na importação (novo):** a tela inicial (`SelecaoPerfil`) ganha um botão "Importar PDF". O usuário escolhe o arquivo, o app lê as respostas escondidas, preenche o formulário do Cliente com elas e leva o usuário **direto para a tela de revisão do Cliente** (`/revisao`), de onde ele já consegue editar a identificação, os ambientes, as perguntas gerais ou qualquer ambiente pelos botões de edição que já existem ali, e gerar um PDF novo, corrigido.
 3. **Rascunho em andamento:** se já houver um preenchimento do Cliente salvo e não concluído naquele navegador, o app **pergunta antes de sobrescrever** e só importa depois da confirmação (decisão 4 do Everton).
 4. **PDF sem dados:** se o arquivo escolhido não tiver as respostas escondidas — PDF gerado antes desta versão, PDF do Projetista, PDF reimpresso ou "salvo como PDF" de novo, foto, ou qualquer outro arquivo — o app mostra uma única mensagem genérica: **"PDF não possui dados para importação"** (decisões 2 e 3 do Everton). A importação só funciona com o arquivo original baixado pelo app.
 
 Quem usa, na prática, é o vendedor/projetista que recebeu o PDF do cliente. Mas, por decisão do Everton (decisão 1), o botão fica na tela inicial e leva ao fluxo do **Cliente** — o PDF importado é o do Cliente e é corrigido dentro do próprio fluxo do Cliente. O fluxo do Projetista (`/vendedor/*`) não muda nesta versão.
+
+**Segundo uso dos mesmos dados (atualização de 22/10/2026 no card).** Os dados escondidos no PDF não servem só ao botão de importar. Programas em Python da automação da Liberação também vão lê-los: o Assistente de E-mail, a ficha por contrato (`BANCO_FICHA_CONTRATO`, #126) e a Conferência Preventiva (#119). Por isso o formato escondido é tratado aqui como um **contrato com leitores externos**, e não como detalhe interno do app (ver a seção "Contrato do formato com outros módulos").
 
 ---
 
@@ -30,7 +34,7 @@ O card pediu que este PRD verificasse quatro pontos no código antes de assumir.
    - `normalizarEstadoSalvo` é uma função **interna** do arquivo (não é exportada); hoje só o próprio `FormProvider` consegue usá-la.
    - `RESTORE_STATE` só pode ser disparado por quem está **dentro** do `FormProvider` do Cliente. Pelo `src/App.jsx:137-144`, o `FormProvider` só envolve as rotas do Cliente (`/identificacao` até `/sucesso`); a `SelecaoPerfil` (rota `/`, `App.jsx:135`) fica **fora** dele. Ou seja, o botão de importar na tela inicial não tem acesso direto a esse comando — a importação precisa "entregar" as respostas ao `FormProvider` de alguma forma (por exemplo, pelo armazenamento do navegador ou pela navegação). A forma exata fica para o Spec; o PRD só registra que o reaproveitamento do card é possível, mas não é "plugar e usar".
    - Existem gêmeos no lado do Projetista (`FormProviderVendedor.jsx:25` e `RESTORE_STATE_VENDEDOR` em `:180`), que **não** fazem parte desta versão.
-2. **"Sem dependência nova" é verdadeiro para gravar e, com uma condição, também para ler.** Verificado na versão do `jsPDF` travada no `package-lock.json` (2.5.2): a biblioteca permite gravar propriedades do documento (título, assunto, autor, palavras-chave, criador) e também um bloco de metadados extra; as propriedades são gravadas como texto puro, sem compressão e sem criptografia (o projeto não liga nenhuma das duas — `pdf.js:92` cria o documento só com orientação, unidade e formato). Porém o **jsPDF não lê PDF** — ele só escreve. Ler no navegador sem biblioteca nova é possível porque, como a propriedade fica em texto puro dentro do arquivo, basta o app abrir o arquivo escolhido, procurar a marca da versão e decodificar o que vem depois. Isso funciona **só para PDFs gerados pelo próprio app** (que é exatamente o escopo decidido). Se algum dia a leitura precisar entender PDFs de terceiros, aí sim seria necessária uma biblioteca de leitura (ex.: pdf.js da Mozilla ou pdf-lib) — registrado como premissa e risco, não como escopo.
+2. **"Sem dependência nova" é verdadeiro para gravar e, com uma condição, também para ler.** Verificado na versão do `jsPDF` travada no `package-lock.json` (2.5.2): a biblioteca permite gravar propriedades do documento (título, assunto, autor, palavras-chave, criador) e também um bloco de metadados extra; as propriedades são gravadas como texto puro, sem compressão e sem criptografia (o projeto não liga nenhuma das duas — `pdf.js:92` cria o documento só com orientação, unidade e formato). Porém o **jsPDF não lê PDF** — ele só escreve. Ler no navegador sem biblioteca nova é possível porque, como a propriedade fica em texto puro dentro do arquivo, basta o app abrir o arquivo escolhido, procurar a marca da versão e decodificar o que vem depois. Isso funciona **só para PDFs gerados pelo próprio app** (que é exatamente o escopo decidido). Se algum dia a leitura precisar entender PDFs de terceiros, aí sim seria necessária uma biblioteca de leitura (ex.: pdf.js da Mozilla ou pdf-lib) — registrado como premissa e risco, não como escopo. Essa conclusão vale para o **app**. Os leitores em Python (ver "Contrato do formato com outros módulos") usam bibliotecas de PDF próprias do lado deles, que já leem as propriedades padrão do documento; o que este PRD exige é que o local escolhido seja lido por elas sem tratamento especial.
 3. **Onde o PDF é gerado:** confirmado em `src/services/pdf.js`, função `gerarPdf` (linha 91 em diante), chamada pela revisão do Cliente em `StepRevisao.jsx:33-44`, que depois navega para `/sucesso`. O download acontece em `pdf.js:570`, com o nome `Checklist_Cliente_{contrato}_{data}.pdf`.
 4. **Como o rascunho do Cliente é guardado:** `FormProvider.jsx:7` usa a chave `byarabi_checklist_rascunho`; o estado **inteiro** é regravado a cada mudança (`FormProvider.jsx:295-298`). Ao abrir qualquer rota do Cliente, se houver algo salvo, aparece o diálogo "Continuar de onde parou?" (`:315-330`), cujo "Sim" leva à última etapa salva (`:300-306`) e cujo "Não" apaga o rascunho e vai para `/identificacao` (`:308-313`). Existe ainda uma trava antiga (`:280-283`) que descarta silenciosamente rascunhos de um formato anterior (os que tinham o campo `g2_temReforma`). A chave é apagada quando o usuário conclui pelo "Iniciar novo preenchimento" da tela de sucesso (`StepSucesso.jsx:9-12` → `RESET_STATE`, `FormProvider.jsx:260-263`).
 
@@ -57,8 +61,20 @@ A aplicação é um SPA React (Vite), `HashRouter`, sem backend, com dois fluxos
 
 ### Relação com outros cards e sistemas
 
-- **CHECKLIST_VENDA_FUTURA (`PRDS_E_SPECS/PRD_CHECKLIST_VENDA_FUTURA.md`)** — aquele PRD fechou (Premissa 1) que o PDF da venda futura é só para leitura humana, mas registrou a dúvida sobre "layout estável ou dados embutidos" para o programa que consome o PDF. A técnica decidida aqui — guardar os dados versionados nas propriedades do próprio PDF — é a mesma que serviria àquele caso no futuro. **Fica só como relação**: a venda futura não entra no escopo deste PRD, e este PRD não altera nada do que aquele definiu.
-- **Assistente de E-mail (externo a este repositório)** — hoje exige o RAR e um Word ou PDF de checklist, e vai passar a exigir o RAR e dois PDFs. Como esta melhoria não muda o conteúdo visível nem o nome do PDF do Cliente, ela não interfere no que o Assistente de E-mail recebe. Nenhuma mudança naquele sistema faz parte deste PRD.
+- **CHECKLIST_VENDA_FUTURA (`PRDS_E_SPECS/PRD_CHECKLIST_VENDA_FUTURA.md`)** — já implementada (22/10/2026). Aquele PRD fechou (Premissa 1) que o PDF da venda futura é só para leitura humana, mas registrou a dúvida sobre "layout estável ou dados embutidos" para o programa que consome o PDF. A técnica decidida aqui — guardar os dados versionados nas propriedades do próprio PDF — é a mesma que serviria àquele caso no futuro. **Fica só como relação**: a venda futura não entra no escopo deste PRD, e este PRD não altera nada do que aquele definiu.
+- **Assistente de E-mail (externo a este repositório)** — hoje exige o RAR e um Word ou PDF de checklist, e vai passar a exigir o RAR e dois PDFs (card #137). Esta melhoria não muda o conteúdo visível nem o nome do PDF do Cliente, então não interfere na conferência de nomes de arquivo. **Mas passa a ser leitor dos dados escondidos** (ver abaixo). A regra do robô para PDF sem os dados (recusar o e-mail) é decisão à parte, do card #137, e não faz parte deste PRD.
+- **Ficha por contrato (`BANCO_FICHA_CONTRATO`, card #126)** e **Conferência Preventiva (card #119)** — módulos externos a este repositório que vão receber/consumir os dados escondidos, via Assistente de E-mail. Nenhuma mudança neles faz parte deste PRD.
+
+### Contrato do formato com outros módulos
+
+A partir da atualização de 22/10/2026, o bloco escondido no PDF é um **formato compartilhado**. Regras que este PRD fixa:
+
+1. **Leitores conhecidos:** o app (botão "Importar PDF") e programas em Python da automação — Assistente de E-mail, que grava na ficha do contrato (#126), e Conferência Preventiva (#119).
+2. **Só respostas.** Por decisão do Everton (23/10/2026), o robô não precisa de score nem de CCs; os outros módulos trabalham com o que receberem. O bloco carrega apenas as respostas (identificação, ambientes selecionados, perguntas gerais e respostas por ambiente). Não carrega score, CCs, avisos nem dados internos de navegação do app.
+3. **Legível fora do navegador.** O local e a codificação escolhidos no Spec precisam ser lidos por uma biblioteca comum de PDF em Python, sem truque, e decodificados de volta para as respostas originais, com acentos intactos. O Spec escolhe o local e **comprova** a leitura em Python (CA-14).
+4. **Marca de versão "V1" no início**, para qualquer leitor saber o formato antes de interpretar o resto.
+5. **Mudou o formato, mudou a versão.** Qualquer alteração que um leitor existente não consiga absorver gera uma versão nova ("V2"…). Antes de gerá-la, os leitores externos precisam ser avisados — a versão deixa de ser só proteção contra restaurar PDF antigo no app.
+6. **Fora deste PRD:** o que cada módulo faz com os dados, como o robô trata PDF sem dados, e qualquer mudança nos programas Python.
 
 ---
 
@@ -67,10 +83,11 @@ A aplicação é um SPA React (Vite), `HashRouter`, sem backend, com dois fluxos
 | Arquivo | Tipo de mudança |
 |---|---|
 | `src/services/pdf.js` | Passa a gravar, nas propriedades do PDF, uma cópia versionada ("V1") das respostas do Cliente. Nenhuma mudança no que é impresso nem no nome do arquivo |
-| `src/screens/SelecaoPerfil/SelecaoPerfil.jsx` | Ganha o botão "Importar PDF do cliente", a escolha do arquivo, a mensagem de erro genérica e a pergunta de confirmação quando houver rascunho do Cliente em andamento |
+| `src/screens/SelecaoPerfil/SelecaoPerfil.jsx` | Ganha o botão "Importar PDF", a escolha do arquivo, a mensagem de erro genérica e a pergunta de confirmação quando houver rascunho do Cliente em andamento |
 | `src/screens/SelecaoPerfil/SelecaoPerfil.module.css` | Estilo do novo botão (se não bastar reaproveitar `.btnPerfil` ou uma variação dele) |
 | `src/context/FormProvider.jsx` | Ajuste mínimo para receber o estado importado e restaurá-lo pelo caminho que já existe (`normalizarEstadoSalvo` + `RESTORE_STATE`), abrindo direto em `/revisao` e **sem** mostrar o diálogo "Continuar de onde parou?" por cima da importação |
-| Arquivo novo (nome a definir no Spec) | Serviço pequeno que lê o arquivo escolhido, procura o bloco escondido, confere a versão e devolve as respostas — ou avisa que não há dados |
+| Arquivo novo (nome a definir no Spec) | Serviço pequeno que lê o arquivo escolhido, procura o bloco escondido, confere a versão e devolve as respostas — ou avisa que não há dados. Provavelmente também concentra a gravação/codificação, para que ida e volta fiquem no mesmo lugar |
+| `testes/` | O Spec decide quais casos novos entram (o serviço de leitura/gravação é lógica pura e cabe na suíte atual) e quais testes existentes são tocados — em especial `P_pdf_cliente.test.js`, porque `pdf.js` muda. Só aditivo, sem dependência nova |
 
 Nenhum arquivo de `src/domain/`, do fluxo do Projetista ou de componentes compartilhados é alterado.
 
@@ -78,11 +95,11 @@ Nenhum arquivo de `src/domain/`, do fluxo do Projetista ou de componentes compar
 
 ## O que será adicionado
 
-1. **Dados escondidos no PDF do Cliente:** a cada geração, o PDF do Cliente passa a carregar uma cópia completa das respostas (identificação, ambientes selecionados, perguntas gerais e respostas por ambiente), com uma marca de versão "V1". Fica numa propriedade do arquivo, não no conteúdo impresso.
-2. **Botão "Importar PDF do cliente" na `SelecaoPerfil`**, abaixo ou ao lado dos botões "Cliente" e "Projetista", no mesmo padrão visual da tela.
+1. **Dados escondidos no PDF do Cliente:** a cada geração, o PDF do Cliente passa a carregar uma cópia completa das respostas (identificação, ambientes selecionados, perguntas gerais e respostas por ambiente), com uma marca de versão "V1". **Sem score, sem CCs e sem dados internos de navegação** (decisão do Everton, 23/10/2026). Fica numa propriedade padrão do arquivo, não no conteúdo impresso, e precisa ser legível também por programas em Python (ver "Contrato do formato com outros módulos").
+2. **Botão "Importar PDF" na `SelecaoPerfil`**, **abaixo** dos botões "Cliente" e "Projetista", centralizado e com visual mais discreto (secundário), por ser uma ação ocasional e não um terceiro perfil. Mantém o padrão visual da tela (fontes e cores do design system).
 3. **Leitura do arquivo no navegador**, 100% local (nada é enviado para servidor), aceitando apenas o PDF original baixado pelo app.
-4. **Confirmação antes de sobrescrever:** se já existir um rascunho do Cliente salvo naquele navegador, aparece uma pergunta (ex.: "Já existe um preenchimento em andamento. Importar este PDF vai substituí-lo. Deseja continuar?"), com opção de cancelar. Cancelando, nada muda — o rascunho continua lá. O texto exato fica para o Spec.
-5. **Mensagem genérica de erro:** "PDF não possui dados para importação", para qualquer arquivo sem os dados escondidos ou com dados que não possam ser lidos.
+4. **Confirmação antes de sobrescrever:** se já existir um rascunho do Cliente salvo naquele navegador, aparece a pergunta **"Já existe um preenchimento em andamento. Importar este PDF vai substituí-lo. Deseja continuar?"**, com opção de cancelar. Cancelando, nada muda — o rascunho continua lá. O texto dos dois botões da pergunta (confirmar e cancelar) fica para o Spec.
+5. **Mensagem genérica de erro:** **"PDF não possui dados para importação"**, para qualquer arquivo sem os dados escondidos ou com dados que não possam ser lidos.
 6. **Chegada direta na revisão do Cliente** (`/revisao`), com o formulário inteiro preenchido, score e CCs recalculados como num preenchimento normal, e todos os botões de edição já existentes funcionando. Ao gerar o PDF de novo, sai um PDF corrigido — que, por sua vez, também carrega os dados escondidos e pode ser importado outra vez.
 
 ---
@@ -111,8 +128,8 @@ Nada. É uma melhoria aditiva: nenhuma tela, rota, texto, validação ou regra d
 
 1. **Só PDFs gerados depois desta versão podem ser importados.** Os PDFs do Cliente já existentes não têm os dados escondidos e recebem a mensagem genérica. Não há conversão de PDFs antigos.
 2. **Só o arquivo original funciona.** PDF reimpresso, "salvo como PDF" de novo, editado em outro programa, escaneado ou fotografado perde os dados escondidos e recebe a mesma mensagem genérica (decisão 3). Aceito pelo Everton.
-3. **A leitura não precisa de biblioteca nova** porque o app só precisa ler os PDFs que ele mesmo gerou, nos quais a propriedade fica em texto puro (verificado no jsPDF 2.5.2, sem compressão nem criptografia ligadas no projeto). Se essa condição deixar de valer, ver Risco 3.
-4. **A versão "V1" identifica o formato dos dados escondidos.** Se no futuro o formato do formulário do Cliente mudar a ponto de um PDF V1 não poder ser restaurado com segurança, uma nova versão será criada e PDFs V1 passam a receber a mesma mensagem genérica — o usuário não vê a palavra "versão" (decisão 2). Mudanças pequenas (campo novo com valor padrão) continuam sendo absorvidas por `normalizarEstadoSalvo`, como já acontece hoje com rascunhos.
+3. **A leitura no app não precisa de biblioteca nova** porque o app só precisa ler os PDFs que ele mesmo gerou, nos quais a propriedade fica em texto puro (verificado no jsPDF 2.5.2, sem compressão nem criptografia ligadas no projeto). Se essa condição deixar de valer, ver Risco 3. A leitura em Python, nos programas externos, é por conta deles e usa biblioteca própria; o requisito aqui é só que o formato seja legível por elas (CA-14).
+4. **A versão "V1" identifica o formato dos dados escondidos**, para o app e para os leitores externos (ver "Contrato do formato com outros módulos"). Se no futuro o formato do formulário do Cliente mudar a ponto de um PDF V1 não poder ser restaurado com segurança, uma nova versão será criada e PDFs V1 passam a receber a mesma mensagem genérica — o usuário não vê a palavra "versão" (decisão 2). Mudanças pequenas (campo novo com valor padrão) continuam sendo absorvidas por `normalizarEstadoSalvo`, como já acontece hoje com rascunhos.
 5. **O destino é sempre `/revisao` do Cliente**, independentemente da etapa em que o PDF original foi gerado (um PDF só é gerado a partir da revisão, então o formulário sempre está completo).
 6. **Dados pessoais escondidos no PDF não criam exposição nova.** Nome, contrato, telefone e endereço já estão impressos na capa do mesmo PDF; as respostas técnicas também já estão impressas no corpo. Os dados escondidos ficam visíveis apenas para quem abrir as "propriedades do documento" num leitor de PDF, e codificados (não legíveis a olho nu).
 7. **Importar não apaga nada sem confirmação.** Sem rascunho salvo, importa direto; com rascunho salvo, só importa após o "sim" (decisão 4). Após importar, o estado importado passa a ser o rascunho salvo normal do Cliente (sobrevive a atualizar a página, como hoje).
@@ -128,29 +145,31 @@ Nada. É uma melhoria aditiva: nenhuma tela, rota, texto, validação ou regra d
 4. **Tamanho dos dados escondidos.** Um preenchimento com muitos ambientes, eletros e observações longas gera um bloco grande. Há leitores de PDF antigos que limitam o tamanho de textos em propriedades (na casa de 32 mil caracteres). Isso não afeta a leitura pelo próprio app, mas o Spec deve medir o tamanho num caso grande real e, se necessário, compactar ou dividir.
 5. **Acentos e caracteres especiais.** As respostas têm acentos (nomes, endereços, observações). Gravá-las direto como texto numa propriedade do PDF pode corromper caracteres. Mitigação: codificar o conteúdo num formato só com letras e números antes de gravar (o Spec define qual), e testar ida e volta com acentos (CA-01).
 6. **PDF de terceiros ou malformado.** O usuário pode escolher qualquer arquivo (PDF do Projetista, PDF de outro sistema, arquivo corrompido, arquivo renomeado para ".pdf", arquivo enorme). A leitura nunca pode travar a tela nem deixar o formulário pela metade: qualquer falha resulta na mensagem genérica e em nenhum estado alterado. Coberto pelos CA-06 a CA-09.
-7. **Dados escondidos adulterados.** Alguém poderia editar o bloco escondido à mão. Como não há backend e o PDF corrigido sempre é revisado por uma pessoa antes de seguir, o risco é baixo; mitigação mínima: só aceitar o bloco se ele tiver a marca "V1" e a estrutura esperada, caindo na mensagem genérica caso contrário.
+7. **Dados escondidos adulterados.** Alguém poderia editar o bloco escondido à mão. No app, o PDF corrigido sempre é revisado por uma pessoa antes de seguir, então o risco é baixo; mitigação mínima: só aceitar o bloco se ele tiver a marca "V1" e a estrutura esperada, caindo na mensagem genérica caso contrário. Nos leitores externos não há essa revisão humana, e os dados não têm assinatura nem garantia de integridade: cabe a cada módulo tratá-los como informação do PDF recebido, não como verdade conferida. Fora do escopo deste PRD.
 8. **Divergência futura entre Cliente e Projetista.** Esta versão cria um precedente só no lado do Cliente. Quando o Projetista for incluído, a mesma ideia precisará ser replicada em `pdfVendedor.js` e `FormProviderVendedor.jsx`, como já acontece com toda regra compartilhada no projeto (ver CLAUDE.md, "Dois fluxos independentes").
+9. **Mudança de formato quebra leitores externos sem aviso.** Os programas em Python (Assistente de E-mail, ficha #126, Conferência #119) vão depender do formato "V1". Uma alteração futura em `schema.js` (campo renomeado, removido ou com outro significado) muda o conteúdo gravado sem que nada neste repositório avise o outro lado. Mitigação: a regra 5 do "Contrato do formato com outros módulos" (mudou o formato, nova versão, leitores avisados antes) e o CA-14, que serve de teste de que o formato continua legível fora do app.
 
 ---
 
 ## Pontos a definir no Spec (não decididos neste PRD)
 
-1. **Onde exatamente gravar os dados no PDF** — qual propriedade do documento (ou bloco de metadados) e como codificar, respeitando os Riscos 3, 4 e 5.
-2. **Como entregar o estado importado ao `FormProvider`** — que hoje está fora do alcance da `SelecaoPerfil` — sem o diálogo "Continuar de onde parou?" no meio (Risco 1), reaproveitando `normalizarEstadoSalvo` e `RESTORE_STATE`. Critério: a forma mais simples de implementar.
-3. **Texto exato** do botão, da pergunta de confirmação e onde o botão fica na `SelecaoPerfil`.
+1. **Onde exatamente gravar os dados no PDF** — qual propriedade do documento (ou bloco de metadados) e como codificar, respeitando os Riscos 3, 4 e 5 **e o requisito de ser legível em Python** (regra 3 do "Contrato do formato com outros módulos"). O Spec escolhe e comprova a leitura em Python por um exemplo, que sustenta o CA-14.
+2. **Como entregar o estado importado ao `FormProvider`** — que hoje está fora do alcance da `SelecaoPerfil` — sem o diálogo "Continuar de onde parou?" no meio (Risco 1), reaproveitando `normalizarEstadoSalvo` e `RESTORE_STATE`. Critério: a forma mais simples de implementar. O Spec também confirma que `normalizarEstadoSalvo` aceita o estado sem os dados internos de navegação (`_meta`), já que o payload não os carrega.
+3. **Textos dos botões da pergunta de confirmação** (confirmar e cancelar). O texto do botão "Importar PDF", sua posição (abaixo dos dois botões, discreto), a pergunta de confirmação e a mensagem de erro já estão fechados neste PRD.
 4. **Nome e local do novo serviço de leitura** (ex.: ao lado de `pdf.js` em `src/services/`).
+5. **Testes automatizados** — quais casos novos entram na suíte `testes/` e quais testes existentes são tocados (ver "Critérios de aceitação").
 
 ---
 
 ## Critérios de aceitação
 
-Cada critério é verificável rodando `npm run dev` e navegando manualmente — não há suíte de testes automatizada neste projeto. A validação de compilação continua sendo `npm run build`.
+Cada critério tem entrada e resultado esperado e é verificável rodando `npm run dev` e navegando manualmente. A validação de compilação é `npm run build` e a suíte de regressão em `testes/` (`npm test`) deve continuar verde (ver CA-13). O Spec transforma em teste automatizado cada critério que dá para exercitar sem tela (ex.: CA-01 no que toca a ida e volta dos dados, CA-06 a CA-10, CA-14) e registra como conferência manual os que dependem de tela (ex.: CA-03, CA-04, CA-05).
 
 ---
 
 ### CA-01 — Ida e volta completa (caminho feliz)
 
-**Entrada:** Navegador sem rascunho do Cliente salvo. Pelo botão "Cliente", preencher uma checklist completa com pelo menos dois ambientes de tipos diferentes (ex.: Cozinha com dois eletros e Dormitório com TV), algum CC ativado, e observações com acentos ("Atenção: vão de 150mm"). Gerar o PDF e concluir em "Iniciar novo preenchimento". De volta à tela inicial, clicar em "Importar PDF do cliente" e escolher o PDF que acabou de ser baixado.
+**Entrada:** Navegador sem rascunho do Cliente salvo. Pelo botão "Cliente", preencher uma checklist completa com pelo menos dois ambientes de tipos diferentes (ex.: Cozinha com dois eletros e Dormitório com TV), algum CC ativado, e observações com acentos ("Atenção: vão de 150mm"). Gerar o PDF e concluir em "Iniciar novo preenchimento". De volta à tela inicial, clicar em "Importar PDF" e escolher o PDF que acabou de ser baixado.
 
 **Resultado esperado:** O app abre direto a revisão do Cliente (`/revisao`), sem passar pela identificação e sem mostrar "Continuar de onde parou?". Todos os dados aparecem exatamente como foram preenchidos — identificação, ambientes (com nomes), perguntas gerais, eletros, observações com acentos intactos — e o score global, o score por ambiente e os CCs são os mesmos do PDF original.
 
@@ -174,7 +193,7 @@ Cada critério é verificável rodando `npm run dev` e navegando manualmente —
 
 ### CA-04 — Rascunho em andamento: usuário confirma
 
-**Entrada:** Pelo botão "Cliente", começar outro preenchimento e parar no meio (ex.: na etapa de ambientes). Voltar para a tela inicial, clicar em "Importar PDF do cliente" e escolher um PDF válido.
+**Entrada:** Pelo botão "Cliente", começar outro preenchimento e parar no meio (ex.: na etapa de ambientes). Voltar para a tela inicial, clicar em "Importar PDF" e escolher um PDF válido.
 
 **Resultado esperado:** Antes de qualquer mudança, aparece uma pergunta avisando que já existe um preenchimento em andamento e que a importação vai substituí-lo. Ao confirmar, o app abre a revisão com os dados do PDF importado. Atualizando a página (F5), os dados importados continuam lá.
 
@@ -244,8 +263,16 @@ Cada critério é verificável rodando `npm run dev` e navegando manualmente —
 
 ---
 
-### CA-13 — Build
+### CA-13 — Build e suíte de regressão
 
-**Entrada:** Rodar `npm run build`.
+**Entrada:** Rodar `npm run build` e `npm test`.
 
-**Resultado esperado:** Compila sem erros, e o `package.json` não tem nenhuma dependência nova.
+**Resultado esperado:** O build compila sem erros; `npm test` passa inteiro, sem nenhum teste pulado, incluindo os testes novos que o Spec definir e os testes atuais de PDF do Cliente (a geração do PDF muda). O `package.json` não tem nenhuma dependência nova.
+
+---
+
+### CA-14 — Leitura dos dados por um programa em Python
+
+**Entrada:** Um PDF do Cliente gerado pelo app com pelo menos dois ambientes e observações com acentos ("Atenção: vão de 150mm"). Num script Python simples, com uma biblioteca comum de leitura de PDF, abrir o arquivo, ler a propriedade onde os dados foram gravados e decodificá-los.
+
+**Resultado esperado:** O script obtém a marca "V1" e as respostas idênticas às preenchidas (identificação, ambientes selecionados, perguntas gerais e respostas por ambiente), com os acentos intactos. O conteúdo não traz score, CCs, avisos nem dados internos de navegação do app. O script não precisa de nenhum tratamento especial além de decodificar o texto.
