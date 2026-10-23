@@ -14,6 +14,8 @@ SPA React (Vite) de coleta guiada de informações técnicas para liberação de
 
 **Venda futura (implementada, card Trello `CHECKLIST_VENDA_FUTURA`):** cliente compra hoje para encomendar daqui a anos, como uma carta de crédito. Não tem ambientes, eletros, score nem CCs. Botão Projetista → `/projetista` (Normal ou Venda futura) → `/futura/*`: Identificação (reusa `StepIdentificacao` por props) → Revisão → PDF só com dados cadastrais (`Checklist_Futura_*.pdf`). Estado só em memória (`FormProviderFutura`, sem `localStorage`).
 
+**Importar PDF (implementado, `SPEC_IMPORTACAO_PDF_CLIENTE`):** todo PDF do Cliente leva as respostas escondidas na propriedade Keywords (`V1:` + Base64 de JSON, só 4 chaves: identificação, ambientes, globais, respostas). Esse formato é **contrato com leitores Python externos**: mudou o formato, muda a versão e os leitores são avisados antes. Não ligar compressão nem criptografia no jsPDF sem rever `services/importacaoPdf.js`.
+
 Veja `README.md` para a descrição funcional completa e `especificacao-checklist-dinamica.md` para as regras de perguntas/CCs/pontuação — não repetir aqui.
 
 ## Comandos
@@ -60,12 +62,13 @@ Ao mudar comportamento de score, CC ou perguntas, editar o `domain/` — não es
 
 ### Estado e persistência
 
-Context API + `useReducer` (`FormProvider*`). O estado é sincronizado com `localStorage`, então o preenchimento sobrevive a refresh. Ao iniciar um novo preenchimento, o fluxo volta à `SelecaoPerfil` (ver commit `31e2e7f`) — atenção para limpar/reinicializar o estado ao trocar de perfil.
+Context API + `useReducer` (`FormProvider*`). O estado é sincronizado com `localStorage`, então o preenchimento sobrevive a refresh. "Iniciar novo preenchimento" **não apaga** `byarabi_checklist_rascunho` (observado). A importação (botão na `SelecaoPerfil`) grava essa chave, navega para `/revisao` com `state.importado` e o `FormProvider` restaura sem diálogo; se já houver valor na chave, pergunta antes de substituir.
 
 ### Serviços externos
 
 - `services/cep.js` — autofill de endereço via API pública ViaCEP (timeout de 5s; tratar falha silenciosamente, o usuário pode digitar manualmente).
 - `services/pdf.js` / `pdfVendedor.js` — geração de PDF com `jsPDF` + `jspdf-autotable`, client-side. Ver `RELATORIO_FONTES_PDF.md` para questões de fonte/acentuação no PDF.
+- `services/importacaoPdf.js` — grava (`montarDadosPdf`) e lê (`lerDadosPdf`, nunca lança exceção) o formato V1 dos dados escondidos no PDF do Cliente.
 
 ## Metodologia e documentação (SDD)
 
