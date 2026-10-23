@@ -1,6 +1,6 @@
-// Substitui "jspdf" dentro do pacote (Spec, seção 4.3): cria a instância REAL e troca quatro métodos nela.
+// Substitui "jspdf" dentro do pacote (Spec, seção 4.3): cria a instância REAL e troca cinco métodos nela.
 import m from '../../node_modules/jspdf/dist/jspdf.node.min.js'
-import { registrarTexto, registrarQuebra, registrarLink, registrarSave } from './captura_registro.js'
+import { registrarTexto, registrarQuebra, registrarLink, registrarSave, registrarPropriedades } from './captura_registro.js'
 
 const JsPDFReal = m.jsPDF || (m.default && m.default.jsPDF) || m
 
@@ -26,10 +26,11 @@ function fabricante(...args) {
   embrulhar('text', (a) => registrarTexto(a[0]))
   embrulhar('splitTextToSize', (a, linhas) => registrarQuebra(a[0], linhas))
   embrulhar('link', (a) => registrarLink(a[4] && a[4].url))
+  embrulhar('setProperties', (a) => registrarPropriedades(a[0]))
 
-  // save não grava nada: só registra o nome do arquivo
+  // save não grava em disco: registra o nome e guarda os bytes reais do arquivo
   doc.save = (nome) => {
-    registrarSave(nome)
+    registrarSave(nome, doc.output('arraybuffer'))
     return doc
   }
 

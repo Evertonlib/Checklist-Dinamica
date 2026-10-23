@@ -4,6 +4,7 @@ import { formatarNomeAmbiente } from '../domain/ambientes.js'
 import { TAMANHOS_CAMA } from '../steps/StepPerguntasPorAmbiente/formUtils.js'
 import { calcularScore } from '../domain/scoreEngine.js'
 import { construirCCs } from '../domain/ccBuilder.js'
+import { montarDadosPdf } from './importacaoPdf.js'
 
 const NIVEL_MEDIO = 'M\u00c9DIO'
 
@@ -569,5 +570,8 @@ export async function gerarPdf(state) {
     }
   })
 
+  // Respostas escondidas na propriedade Keywords, para o botão "Importar PDF" e leitores externos (formato V1).
+  // Não ligar compressão nem criptografia no jsPDF sem rever a leitura em importacaoPdf.js.
+  doc.setProperties({ keywords: montarDadosPdf(state) })
   doc.save(`Checklist_Cliente_${contrato}_${dataArquivo}.pdf`)
 }

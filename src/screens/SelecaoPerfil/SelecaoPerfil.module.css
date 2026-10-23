@@ -44,3 +44,56 @@
 .btnPerfil:hover {
   background: #000;
 }
+
+/* Importar PDF: ação ocasional, visual secundário (contorno dourado, sem fundo cheio) */
+.btnImportar {
+  margin-top: 28px;
+  background: transparent;
+  color: #1a1a1a;
+  border: 2px solid #c8a84b;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.btnImportar:hover {
+  background: rgba(200, 168, 75, 0.15);
+}
+
+.inputArquivo {
+  display: none;
+}
+
+/* Botões das janelas de aviso (o Modal só fornece a caixa) */
+.btnModal {
+  background: #1a1a1a;
+  color: #c8a84b;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.btnModal:hover {
+  background: #000;
+}
+
+.btnModalSecundario {
+  background: transparent;
+  color: #1a1a1a;
+  border: 2px solid #c8a84b;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+}

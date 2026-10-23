@@ -4,11 +4,16 @@ let eventos = []
 let desenhandoTabela = false
 // Linhas quebradas pendentes: { original, linhas, recebidas }
 let pendentes = []
+// Propriedades do documento (setProperties) e bytes reais do arquivo salvo
+let propriedades = {}
+let bytesDoArquivo = null
 
 export function iniciarCaptura() {
   eventos = []
   desenhandoTabela = false
   pendentes = []
+  propriedades = {}
+  bytesDoArquivo = null
 }
 
 export function marcarTabela(ligada) {
@@ -42,8 +47,13 @@ export function registrarLink(url) {
   eventos.push({ tipo: 'link', url })
 }
 
-export function registrarSave(nome) {
+export function registrarSave(nome, bytes) {
   eventos.push({ tipo: 'save', nome })
+  bytesDoArquivo = bytes ? new Uint8Array(bytes) : null
+}
+
+export function registrarPropriedades(valor) {
+  propriedades = { ...propriedades, ...structuredClone(valor) }
 }
 
 export function lerCaptura() {
@@ -60,5 +70,7 @@ export function lerCaptura() {
     tabelas: copia.filter((e) => e.tipo === 'tabela'),
     links: copia.filter((e) => e.tipo === 'link').map((e) => e.url),
     saves: copia.filter((e) => e.tipo === 'save').map((e) => e.nome),
+    propriedades: { ...propriedades },
+    bytes: bytesDoArquivo ? new Uint8Array(bytesDoArquivo) : null,
   }
 }

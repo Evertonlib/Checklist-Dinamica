@@ -1,6 +1,6 @@
 # SPEC — Importação do PDF do Cliente
 
-**Status:** Aguardando aprovação
+**Status:** Aprovado
 **PRD de origem:** `PRDS_E_SPECS/PRD_IMPORTACAO_PDF_CLIENTE.md` (aprovado; atualização de 23/10/2026)
 **Critério de decisão (Everton, 02/10/2026):** a forma mais simples de implementar.
 
@@ -204,17 +204,17 @@ Alterações de apoio em `testes/auxiliares/` (arquivos de apoio, não testes): 
 
 ## Plano de Execução
 
-- [ ] Task 1 — Criar `src/services/importacaoPdf.js` com `montarDadosPdf(state)` e `lerDadosPdf(bytes)` (seção 2.1, 2.2): formato `V1:` + Base64 de JSON UTF-8 com as quatro chaves; leitura que nunca lança exceção e devolve `null` em qualquer falha.
-- [ ] Task 2 — Acrescentar aos auxiliares de teste (seção 2.6): `save` guarda os bytes reais do arquivo, `setProperties` registra o que recebe, e `lerCaptura` devolve `propriedades` e `bytes`. Rodar `npm test` para provar que os testes existentes seguem verdes.
-- [ ] Task 3 — Alterar `src/services/pdf.js`: gravar `keywords` com `montarDadosPdf(state)` antes do `doc.save`, e comentário curto sobre não ligar compressão/criptografia. Rodar `npm test` (pacote dos PDFs é montado de uma vez).
-- [ ] Task 4 — Criar `testes/I_importacao_pdf.test.js` com os casos T1, T2 e T3 (gravação e ida e volta).
-- [ ] Task 5 — Adicionar ao mesmo arquivo os casos de falha T4 a T8.
-- [ ] Task 6 — Adicionar T9 (formato legível, só respostas) e T10 (tamanho). O T10 imprime o tamanho medido, e quem implementa anota esse número em Desvios mesmo quando o teste passa (para dar noção de folga). Se T10 falhar, parar e registrar em Desvios.
-- [ ] Task 7 — Alterar `src/context/FormProvider.jsx`: restauração direta quando a navegação traz `importado: true` e há valor salvo, sem diálogo (seção 2.3, item 2). Sem a marca, comportamento idêntico ao atual.
-- [ ] Task 8 — Alterar `SelecaoPerfil.jsx` e `.module.css`: botão "Importar PDF", seleção de arquivo, limite de 20 MB, modal de erro, pergunta de confirmação com "Sim, importar" e "Cancelar", gravação do rascunho e navegação para `/revisao`.
-- [ ] Task 9 — Conferência manual no `npm run dev` (CA-01 a CA-12), incluindo a leitura em Python do CA-14 com um PDF real; anotar o resultado em Desvios.
-- [ ] Task 10 — Rodar `npm run build` (compila e `package.json` sem dependência nova).
-- [ ] Task 11 — Rodar a suíte inteira com `npm test`: verde e sem teste pulado.
+- [x] Task 1 — Criar `src/services/importacaoPdf.js` com `montarDadosPdf(state)` e `lerDadosPdf(bytes)` (seção 2.1, 2.2): formato `V1:` + Base64 de JSON UTF-8 com as quatro chaves; leitura que nunca lança exceção e devolve `null` em qualquer falha.
+- [x] Task 2 — Acrescentar aos auxiliares de teste (seção 2.6): `save` guarda os bytes reais do arquivo, `setProperties` registra o que recebe, e `lerCaptura` devolve `propriedades` e `bytes`. Rodar `npm test` para provar que os testes existentes seguem verdes.
+- [x] Task 3 — Alterar `src/services/pdf.js`: gravar `keywords` com `montarDadosPdf(state)` antes do `doc.save`, e comentário curto sobre não ligar compressão/criptografia. Rodar `npm test` (pacote dos PDFs é montado de uma vez).
+- [x] Task 4 — Criar `testes/I_importacao_pdf.test.js` com os casos T1, T2 e T3 (gravação e ida e volta).
+- [x] Task 5 — Adicionar ao mesmo arquivo os casos de falha T4 a T8.
+- [x] Task 6 — Adicionar T9 (formato legível, só respostas) e T10 (tamanho). O T10 imprime o tamanho medido, e quem implementa anota esse número em Desvios mesmo quando o teste passa (para dar noção de folga). Se T10 falhar, parar e registrar em Desvios.
+- [x] Task 7 — Alterar `src/context/FormProvider.jsx`: restauração direta quando a navegação traz `importado: true` e há valor salvo, sem diálogo (seção 2.3, item 2). Sem a marca, comportamento idêntico ao atual.
+- [x] Task 8 — Alterar `SelecaoPerfil.jsx` e `.module.css`: botão "Importar PDF", seleção de arquivo, limite de 20 MB, modal de erro, pergunta de confirmação com "Sim, importar" e "Cancelar", gravação do rascunho e navegação para `/revisao`.
+- [x] Task 9 — Conferência manual no `npm run dev` (CA-01 a CA-12), incluindo a leitura em Python do CA-14 com um PDF real; anotar o resultado em Desvios.
+- [x] Task 10 — Rodar `npm run build` (compila e `package.json` sem dependência nova).
+- [x] Task 11 — Rodar a suíte inteira com `npm test`: verde e sem teste pulado.
 
 Se um teste novo falhar porque o código faz diferente do esperado acima, não ajuste o esperado para ficar verde: registre em Desvios e pare. Se um teste existente que não está na lista de afetados falhar, corrija o código, não o teste.
 
@@ -222,4 +222,22 @@ Se um teste novo falhar porque o código faz diferente do esperado acima, não a
 
 ## Desvios
 
-*(vazia — será preenchida durante a implementação)*
+Implementação concluída em 23/10/2026. Nenhum teste novo falhou; nenhum teste existente foi alterado. Registros:
+
+1. **Tamanho medido no T10 (maior caso real, 17 ambientes):** **11.099 caracteres** no valor gravado, cerca de um terço do limite de 32.000. O teste imprime esse número a cada rodada (linha `ℹ T10 — tamanho medido...`).
+2. **Suíte final (Task 11):** 127 testes, 127 passaram, 0 pulados (antes: 117; mais os 10 novos T1 a T10). `npm run build` compila (aviso de chunk maior que 500 kB já existia). `package.json` e `package-lock.json` sem mudança.
+3. **Conferência manual (Task 9), feita em `npm run dev` no Chrome, com PDF fictício (contrato 9001):**
+   - CA-01 sem rascunho: abre direto em `/revisao`, sem "Continuar de onde parou?", com identificação, 2 ambientes, CCs e scores; chave gravada com `_meta.etapaAtual = revisao` e observação "Atenção: vão de 150mm" intacta.
+   - CA-04: com rascunho presente aparece a pergunta (texto do PRD, botões "Sim, importar" e "Cancelar") antes de qualquer mudança; "Sim, importar" abre `/revisao` direto, sem diálogo. F5 mostra o "Continuar de onde parou?" normal e o "Sim" volta à revisão com os dados importados.
+   - CA-05: "Cancelar" fecha a pergunta sem gravar nada; em seguida "Cliente" mostra o "Continuar de onde parou?" e o rascunho antigo está como estava.
+   - CA-06: o PDF real antigo (`Checklist_ByArabi_PIN00506_2026-08-14.pdf`, 77.654 bytes, começa com `%PDF`) deu "PDF não possui dados para importação", sem mencionar versão, e o rascunho continuou intacto. O conteúdo desse PDF não foi lido nem copiado.
+   - CA-08/CA-09: texto renomeado para .pdf, PDF válido cortado ao meio e arquivo vazio deram a mesma mensagem, sem alterar o rascunho. CA-09(c), desistência do seletor: nada acontece, sem mensagem.
+   - CA-11/CA-12: "Cliente" sem rascunho vai a `/identificacao` sem diálogo; "Projetista" vai a `/projetista`; a chave `byarabi_checklist_vendedor` ficou idêntica em todo o teste, inclusive durante a importação com rascunho do Cliente.
+   - Geração no navegador: o PDF gerado pela tela de revisão tem o nome `Checklist_Cliente_{contrato}_{data}.pdf` e traz `/Keywords (V1:...)` com as 4 chaves; a tela de sucesso aparece como antes.
+   - Observação 10 reproduzida: depois de "Iniciar novo preenchimento" a chave `byarabi_checklist_rascunho` continua presente com o preenchimento completo (2 ambientes). O mecanismo continua sendo causa provável, não confirmada.
+4. **CA-14 (Python):** lido com **PyMuPDF** (`pymupdf`), porque o `pypdf` não está instalado nesta máquina. Marca `V1`, as 4 chaves, conteúdo idêntico ao preenchido e acentos intactos ("Atenção: vão de 150mm"). O PDF lido foi gerado pelo `gerarPdf` real (mesma rota dos testes, bytes em memória), não baixado pela tela. Leitura com `pypdf` fica por conta de quem for usá-lo.
+5. **Desvios de forma (sem mudar comportamento):**
+   - `FormProvider.jsx`: a lógica do `confirmarRascunho` virou uma função `restaurar(estadoSalvo)` reaproveitada pelo caminho da importação (mesmo comportamento do diálogo). Leitura da marca via `useLocation`.
+   - `SelecaoPerfil.jsx`: `localStorage` protegido por `try/catch`; se a gravação falhar, aparece a mesma mensagem de erro.
+   - Botão "Importar PDF": contorno dourado com texto grafite (em vez de texto dourado), para manter contraste sobre o fundo claro.
+   - Teste de sanidade: com a chave `respostasPorAmbiente` removida de propósito do serviço, T1, T3, T9 e T10 falharam; o serviço foi restaurado idêntico. A checagem do `)` final em `lerDadosPdf` é só uma segunda proteção (JSON cortado já falha no `JSON.parse`).

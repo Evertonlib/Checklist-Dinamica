@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { FormContext } from './FormContext.js'
 import { estadoInicial, defaultsPorFormType } from '../domain/schema.js'
 import { AMBIENTES_DISPONIVEIS } from '../domain/ambientes.js'
@@ -288,6 +288,18 @@ export function FormProvider({ children }) {
   const [ready, setReady] = useState(false)
   const [rascunho, setRascunho] = useState(null)
   const [state, dispatch] = useReducer(reducer, undefined, criarEstadoInicial)
+  // A importação de PDF (SelecaoPerfil) grava o rascunho e navega com { importado: true }:
+  // nesse caso restaura direto, sem perguntar "Continuar de onde parou?". Só vale na montagem.
+  const location = useLocation()
+  const importando = location.state?.importado === true
+
+  const restaurar = (estadoSalvo) => {
+    const estadoRestaurado = normalizarEstadoSalvo(estadoSalvo)
+    dispatch({ type: 'RESTORE_STATE', estadoCompleto: estadoRestaurado })
+    setRascunho(null)
+    setReady(true)
+    navigate(normalizarRotaEtapa(estadoRestaurado._meta.etapaAtual), { replace: true })
+  }
 
   useEffect(() => {
     const salvo = localStorage.getItem(STORAGE_KEY)
@@ -297,6 +309,8 @@ export function FormProvider({ children }) {
         if (parsed?.global?.g2_temReforma !== undefined) {
           localStorage.removeItem(STORAGE_KEY)
           setReady(true)
+        } else if (importando) {
+          restaurar(parsed)
         } else {
           setRascunho(parsed)
         }
@@ -313,13 +327,7 @@ export function FormProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state, ready])
 
-  const confirmarRascunho = () => {
-    const estadoRestaurado = normalizarEstadoSalvo(rascunho)
-    dispatch({ type: 'RESTORE_STATE', estadoCompleto: estadoRestaurado })
-    setRascunho(null)
-    setReady(true)
-    navigate(normalizarRotaEtapa(estadoRestaurado._meta.etapaAtual), { replace: true })
-  }
+  const confirmarRascunho = () => restaurar(rascunho)
 
   const descartarRascunho = () => {
     dispatch({ type: 'RESET_STATE' })
