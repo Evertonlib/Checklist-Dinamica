@@ -1,6 +1,6 @@
 # PRD — Importação do PDF do Cliente
 
-**Status:** Aguardando aprovação
+**Status:** Aprovado
 **Data:** 2026-10-15 (atualizado em 2026-10-23)
 **Projeto:** Checklist Dinâmica — By Arabi Planejados
 **Origem:** card Trello #99 "IMPORTACAO_PDF_CLIENTE" (board "Projetos automação"), decisões fechadas pelo Everton em 10/10/2026 e atualização do card em 22/10/2026 (novos leitores dos dados escondidos).

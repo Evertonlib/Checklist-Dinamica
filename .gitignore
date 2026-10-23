@@ -3,3 +3,6 @@ node_modules/
 
 # Build (gerado pela CI no deploy)
 dist/
+
+# PDF real de cliente (dados pessoais) usado só como arquivo de teste manual — nunca commitar
+Checklist_ByArabi_PIN00506_2026-08-14.pdf
