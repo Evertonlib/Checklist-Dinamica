@@ -1,7 +1,7 @@
 import { assertSemRede } from './auxiliares/travas.js'
 import { test, after } from 'node:test'
 import assert from 'node:assert/strict'
-import { validarFormularioAmbiente, limitarCm } from '../src/steps/StepPerguntasPorAmbiente/formUtils.js'
+import { validarFormularioAmbiente, limitarCm, limitarCmRebaixo } from '../src/steps/StepPerguntasPorAmbiente/formUtils.js'
 import { defaultsPorFormType } from '../src/domain/schema.js'
 import { eletro, eletronico, MEDIDAS } from './auxiliares/construtores.js'
 
@@ -166,4 +166,13 @@ test('T-F16 — limitarCm: até 3 inteiros e 1 decimal, com vírgula', () => {
   assert.equal(limitarCm('12'), '12')
   assert.equal(limitarCm('1234'), '123')
   assert.equal(limitarCm(null), '')
+})
+
+test('T-F17 — limitarCmRebaixo: até 2 inteiros e 1 decimal (máx. 99 cm)', () => {
+  assert.equal(limitarCmRebaixo('123'), '12')
+  assert.equal(limitarCmRebaixo('12,5'), '12,5')
+  assert.equal(limitarCmRebaixo('12.57'), '12,5')
+  assert.equal(limitarCmRebaixo('123,4'), '12,4')
+  assert.equal(limitarCmRebaixo(null), '')
+  assert.equal(limitarCm('123'), '123')
 })

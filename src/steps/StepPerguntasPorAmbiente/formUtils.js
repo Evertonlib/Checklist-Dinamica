@@ -10,6 +10,14 @@ export function limitarCm(valor) {
   return saida
 }
 
+// Rebaixo de teto nao passa de 1 metro: até 2 algarismos inteiros + 1 casa decimal (ex.: 12,5).
+export function limitarCmRebaixo(valor) {
+  const v = limitarCm(valor)
+  const [inteiro, decimal] = v.split(',')
+  if (decimal === undefined) return inteiro.slice(0, 2)
+  return inteiro.slice(0, 2) + ',' + decimal
+}
+
 export const TIPOS_CUBA = ['Embutir', 'Semi-encaixe', 'Sobrepor', 'Apoio', 'Esculpida']
 
 export const TAMANHOS_CAMA = [

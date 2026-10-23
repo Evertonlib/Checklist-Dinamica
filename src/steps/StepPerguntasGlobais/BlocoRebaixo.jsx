@@ -1,7 +1,7 @@
 import { useFormContext } from '../../context/FormContext.js'
 import { formatarNomeAmbiente } from '../../domain/ambientes.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { limitarCm } from '../StepPerguntasPorAmbiente/formUtils.js'
+import { limitarCmRebaixo } from '../StepPerguntasPorAmbiente/formUtils.js'
 import styles from './StepPerguntasGlobais.module.css'
 
 export function BlocoRebaixo() {
@@ -87,7 +87,7 @@ export function BlocoRebaixo() {
                   type="text"
                   inputMode="decimal"
                   value={ambienteRebaixo.cm ?? ''}
-                  onChange={(e) => setCm(ambienteRebaixo.instanceId, limitarCm(e.target.value))}
+                  onChange={(e) => setCm(ambienteRebaixo.instanceId, limitarCmRebaixo(e.target.value))}
                   placeholder="cm"
                 />
               </div>
