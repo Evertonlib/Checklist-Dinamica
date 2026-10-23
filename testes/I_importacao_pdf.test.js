@@ -306,3 +306,66 @@ test('T10 — tamanho com o maior caso real: 17 ambientes, 9 eletros, até 32.00
   assert.ok(tamanho <= 32000, `valor gravado com ${tamanho} caracteres, acima do limite de 32000: registrar em Desvios`)
   assert.deepEqual(lerDadosPdf(bytes), quatroPartes(estado))
 })
+
+// ---------------------------------------------------------------------------
+// Estrutura exigida e chaves extras (Spec 2.2). Entradas derivadas do PDF da T1,
+// trocando só a propriedade de palavras-chave.
+// ---------------------------------------------------------------------------
+
+// Troca o conteúdo escondido por um V1 válido montado a partir das quatro partes de `estado`
+function comConteudoV1(bytes, conteudo) {
+  return comPalavrasChave(bytes, `V1:${base64(JSON.stringify(conteudo))}`)
+}
+
+test('T11 — V1 sem "global" ou com "global" que não é objeto não tem dados', async () => {
+  const estado = estadoCompleto()
+  const { bytes } = await pdf.cliente(estado)
+  const partes = quatroPartes(estado)
+
+  // Controle: as quatro partes intactas são aceitas (o defeito abaixo é a única diferença)
+  assert.deepEqual(lerDadosPdf(comConteudoV1(bytes, partes)), partes)
+
+  // (a) chave "global" ausente
+  const semGlobal = { ...partes }
+  delete semGlobal.global
+  semDados(comConteudoV1(bytes, semGlobal))
+  // (b) "global" que é uma lista em vez de objeto
+  semDados(comConteudoV1(bytes, { ...partes, global: [1, 2, 3] }))
+})
+
+test('T12 — V1 sem "respostasPorAmbiente" ou com "respostasPorAmbiente" que não é objeto não tem dados', async () => {
+  const estado = estadoCompleto()
+  const { bytes } = await pdf.cliente(estado)
+  const partes = quatroPartes(estado)
+
+  // Controle: as quatro partes intactas são aceitas
+  assert.deepEqual(lerDadosPdf(comConteudoV1(bytes, partes)), partes)
+
+  // (a) chave "respostasPorAmbiente" ausente
+  const semRespostas = { ...partes }
+  delete semRespostas.respostasPorAmbiente
+  semDados(comConteudoV1(bytes, semRespostas))
+  // (b) "respostasPorAmbiente" que é uma lista em vez de objeto
+  semDados(comConteudoV1(bytes, { ...partes, respostasPorAmbiente: [1, 2, 3] }))
+})
+
+test('T13 — V1 com chaves extras devolve só as quatro partes, com os valores da entrada', async () => {
+  const estado = estadoCompleto()
+  const { bytes } = await pdf.cliente(estado)
+  const partes = quatroPartes(estado)
+
+  const comExtras = { ...partes, _meta: { etapaAtual: 'sucesso' }, chaveInventada: 'valor qualquer' }
+  const lido = lerDadosPdf(comConteudoV1(bytes, comExtras))
+
+  assert.notEqual(lido, null)
+  // Exatamente as quatro chaves do contrato, nenhuma outra
+  assert.deepEqual(Object.keys(lido).sort(), [
+    'ambientesSelecionados',
+    'global',
+    'identificacao',
+    'respostasPorAmbiente',
+  ])
+  // Valores iguais aos da entrada
+  assert.deepEqual(lido, partes)
+  assert.equal(lido.identificacao.contrato, '9001')
+})

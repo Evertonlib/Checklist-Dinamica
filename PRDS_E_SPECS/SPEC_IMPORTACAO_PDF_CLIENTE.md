@@ -118,7 +118,7 @@ Fluxo do Projetista inteiro (`FormProviderVendedor.jsx`, `schemaVendedor.js`, `s
 | CA-07 | 3.1 e 3.3 | T5 + conferência manual |
 | CA-08 | 3.1 | T6 + conferência manual |
 | CA-09 | 3.1 e 3.3 | T7 (a, b) + conferência manual (a, b na tela; c) |
-| CA-10 | 3.1 | T8 |
+| CA-10 | 3.1 | T8, T11 a T13 |
 | CA-11, CA-12 | 3.5 (sem marca = igual a hoje) | Testes existentes + conferência manual |
 | CA-13 | Task final | `npm run build` e `npm test` |
 | CA-14 | 2.1 | T9 (decodificação independente em Node) + conferência manual em Python |
@@ -186,11 +186,26 @@ Entrada: estado fictício no formato do MAIOR caso real já gerado pelo app (con
 Esperado: o valor gravado na propriedade tem no máximo 32.000 caracteres e volta idêntico à entrada pelo `lerDadosPdf`; o teste **registra (imprime) o tamanho medido** do valor gravado, mesmo quando passa. Se passar de 32.000: falha, vai para Desvios, sem compactar.
 Evidência medida (pelo Claude principal, com os formatos reais de `construtores.js` e `schema.js`): cerca de 10.960 caracteres (JSON de cerca de 8.217 bytes), aproximadamente um terço do limite. O caso antigo previsto neste Spec (10 ambientes × 6 eletros × 3 eletrônicos × observação de 500 caracteres) media cerca de 37.300 caracteres e passaria do limite; foi trocado por não representar um preenchimento real.
 
+**Testes acrescentados depois da mutação (23/10/2026, ver Desvios, item 6).** Fecham a diferença entre as quatro exigências de estrutura e a regra de chaves extras da seção 2.2 e o que a T8 cobria. Entradas derivadas do PDF da T1, trocando só a propriedade de palavras-chave; a T8 não foi alterada.
+
+**T11 — "global" ausente ou inválido (CA-10, estrutura).**
+Entrada: V1 válido com as quatro partes da T1, mas (a) sem a chave `global`; (b) com `global` sendo uma lista.
+Esperado: nos dois casos, sem dados e sem erro lançado. (Controle no próprio teste: com as quatro partes intactas, a leitura devolve as quatro partes.)
+
+**T12 — "respostasPorAmbiente" ausente ou inválido (CA-10, estrutura).**
+Entrada: V1 válido com as quatro partes da T1, mas (a) sem a chave `respostasPorAmbiente`; (b) com `respostasPorAmbiente` sendo uma lista.
+Esperado: nos dois casos, sem dados e sem erro lançado. (Mesmo controle da T11.)
+
+**T13 — Chaves extras são ignoradas (Spec 2.2).**
+Entrada: V1 válido com as quatro partes da T1 mais duas chaves extras: `_meta` (com `etapaAtual: 'sucesso'`) e uma chave inventada.
+Esperado: a leitura devolve exatamente as quatro chaves (identificação, ambientes selecionados, perguntas gerais, respostas por ambiente), com valores iguais aos da entrada, e nenhuma outra.
+
 **Conferência manual (sem teste automatizado, com o motivo):**
 - **CA-01 (tela), CA-03 (edição na tela):** exigem navegador e as telas de revisão e edição; o repo não tem jsdom nem testing-library e o PRD veda dependência nova. Roteiro do CA-01: depois de concluir a checklist e clicar em "Iniciar novo preenchimento", o preenchimento concluído continua salvo (observação 10), então ao clicar em "Importar PDF" e escolher o PDF recém-baixado **aparece a pergunta de substituição**. Esperado: aparece a pergunta; ao escolher "Sim, importar", o app abre direto em `/revisao`, sem "Continuar de onde parou?", com dados, score e CCs iguais ao PDF original. Para conferir o caminho **sem pergunta**, preparar o navegador apagando a chave `byarabi_checklist_rascunho` pela aba Application (Local Storage) antes de importar; então importa direto, sem pergunta. Conferir também que identificação, ambientes (com nomes), perguntas gerais, eletros e observações com acentos aparecem como preenchidos. Roteiro do CA-03: editar ambiente e identificação volta para a revisão; o novo PDF também importa.
 - **CA-02 (aparência):** comparar visualmente o PDF antes e depois (mesmo nome, mesmas páginas e conteúdo).
 - **CA-04 e CA-05 (rascunho em andamento):** dependem de `localStorage`, modal e navegação. O rascunho pode ser um preenchimento parado no meio ou um concluído que permanece salvo (observações 9 e 10). Conferir a pergunta antes de qualquer mudança; "Sim, importar" abre a revisão e F5 mantém os dados (pelo "Sim" do diálogo normal); "Cancelar" não importa e o "Continuar de onde parou?" devolve o rascunho antigo intacto.
 - **CA-06 a CA-09 (mensagem na tela):** a mensagem "PDF não possui dados para importação", sem mencionar versão, e a ausência de alteração do rascunho dependem do modal. Para o item (c) do CA-09 (fechar o seletor de arquivo sem escolher) nada acontece e sem mensagem; não é testável sem navegador. **CA-06, arquivo a usar:** um PDF real do Cliente gerado antes desta melhoria serve de arquivo de teste (por exemplo, um dos PDFs já enviados por vendedores; hoje há um na raiz do repo, `Checklist_ByArabi_PIN00506_2026-08-14.pdf`, já no `.gitignore` por conter dados reais de cliente). Deve resultar na mensagem "PDF não possui dados para importação". É só a indicação de qual arquivo usar na conferência, não um teste automatizado: o conteúdo desse PDF não deve ser lido nem copiado para este Spec.
+- **Limite de 20 MB (Spec 2.2 e 3.3; Risco 6 do PRD, "arquivo enorme"):** escolher um arquivo acima de 20 MB (pode ser qualquer arquivo grande renomeado para `.pdf`, sem dado de cliente) e confirmar que aparece "PDF não possui dados para importação", sem travar a tela e sem alterar o rascunho (conferir a chave `byarabi_checklist_rascunho` na aba Application antes e depois). Depende de `File.size` e do modal; não é testável sem navegador.
 - **CA-11 e CA-12 (regressão de telas):** usar "Cliente" e "Projetista" normalmente, com e sem rascunho; importar um PDF do Cliente com rascunho do Projetista salvo e confirmar que a chave `byarabi_checklist_vendedor` não muda (aba Application do navegador).
 - **CA-14 (leitura em Python):** conferência de um PDF real baixado pelo app com um script curto em Python usando `pypdf` (ou `PyMuPDF`): ler o campo de palavras-chave, separar na primeira `:`, decodificar Base64 e UTF-8, interpretar o JSON. Esperado: marca `V1`, respostas idênticas às preenchidas, acentos intactos, sem score, CCs, avisos nem dados de navegação. O Python não faz parte da suíte do repo (sem dependência nova).
 
@@ -213,6 +228,7 @@ Alterações de apoio em `testes/auxiliares/` (arquivos de apoio, não testes): 
 - [x] Task 7 — Alterar `src/context/FormProvider.jsx`: restauração direta quando a navegação traz `importado: true` e há valor salvo, sem diálogo (seção 2.3, item 2). Sem a marca, comportamento idêntico ao atual.
 - [x] Task 8 — Alterar `SelecaoPerfil.jsx` e `.module.css`: botão "Importar PDF", seleção de arquivo, limite de 20 MB, modal de erro, pergunta de confirmação com "Sim, importar" e "Cancelar", gravação do rascunho e navegação para `/revisao`.
 - [x] Task 9 — Conferência manual no `npm run dev` (CA-01 a CA-12), incluindo a leitura em Python do CA-14 com um PDF real; anotar o resultado em Desvios.
+- [ ] Task 9b — Conferência manual do limite de 20 MB (ver "Conferência manual"): arquivo acima de 20 MB dá a mensagem genérica, sem travar a tela e sem alterar o rascunho. Anotar o resultado em Desvios. (Acrescentada em 23/10/2026; a Task 9 original não cobria esse item.)
 - [x] Task 10 — Rodar `npm run build` (compila e `package.json` sem dependência nova).
 - [x] Task 11 — Rodar a suíte inteira com `npm test`: verde e sem teste pulado.
 
@@ -241,3 +257,11 @@ Implementação concluída em 23/10/2026. Nenhum teste novo falhou; nenhum teste
    - `SelecaoPerfil.jsx`: `localStorage` protegido por `try/catch`; se a gravação falhar, aparece a mesma mensagem de erro.
    - Botão "Importar PDF": contorno dourado com texto grafite (em vez de texto dourado), para manter contraste sobre o fundo claro.
    - Teste de sanidade: com a chave `respostasPorAmbiente` removida de propósito do serviço, T1, T3, T9 e T10 falharam; o serviço foi restaurado idêntico. A checagem do `)` final em `lerDadosPdf` é só uma segunda proteção (JSON cortado já falha no `JSON.parse`).
+6. **Teste de mutação (23/10/2026): três regras do Spec 2.2 sem teste, fechadas com T11 a T13.** Medido numa cópia (só código e testes), com 22 defeitos aplicados um a um: 13 pegos, 9 escaparam. Três escapes eram buracos reais: o Spec 2.2 define **quatro exigências de estrutura** (`identificacao` objeto, `ambientesSelecionados` lista, `global` objeto, `respostasPorAmbiente` objeto) e uma **regra de chaves extras** ("ignoradas"), mas a T8 cobria só duas exigências (`identificacao` e lista em `ambientesSelecionados`). Sem teste, um V1 sem `global` ou sem `respostasPorAmbiente` seria aceito e abriria a revisão com respostas em branco (o `normalizarEstadoSalvo` completa com os padrões), em vez da mensagem de erro; e chaves extras passariam para o rascunho. A regra vem do Spec 2.2; o PRD só tem o critério genérico "estrutura esperada" (Risco 7, CA-10). Sem mudança no código de produção. Testes novos em `testes/I_importacao_pdf.test.js` (a T8 não foi tocada):
+   - **T11** — V1 sem `global` ou com `global` que não é objeto: sem dados.
+   - **T12** — V1 sem `respostasPorAmbiente` ou com `respostasPorAmbiente` que não é objeto: sem dados.
+   - **T13** — V1 com chaves extras (`_meta` e uma inventada): devolve exatamente as quatro chaves, com valores iguais aos da entrada.
+   - **Prova:** reaplicados na cópia, um por vez, os defeitos que tiram a exigência de `global` (M11), a de `respostasPorAmbiente` (M12) e o filtro das quatro chaves (M13): cada um é pego por exatamente 1 teste (T11, T12 e T13, respectivamente). No código real, verdes.
+   - **Suíte final:** 130 testes, 130 passaram, 0 pulados (antes: 127; mais os 3 novos).
+   - **Mantidos sem teste, por decisão:** M05 (compressão do jsPDF, equivalente: comprime o conteúdo das páginas, mas o campo Keywords continua em texto puro no jsPDF 2.5.2) e M14 (checagem do `)` final, equivalente: JSON cortado já falha no `JSON.parse`); M15 (UTF-8 estrito na leitura, risco baixo: só muda o resultado com Base64 adulterado); M19 a M22 (tela, conferência manual).
+   - **Pendente (conferência manual):** limite de 20 MB, que nenhum roteiro conferia. Virou a Task 9b e um item em "Conferência manual"; ainda não foi executada.
