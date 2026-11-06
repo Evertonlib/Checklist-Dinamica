@@ -13,25 +13,27 @@
 
 .campo label {
   font-size: 0.9rem;
-  color: #444;
+  color: var(--ba-ink);
   margin-bottom: 4px;
 }
 
 .campo input {
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   padding: 10px 12px;
   font-size: 1rem;
-  min-height: 44px;
+  min-height: 48px;
+  transition: border-color var(--ba-speed), box-shadow var(--ba-speed);
 }
 
 .campo input:focus {
-  outline: 2px solid #c8a84b;
-  border-color: #c8a84b;
+  outline: none;
+  border-color: var(--ba-gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ba-gold) 12%, transparent);
 }
 
 .erro {
-  color: #c0392b;
+  color: var(--ba-danger);
   font-size: 0.8rem;
   margin-top: 4px;
 }
@@ -46,28 +48,28 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #ccc;
-  background: #f5f0e8;
+  border: 1px solid var(--ba-line);
+  background: var(--ba-paper);
   font-size: 1.2rem;
   cursor: pointer;
   line-height: 1;
   flex-shrink: 0;
-  margin-top: 22px;
+  margin-top: 24px;
 }
 
 .btnAdicionarContrato {
   background: transparent;
-  color: #555;
-  border: 1px solid #ccc;
+  color: var(--ba-muted-aa);
+  border: 1px solid var(--ba-line);
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: var(--ba-radius-pill);
   font-size: 0.9rem;
   cursor: pointer;
-  min-height: 40px;
+  min-height: 44px;
   margin-bottom: 12px;
   align-self: flex-start;
 }
 
 .espacoBar {
-  height: 80px;
+  height: 88px;
 }

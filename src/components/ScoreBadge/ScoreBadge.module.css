@@ -1,13 +1,13 @@
 .badge {
   display: inline-block;
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: var(--ba-radius-pill);
   font-weight: bold;
   font-size: 1rem;
 }
 
-.alto  { background: #fde8ea; color: #c0392b; }
-.medio { background: #fff8e1; color: #b8860b; }
-.baixo { background: #e8f5e9; color: #1b5e20; }
+.alto  { background: color-mix(in srgb, var(--ba-danger) 10%, var(--ba-white)); color: var(--ba-danger); }
+.medio { background: color-mix(in srgb, var(--ba-warn) 10%, var(--ba-white)); color: var(--ba-warn); }
+.baixo { background: color-mix(in srgb, var(--ba-ok) 10%, var(--ba-white)); color: var(--ba-ok); }
 
 .pontos { font-weight: normal; font-size: 0.85em; }

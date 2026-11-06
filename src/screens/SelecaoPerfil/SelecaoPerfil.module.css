@@ -11,13 +11,15 @@
 }
 
 .titulo {
+  font-family: var(--ba-font-display);
+  font-weight: 400;
   font-size: 1.5rem;
-  color: #1a1a1a;
+  color: var(--ba-ink);
   margin-bottom: 8px;
 }
 
 .subtitulo {
-  color: #555;
+  color: var(--ba-muted-aa);
   margin-bottom: 32px;
 }
 
@@ -30,39 +32,44 @@
 }
 
 .btnPerfil {
-  background: #1a1a1a;
-  color: #c8a84b;
-  border: none;
+  background: var(--ba-gold);
+  color: var(--ba-on-gold);
+  border: 1px solid var(--ba-gold);
   padding: 16px 24px;
-  border-radius: 8px;
+  border-radius: var(--ba-radius-pill);
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   min-height: 52px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }
 
 .btnPerfil:hover {
-  background: #000;
+  background: var(--ba-gold-hover);
+  border-color: var(--ba-gold-hover);
 }
 
 /* Importar PDF: ação ocasional, visual secundário (contorno dourado, sem fundo cheio) */
 .btnImportar {
   margin-top: 28px;
   background: transparent;
-  color: #1a1a1a;
-  border: 2px solid #c8a84b;
+  color: var(--ba-gold-text);
+  border: 2px solid var(--ba-gold-deep);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--ba-radius-pill);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   min-height: 48px;
   width: 100%;
   max-width: 320px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }
 
 .btnImportar:hover {
-  background: rgba(200, 168, 75, 0.15);
+  background: var(--ba-gold);
+  border-color: var(--ba-gold);
+  color: var(--ba-on-gold);
 }
 
 .inputArquivo {
@@ -71,29 +78,32 @@
 
 /* Botões das janelas de aviso (o Modal só fornece a caixa) */
 .btnModal {
-  background: #1a1a1a;
-  color: #c8a84b;
-  border: none;
+  background: var(--ba-gold);
+  color: var(--ba-on-gold);
+  border: 1px solid var(--ba-gold);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--ba-radius-pill);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   min-height: 48px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }
 
 .btnModal:hover {
-  background: #000;
+  background: var(--ba-gold-hover);
+  border-color: var(--ba-gold-hover);
 }
 
 .btnModalSecundario {
   background: transparent;
-  color: #1a1a1a;
-  border: 2px solid #c8a84b;
+  color: var(--ba-muted-aa);
+  border: 1px solid var(--ba-line);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--ba-radius-pill);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   min-height: 48px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }

@@ -6,7 +6,7 @@
 
 .pergunta {
   font-size: 0.97rem;
-  color: #222;
+  color: var(--ba-ink);
   margin-bottom: 10px;
   line-height: 1.5;
 }
@@ -24,19 +24,19 @@
 .opcao,
 .opcaoAtiva {
   padding: 10px 14px;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
+  border: 2px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
+  background: var(--ba-white);
   font-size: 0.9rem;
   cursor: pointer;
   min-height: 44px;
 }
 
 .opcaoAtiva {
-  border-color: #c8a84b;
-  background: #fff8e6;
+  border-color: var(--ba-gold);
+  background: color-mix(in srgb, var(--ba-gold) 14%, var(--ba-white));
   font-weight: bold;
-  color: #7a6030;
+  color: var(--ba-gold-text);
 }
 
 .campoAltura {
@@ -53,10 +53,11 @@
 .inputComSufixo {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   overflow: hidden;
   min-height: 44px;
+  transition: border-color var(--ba-speed), box-shadow var(--ba-speed);
 }
 
 .inputComSufixo input {
@@ -68,19 +69,24 @@
 }
 
 .inputComSufixo input:focus {
-  outline: 2px solid #c8a84b;
+  outline: none;
+}
+
+.inputComSufixo:focus-within {
+  border-color: var(--ba-gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ba-gold) 12%, transparent);
 }
 
 .inputComSufixo input:disabled {
-  background: #f5f5f5;
-  color: #999;
+  background: var(--ba-paper-deep);
+  color: var(--ba-muted);
 }
 
 .sufixoMm {
   padding: 0 12px;
-  color: #666;
+  color: var(--ba-muted-aa);
   font-size: 0.9rem;
-  background: #f5f0e8;
+  background: var(--ba-paper);
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -91,12 +97,12 @@
   align-items: center;
   gap: 6px;
   font-size: 0.88rem;
-  color: #555;
+  color: var(--ba-muted-aa);
   cursor: pointer;
 }
 
 .erro {
-  color: #c0392b;
+  color: var(--ba-danger);
   font-size: 0.8rem;
   margin-top: 4px;
   display: block;
@@ -104,8 +110,8 @@
 
 .textarea {
   width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   padding: 10px;
   font-size: 0.95rem;
   resize: vertical;
@@ -114,10 +120,10 @@
 
 .contador {
   font-size: 0.78rem;
-  color: #999;
+  color: var(--ba-muted-aa);
   text-align: right;
   display: block;
   margin-top: 4px;
 }
 
-.espacoBar { height: 80px; }
+.espacoBar { height: 88px; }

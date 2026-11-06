@@ -5,14 +5,14 @@
 }
 
 .instrucao {
-  color: #555;
+  color: var(--ba-muted-aa);
   margin-bottom: 16px;
 }
 
 .ambCard {
-  background: #fff;
-  border: 1px solid #e0d8c8;
-  border-radius: 8px;
+  background: var(--ba-paper);
+  border: 1px solid var(--ba-paper-deep);
+  border-radius: var(--ba-radius-card);
   padding: 14px;
   margin-bottom: 12px;
 }
@@ -38,8 +38,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #ccc;
-  background: #f5f0e8;
+  border: 1px solid var(--ba-line);
+  background: var(--ba-white);
   font-size: 1.2rem;
   cursor: pointer;
   line-height: 1;
@@ -65,22 +65,23 @@
 
 .nomeField label {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--ba-muted-aa);
 }
 
 .nomeField input {
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   padding: 8px 10px;
   font-size: 0.95rem;
-  min-height: 40px;
+  min-height: 44px;
+  transition: border-color var(--ba-speed), box-shadow var(--ba-speed);
 }
 
 .erro {
-  color: #c0392b;
+  color: var(--ba-danger);
   font-size: 0.9rem;
   text-align: center;
   margin-top: 8px;
 }
 
-.espacoBar { height: 80px; }
+.espacoBar { height: 88px; }

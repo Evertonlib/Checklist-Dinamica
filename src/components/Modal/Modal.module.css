@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: color-mix(in srgb, var(--ba-ink-deep) 55%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,12 +10,12 @@
 }
 
 .caixa {
-  background: #fff;
-  border-radius: 10px;
+  background: var(--ba-white);
+  border-radius: var(--ba-radius-card);
   padding: 24px;
   max-width: 440px;
   width: 100%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--ba-ink-deep) 20%, transparent);
 }
 
 .caixa p {

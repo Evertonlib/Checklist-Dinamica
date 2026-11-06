@@ -97,7 +97,7 @@ export function StepRevisao() {
 
       {ccsCC.filter((cc) => cc.nivel === 'MÉDIO').length > 0 && (
         <div className={styles.secao}>
-          <h3 className={styles.tituloMedio}>🟡 Risco Médio</h3>
+          <h3 className={styles.tituloMedio}>🟠 Risco Médio</h3>
           {ccsCC.filter((cc) => cc.nivel === 'MÉDIO').map((cc) => (
             <div key={cc.id} className={`${styles.ccCard} ${styles.cardMedio}`}>
               <span className={styles.ccAmbiente}>{nomeAmbiente(cc.escopo)}</span>

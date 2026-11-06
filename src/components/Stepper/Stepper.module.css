@@ -1,7 +1,7 @@
 .stepper {
-  background: #f5f0e8;
+  background: var(--ba-paper);
   padding: 10px 16px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--ba-line);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -9,14 +9,15 @@
 
 .etapaInfo {
   font-size: 0.72rem;
-  color: #888;
+  color: var(--ba-muted-aa);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .nomeEtapa {
+  font-family: var(--ba-font-display);
   font-size: 1.2rem;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-weight: 400;
+  color: var(--ba-ink);
   line-height: 1.2;
 }

@@ -1,3 +1,36 @@
+/* Design System By Arabi — tokens (fonte: PRDS_E_SPECS/REFERENCIA_DESIGN_SYSTEM_BY_ARABI.html, linhas 738-771).
+   É o único arquivo do app que escreve cor por extenso; os demais usam var(--ba-*). */
+:root {
+  --ba-gold:        #e3b838;
+  --ba-gold-hover:  #edc94f;
+  --ba-gold-soft:   #f0d781;
+  --ba-gold-deep:   #a77d0b;
+  --ba-on-gold:     #17140b;
+  --ba-ink:         #101411;
+  --ba-ink-soft:    #1a201c;
+  --ba-ink-deep:    #080a09;
+  --ba-paper:       #f5f0e6;
+  --ba-paper-deep:  #e9e1d2;
+  --ba-white:       #fffef9;
+  --ba-muted:       #6d716d;
+  --ba-line:        rgba(16, 20, 17, 0.14);
+  --ba-line-dark:   rgba(255, 255, 255, 0.16);
+
+  --ba-gold-text:   #8a6608;
+  --ba-muted-aa:    #5f635f;
+  --ba-ok:          #2f6b45;
+  --ba-warn:        #9a5b1f;
+  --ba-danger:      #a32f2b;
+
+  --ba-font-display: Georgia, "Times New Roman", serif;
+  --ba-font-body:    "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --ba-radius-pill:  999px;
+  --ba-radius-card:  14px;
+  --ba-radius-field: 9px;
+  --ba-speed:        .18s;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -8,10 +41,20 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f7f5f0;
-  color: #222;
+  font-family: var(--ba-font-body);
+  background: var(--ba-white);
+  color: var(--ba-ink);
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--ba-font-display);
+  font-weight: 400;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ba-gold);
+  outline-offset: 4px;
 }
 
 button {
@@ -27,7 +70,7 @@ input, select, textarea {
 .rascunho-dialog {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: color-mix(in srgb, var(--ba-ink-deep) 55%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,8 +79,8 @@ input, select, textarea {
 }
 
 .rascunho-card {
-  background: #fff;
-  border-radius: 10px;
+  background: var(--ba-white);
+  border-radius: var(--ba-radius-card);
   padding: 28px 24px;
   max-width: 400px;
   width: 100%;
@@ -49,7 +92,7 @@ input, select, textarea {
 }
 
 .rascunho-card p {
-  color: #555;
+  color: var(--ba-muted-aa);
   margin-bottom: 20px;
 }
 
@@ -61,19 +104,34 @@ input, select, textarea {
 
 .rascunho-acoes button {
   padding: 12px;
-  border-radius: 6px;
+  border-radius: var(--ba-radius-pill);
   font-size: 1rem;
   border: none;
   min-height: 44px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }
 
 .rascunho-acoes button:first-child {
-  background: #1a1a1a;
-  color: #c8a84b;
+  background: var(--ba-gold);
+  color: var(--ba-on-gold);
+  font-weight: 600;
+}
+
+.rascunho-acoes button:first-child:hover {
+  background: var(--ba-gold-hover);
 }
 
 .btn-secundario {
   background: transparent !important;
-  color: #555 !important;
-  border: 1px solid #ccc !important;
+  color: var(--ba-muted-aa) !important;
+  border: 1px solid var(--ba-line) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

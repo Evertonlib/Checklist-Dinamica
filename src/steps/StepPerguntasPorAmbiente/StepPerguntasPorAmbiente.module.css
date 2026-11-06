@@ -6,14 +6,14 @@
 
 .pergunta {
   font-size: 0.97rem;
-  color: #222;
+  color: var(--ba-ink);
   margin-bottom: 12px;
   line-height: 1.5;
 }
 
 .subpergunta {
   font-size: 0.92rem;
-  color: #333;
+  color: var(--ba-ink);
   margin: 12px 0 8px;
   font-style: italic;
 }
@@ -27,28 +27,29 @@
 .botoesSimNao button {
   flex: 1;
   padding: 10px;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
+  border: 2px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
+  background: var(--ba-white);
   font-size: 1rem;
   cursor: pointer;
   min-height: 44px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
 }
 
 .ativo {
-  border-color: #c8a84b !important;
-  background: #fff8e6 !important;
+  border-color: var(--ba-gold) !important;
+  background: color-mix(in srgb, var(--ba-gold) 14%, var(--ba-white)) !important;
   font-weight: bold;
-  color: #7a6030;
+  color: var(--ba-gold-text);
 }
 
 .aviso {
-  background: #fff8e6;
-  border: 1px solid #c8a84b;
-  border-radius: 6px;
+  background: color-mix(in srgb, var(--ba-warn) 8%, var(--ba-white));
+  border: 1px solid var(--ba-warn);
+  border-radius: var(--ba-radius-field);
   padding: 10px 12px;
   font-size: 0.85rem;
-  color: #7a6030;
+  color: var(--ba-warn);
   margin-top: 8px;
   line-height: 1.5;
 }
@@ -62,26 +63,29 @@
 
 .campo label {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--ba-muted-aa);
   margin-bottom: 4px;
 }
 
 .campo input,
 .campo select {
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   padding: 8px 10px;
   font-size: 0.95rem;
-  min-height: 40px;
+  min-height: 44px;
+  transition: border-color var(--ba-speed), box-shadow var(--ba-speed);
 }
 
 .campo input:focus,
 .campo select:focus {
-  outline: 2px solid #c8a84b;
+  outline: none;
+  border-color: var(--ba-gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ba-gold) 12%, transparent);
 }
 
 .erro {
-  color: #c0392b;
+  color: var(--ba-danger);
   font-size: 0.78rem;
   margin-top: 3px;
 }
@@ -106,7 +110,7 @@
 .tvCampos {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px dashed #ddd;
+  border-top: 1px dashed var(--ba-line);
 }
 
 .chips {
@@ -118,9 +122,9 @@
 
 .chip {
   padding: 8px 14px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  background: #fff;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-pill);
+  background: var(--ba-white);
   cursor: pointer;
   font-size: 0.9rem;
   min-height: 36px;
@@ -128,9 +132,9 @@
 
 .chipAtivo {
   composes: chip;
-  border-color: #c8a84b;
-  background: #fff8e6;
-  color: #7a6030;
+  border-color: var(--ba-gold);
+  background: color-mix(in srgb, var(--ba-gold) 14%, var(--ba-white));
+  color: var(--ba-gold-text);
   font-weight: 500;
 }
 
@@ -142,9 +146,9 @@
 
 .opcaoCama {
   padding: 10px 14px;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
+  border: 2px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
+  background: var(--ba-white);
   cursor: pointer;
   font-size: 0.95rem;
   text-align: left;
@@ -164,18 +168,18 @@
 
 .btnEletro {
   padding: 8px 14px;
-  border: 1px solid #c8a84b;
-  border-radius: 20px;
-  background: #fff8e6;
-  color: #7a6030;
+  border: 1px solid var(--ba-gold);
+  border-radius: var(--ba-radius-pill);
+  background: color-mix(in srgb, var(--ba-gold) 14%, var(--ba-white));
+  color: var(--ba-gold-text);
   cursor: pointer;
   font-size: 0.85rem;
 }
 
 .eletroCard {
-  background: #f9f7f3;
-  border: 1px solid #e0d8c8;
-  border-radius: 8px;
+  background: var(--ba-white);
+  border: 1px solid var(--ba-paper-deep);
+  border-radius: var(--ba-radius-card);
   padding: 12px;
   margin-bottom: 10px;
 }
@@ -190,7 +194,7 @@
 .btnRemover {
   background: transparent;
   border: none;
-  color: #c0392b;
+  color: var(--ba-danger);
   cursor: pointer;
   font-size: 1.1rem;
   padding: 4px 8px;
@@ -198,8 +202,8 @@
 
 .textarea {
   width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
   padding: 10px;
   font-size: 0.95rem;
   resize: vertical;
@@ -208,10 +212,10 @@
 
 .contador {
   font-size: 0.78rem;
-  color: #999;
+  color: var(--ba-muted-aa);
   text-align: right;
   display: block;
   margin-top: 4px;
 }
 
-.espacoBar { height: 80px; }
+.espacoBar { height: 88px; }

@@ -2,7 +2,7 @@ import styles from './ScoreBadge.module.css'
 
 const CONFIG = {
   ALTO:  { emoji: '🔴', cor: styles.alto  },
-  MÉDIO: { emoji: '🟡', cor: styles.medio },
+  MÉDIO: { emoji: '🟠', cor: styles.medio },
   BAIXO: { emoji: '🟢', cor: styles.baixo },
 }
 

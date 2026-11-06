@@ -16,24 +16,33 @@
 }
 
 .titulo {
+  font-family: var(--ba-font-display);
+  font-weight: 400;
   font-size: 1.4rem;
-  color: #1a1a1a;
+  color: var(--ba-ink);
   margin-bottom: 12px;
 }
 
 .texto {
-  color: #555;
+  color: var(--ba-muted-aa);
   line-height: 1.6;
   margin-bottom: 32px;
 }
 
 .btnNovo {
-  background: #1a1a1a;
-  color: #c8a84b;
-  border: none;
+  background: var(--ba-gold);
+  color: var(--ba-on-gold);
+  border: 1px solid var(--ba-gold);
   padding: 14px 28px;
-  border-radius: 6px;
+  border-radius: var(--ba-radius-pill);
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   min-height: 48px;
+  transition: background var(--ba-speed), border-color var(--ba-speed), color var(--ba-speed);
+}
+
+.btnNovo:hover {
+  background: var(--ba-gold-hover);
+  border-color: var(--ba-gold-hover);
 }
