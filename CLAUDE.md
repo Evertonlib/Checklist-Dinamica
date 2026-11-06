@@ -42,7 +42,7 @@ O app tem **dois wizards paralelos**, escolhidos na tela inicial `SelecaoPerfil`
 - **Cliente** (`/identificacao`, `/ambientes`, `/globais`, `/ambiente/:instanceId`, `/revisao`, `/sucesso`) — provider `FormProvider`, steps em `src/steps/`, PDF em `src/services/pdf.js`.
 - **Vendedor** (`/vendedor/*`) — provider `FormProviderVendedor`, steps em `src/steps/vendedor/`, PDF em `src/services/pdfVendedor.js`.
 
-Cada perfil tem seu **próprio Context, schema e PDF** — arquivos com sufixo `Vendedor` são a variante do vendedor. Mudança em um perfil **não** propaga para o outro automaticamente; ao alterar regra compartilhada, verificar se ambos os lados precisam do ajuste.
+Cada perfil tem seu **próprio Context, schema e PDF** — arquivos com sufixo `Vendedor` são a variante do vendedor. Mudança de regra em um perfil **não** propaga para o outro automaticamente; ao alterar regra compartilhada, verificar se ambos os lados precisam do ajuste. **Exceção no CSS:** a Venda futura reaproveita `StepRevisaoVendedor.module.css`, `StepSucessoVendedor.module.css` e `StepIdentificacao.module.css`, e `/projetista` usa `SelecaoPerfil.module.css`; editar esses arquivos muda também essas telas, então conferir `/futura/*` e `/projetista`. As cores vêm de tokens `--ba-*` só em `src/index.css` (nenhum hex fora dele).
 
 ### Roteamento e etapas dinâmicas
 
