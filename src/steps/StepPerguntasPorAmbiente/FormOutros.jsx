@@ -7,9 +7,11 @@ import {
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
+import { rolarParaCard } from '../../utils/scrollUtils.js'
 import {
   ELETRONICOS_CONFIG,
   ELETROS_CONFIG,
+  MAX_MODELO,
   TAMANHOS_CAMA,
   TIPOS_CUBA,
   limitarCm,
@@ -58,6 +60,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         link: '',
       },
     })
+    rolarParaCard(`eletro-${instanceId}-${(resp.eletros || []).length}`)
   }
 
   const addEletronico = (tipo) => {
@@ -76,6 +79,7 @@ export function FormOutros({ instanceId, erros = {} }) {
         link: '',
       },
     })
+    rolarParaCard(`eletronico-${instanceId}-${(resp.eletronicosList || []).length}`)
   }
 
   return (
@@ -227,14 +231,14 @@ export function FormOutros({ instanceId, erros = {} }) {
               const depuradorEmbutido = eletro.tipo === 'Depurador' && eletro.subtipo === 'Embutido'
 
               return (
-                <div key={index} className={styles.eletroCard}>
+                <div key={index} id={`eletro-${instanceId}-${index}`} className={styles.eletroCard}>
                   <div className={styles.eletroHeader}>
                     <strong>{eletro.tipo}</strong>
                     <button
                       onClick={() => dispatch({ type: 'REMOVE_ELETRO', instanceId, index })}
                       className={styles.btnRemover}
                     >
-                      ✕
+                      ✕ Remover
                     </button>
                   </div>
 
@@ -338,6 +342,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                   <div className={styles.campo}>
                     <label>Modelo{depuradorEmbutido ? ' *' : ''}</label>
                     <input
+                      maxLength={MAX_MODELO}
                       value={eletro.modelo || ''}
                       onChange={(e) => dispatch({
                         type: 'UPDATE_ELETRO',
@@ -411,14 +416,14 @@ export function FormOutros({ instanceId, erros = {} }) {
               const isTV = eletronico.tipo === 'TV'
 
               return (
-                <div key={index} className={styles.eletroCard}>
+                <div key={index} id={`eletronico-${instanceId}-${index}`} className={styles.eletroCard}>
                   <div className={styles.eletroHeader}>
                     <strong>{eletronico.tipo}</strong>
                     <button
                       onClick={() => dispatch({ type: 'REMOVE_ELETRONICO', instanceId, index })}
                       className={styles.btnRemover}
                     >
-                      ✕
+                      ✕ Remover
                     </button>
                   </div>
 
@@ -483,6 +488,7 @@ export function FormOutros({ instanceId, erros = {} }) {
                   <div className={styles.campo}>
                     <label>Modelo (opcional)</label>
                     <input
+                      maxLength={MAX_MODELO}
                       value={eletronico.modelo || ''}
                       onChange={(e) => dispatch({
                         type: 'UPDATE_ELETRONICO',

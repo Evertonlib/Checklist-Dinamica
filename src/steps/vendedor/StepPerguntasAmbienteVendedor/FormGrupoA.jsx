@@ -6,7 +6,7 @@ const NAO_SE_APLICA = 'não se aplica'
 const OPCOES_FECHAMENTO = [{ valor: 'SIM', label: 'SIM' }, { valor: 'NAO', label: 'NÃO' }]
 const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
-const OPCOES_CORREDICAS = ['Telescópicas', 'Ocultas']
+const OPCOES_CORREDICAS = ['Ocultas']
 
 export function FormGrupoA({ instanceId, erros = {} }) {
   const { state, dispatch } = useFormContextVendedor()

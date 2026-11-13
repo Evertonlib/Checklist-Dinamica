@@ -5,7 +5,7 @@ import styles from './StepPerguntasAmbienteVendedor.module.css'
 const NAO_SE_APLICA = 'não se aplica'
 const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
-const OPCOES_CORREDICAS = ['Telescópicas', 'Ocultas']
+const OPCOES_CORREDICAS = ['Ocultas']
 
 export function FormGrupoC({ instanceId, erros = {} }) {
   const { state, dispatch } = useFormContextVendedor()

@@ -6,7 +6,8 @@ import {
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { ELETRONICOS_CONFIG, limitarCm } from './formUtils.js'
+import { rolarParaCard } from '../../utils/scrollUtils.js'
+import { ELETRONICOS_CONFIG, MAX_MODELO, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormHomeSalaOffice({ instanceId, erros = {} }) {
@@ -32,6 +33,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
         link: '',
       },
     })
+    rolarParaCard(`eletronico-${instanceId}-${(resp.eletronicosList || []).length}`)
   }
 
   const updEletronico = (index, campo, valor) =>
@@ -82,10 +84,10 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
               const isTV = eletronico.tipo === 'TV'
 
               return (
-                <div key={index} className={styles.eletroCard}>
+                <div key={index} id={`eletronico-${instanceId}-${index}`} className={styles.eletroCard}>
                   <div className={styles.eletroHeader}>
                     <strong>{eletronico.tipo}</strong>
-                    <button onClick={() => remEletronico(index)} className={styles.btnRemover}>✕</button>
+                    <button onClick={() => remEletronico(index)} className={styles.btnRemover}>✕ Remover</button>
                   </div>
 
                   {isTV && (
@@ -136,7 +138,7 @@ export function FormHomeSalaOffice({ instanceId, erros = {} }) {
 
                   <div className={styles.campo}>
                     <label>Modelo (opcional)</label>
-                    <input value={eletronico.modelo} onChange={(e) => updEletronico(index, 'modelo', e.target.value)} />
+                    <input maxLength={MAX_MODELO} value={eletronico.modelo} onChange={(e) => updEletronico(index, 'modelo', e.target.value)} />
                   </div>
 
                   <div className={styles.linha3}>

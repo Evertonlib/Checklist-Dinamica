@@ -6,7 +6,7 @@ import {
   TEXTO_TV_PONTO_FORA,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { TAMANHOS_CAMA, limitarCm } from './formUtils.js'
+import { MAX_MODELO, TAMANHOS_CAMA, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormDormitorio({ instanceId, erros = {} }) {
@@ -97,7 +97,7 @@ export function FormDormitorio({ instanceId, erros = {} }) {
               </div>
               <div className={styles.campo}>
                 <label>Modelo (opcional)</label>
-                <input value={resp.tv_modelo || ''} onChange={(e) => set('tv_modelo', e.target.value)} />
+                <input maxLength={MAX_MODELO} value={resp.tv_modelo || ''} onChange={(e) => set('tv_modelo', e.target.value)} />
               </div>
               <div className={styles.linha3}>
                 <div className={styles.campo}>

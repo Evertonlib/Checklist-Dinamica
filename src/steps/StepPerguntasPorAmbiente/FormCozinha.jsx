@@ -5,7 +5,8 @@ import {
   TEXTO_TANQUE_RETIRAR,
 } from '../../domain/checklistTextos.js'
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup.jsx'
-import { ELETROS_CONFIG, limitarCm } from './formUtils.js'
+import { rolarParaCard } from '../../utils/scrollUtils.js'
+import { ELETROS_CONFIG, MAX_MODELO, limitarCm } from './formUtils.js'
 import styles from './StepPerguntasPorAmbiente.module.css'
 
 export function FormCozinha({ instanceId, erros = {} }) {
@@ -31,6 +32,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
         link: '',
       },
     })
+    rolarParaCard(`eletro-${instanceId}-${(resp.eletros || []).length}`)
   }
 
   const updEletro = (index, campo, valor) =>
@@ -145,10 +147,10 @@ export function FormCozinha({ instanceId, erros = {} }) {
               const depuradorEmbutido = eletro.tipo === 'Depurador' && eletro.subtipo === 'Embutido'
 
               return (
-                <div key={index} className={styles.eletroCard}>
+                <div key={index} id={`eletro-${instanceId}-${index}`} className={styles.eletroCard}>
                   <div className={styles.eletroHeader}>
                     <strong>{eletro.tipo}</strong>
-                    <button onClick={() => remEletro(index)} className={styles.btnRemover}>✕</button>
+                    <button onClick={() => remEletro(index)} className={styles.btnRemover}>✕ Remover</button>
                   </div>
 
                   {config.subtipos.length > 0 && (
@@ -220,7 +222,7 @@ export function FormCozinha({ instanceId, erros = {} }) {
 
                   <div className={styles.campo}>
                     <label>Modelo{depuradorEmbutido ? ' *' : ''}</label>
-                    <input value={eletro.modelo} onChange={(e) => updEletro(index, 'modelo', e.target.value)} />
+                    <input maxLength={MAX_MODELO} value={eletro.modelo} onChange={(e) => updEletro(index, 'modelo', e.target.value)} />
                     {erros[`eletro_${index}_modelo`] && (
                       <span className={`${styles.erro} erro-campo`}>{erros[`eletro_${index}_modelo`]}</span>
                     )}

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatarNomeAmbiente } from '../domain/ambientes.js'
-import { TAMANHOS_CAMA } from '../steps/StepPerguntasPorAmbiente/formUtils.js'
+import { TAMANHOS_CAMA, limitarModelo } from '../steps/StepPerguntasPorAmbiente/formUtils.js'
 import { calcularScore } from '../domain/scoreEngine.js'
 import { construirCCs } from '../domain/ccBuilder.js'
 import { montarDadosPdf } from './importacaoPdf.js'
@@ -416,7 +416,7 @@ export async function gerarPdf(state) {
           [ccPorId.get(`TV_PONTO_${instanceId}`)]
         )
         escreverPergunta('Polegadas', resp.tv_polegadas ?? '—')
-        if (resp.tv_modelo) escreverPergunta('Modelo', resp.tv_modelo)
+        if (resp.tv_modelo) escreverPergunta('Modelo', limitarModelo(resp.tv_modelo))
         if (resp.tv_largura_cm) escreverPergunta('Largura (cm)', resp.tv_largura_cm)
         if (resp.tv_altura_cm) escreverPergunta('Altura (cm)', resp.tv_altura_cm)
         if (resp.tv_profundidade_cm) escreverPergunta('Profundidade (cm)', resp.tv_profundidade_cm)
@@ -469,7 +469,7 @@ export async function gerarPdf(state) {
         const eletrosOrdenados = ordenarEletros(resp.eletros)
         const eletrosBody = eletrosOrdenados.map((eletro) => [
           descreverEletro(eletro) || '—',
-          eletro.modelo || '—',
+          limitarModelo(eletro.modelo) || '—',
           eletro.largura_cm || '—',
           eletro.altura_cm || '—',
           eletro.profundidade_cm || '—',
@@ -525,7 +525,7 @@ export async function gerarPdf(state) {
         garantirEspaco(20)
         const eletronicoBody = resp.eletronicosList.map((eletronico) => [
           descreverEletronico(eletronico) || '—',
-          eletronico.modelo || '—',
+          limitarModelo(eletronico.modelo) || '—',
           eletronico.largura_cm || '—',
           eletronico.altura_cm || '—',
           eletronico.profundidade_cm || '—',

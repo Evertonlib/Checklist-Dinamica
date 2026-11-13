@@ -1,3 +1,11 @@
+// Campo "Modelo" (eletros, eletrônicos, TV): o cliente chegou a colar a página inteira do produto.
+// O maxLength corta na digitação/colagem; limitarModelo protege o PDF de rascunhos e PDFs importados antigos.
+export const MAX_MODELO = 100
+export function limitarModelo(valor) {
+  if (valor == null) return ''
+  return String(valor).slice(0, MAX_MODELO)
+}
+
 // Limita campos de medida em cm: até 3 algarismos inteiros + 1 casa decimal (ex.: 138,5).
 // Aceita vírgula ou ponto na digitação; devolve string com vírgula como separador (padrão BR).
 export function limitarCm(valor) {

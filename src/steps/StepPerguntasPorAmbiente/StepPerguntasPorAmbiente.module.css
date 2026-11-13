@@ -193,11 +193,13 @@
 
 .btnRemover {
   background: transparent;
-  border: none;
+  border: 1px solid var(--ba-danger);
+  border-radius: var(--ba-radius-pill);
   color: var(--ba-danger);
   cursor: pointer;
-  font-size: 1.1rem;
-  padding: 4px 8px;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  min-height: 40px;
 }
 
 .textarea {

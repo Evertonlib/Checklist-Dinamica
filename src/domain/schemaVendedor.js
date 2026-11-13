@@ -6,7 +6,7 @@ export const defaultsPorGrupo = {
     fechamentoTeto: null,         // "SIM" | "NAO" | "não se aplica" | null
     caixaria: null,               // "MDP" | "MDF" | "não se aplica" | null
     dobradicas: null,             // "Convencionais" | "Amortecimento" | "não se aplica" | null
-    corredicas: null,             // "Telescópicas" | "Ocultas" | "não se aplica" | null
+    corredicas: null,             // "Ocultas" | "não se aplica" | null (Telescópicas removida do formulário)
     observacoes: '',              // opcional, texto livre, máx. 300 chars
   },
   B: {
