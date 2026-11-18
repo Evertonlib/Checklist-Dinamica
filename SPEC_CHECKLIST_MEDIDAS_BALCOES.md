@@ -36,7 +36,7 @@ Observações (o código prevalece; o PRD não foi alterado):
   1.4). Ver a nota lá.
 - **Estado do repositório em 18/11/2026:** o PRD e o Spec já estão commitados na `main` (commit
   `d9fe6cc`). A Task 0 do Plano só cria a branch da implementação a partir dela.
-- Nada mais divergiu. Nenhum item para "Desvios" no momento (a seção abaixo continua vazia).
+- Nada mais divergiu na conferência PRD x código. Os desvios surgidos na implementação estão na Seção 5.
 
 ---
 
@@ -435,7 +435,7 @@ Cada task é feita e conferida sozinha, na ordem abaixo. Rodar `npm test` ao fim
 deixar teste existente vermelho (exceto T-V03 e T-V06 entre o início da Task 9 e a sua própria edição,
 que acontecem na mesma task).
 
-- [ ] **Task 0 — Branch da implementação.** Toda a implementação é feita numa **branch própria criada a
+- [x] **Task 0 — Branch da implementação.** Toda a implementação é feita numa **branch própria criada a
   partir da `main`**, antes da primeira task. O PRD e o Spec **já estão commitados na `main`** (o Everton
   os commitou em 18/11/2026), então a branch já nasce com eles e **não há commit de documentos nesta
   task**. Nada vai para a `main` durante o Plano; o merge será feito pelo Everton depois, junto com outras
@@ -444,42 +444,43 @@ que acontecem na mesma task).
   atualizada. **Sem push, sem merge.** Commit de código continua só quando o Everton pedir. Validação:
   `git branch --show-current` mostra a branch nova; `git status` limpo; `git log` mostra, no topo, o
   commit dos documentos que já veio da `main`, e nenhum commit novo.
-- [ ] **Task 1 — Schema.** Em `src/domain/schemaVendedor.js`, acrescentar ao grupo A, logo depois de
+- [x] **Task 1 — Schema.** Em `src/domain/schemaVendedor.js`, acrescentar ao grupo A, logo depois de
   `alturaArmario_mm`, `tipoBalcao`, `balcaoAlturaForaPadrao` e `balcaoProfundidadeForaPadrao`, todos
   `null`, com comentário de valores (1.1). Validação: `npm test` — T-V03 e T-V06 ainda não mudaram e
   ainda passam (a pergunta nova só aparece no PDF na Task 9), e `npm run build` compila.
-- [ ] **Task 2 — Regra compartilhada de texto/destaque + T19.** Criar
+- [x] **Task 2 — Regra compartilhada de texto/destaque + T19.** Criar
   `src/domain/respostaBalcaoVendedor.js` com `descreverRespostaBalcao(resp)` conforme a tabela de 1.4
   (arquivo acrescentado pelo Spec; ver a nota em 1.4). Criar `testes/V_resposta_balcao.test.js` com o
   **T19** (11 verificações, esperado escrito por extenso a partir do PRD). Validação: `npm test` — **T19
   verde**. O texto dentro do PDF é coberto depois, pelos T1 a T9 da Task 9; a **cor** no PDF é conferência
   manual da Task 10.
-- [ ] **Task 3 — Regras de validação (movimento sem mudar comportamento).** Criar
+- [x] **Task 3 — Regras de validação (movimento sem mudar comportamento).** Criar
   `src/domain/validacaoVendedor.js` com `MSG_RESPONDA`, `MSG_RESPONDA_SIM_NAO` e
   `validarRespostasGrupo`; primeiro só com o conteúdo movido de `StepPerguntasAmbienteVendedor.jsx:
   14-37` (sem a regra nova), **mantendo o componente como está** (ainda não importa o arquivo novo; a
   constante `NAO_SE_APLICA` fica nos dois lugares, ver 1.2). Validação: `npm run build`; a cobertura
   vem na Task 4.
-- [ ] **Task 4 — Testes de regressão da validação (congelar o comportamento antigo).** Criar
+- [x] **Task 4 — Testes de regressão da validação (congelar o comportamento antigo).** Criar
   `testes/V_validacao_projetista.test.js` com **T17 e T18** (e a base do grupo A) e rodar contra o
   arquivo da Task 3 **antes** de acrescentar a regra nova. Validação: `npm test` — T17 e T18 verdes.
   (T18 usa `tipoBalcao = "Convencionais"` na entrada; por enquanto a regra nova ainda não existe e o
   campo é ignorado, então o resultado é o mesmo.)
-- [ ] **Task 5 — Regra nova na validação.** Em `validacaoVendedor.js`, acrescentar `tipoBalcao` à lista
+- [x] **Task 5 — Regra nova na validação.** Em `validacaoVendedor.js`, acrescentar `tipoBalcao` à lista
   do grupo A (depois de `alturaArmario_mm`) e a verificação das duas subperguntas quando `tipoBalcao`
   for `'Editados'` (1.2). Acrescentar a `V_validacao_projetista.test.js` os casos **T10 a T16**.
   Validação: `npm test` — T10 a T18 verdes. O componente **ainda não importa** este arquivo, então a
   tela continua avançando como hoje.
-- [ ] **Task 6 — CSS das subperguntas.** Acrescentar ao fim de
+- [x] **Task 6 — CSS das subperguntas.** Acrescentar ao fim de
   `StepPerguntasAmbienteVendedor.module.css` a classe nova do bloco das subperguntas (1.5). Validação:
   `npm run build` (compila; nenhuma regra existente editada).
-- [ ] **Task 7 — Tela do grupo A.** Em `FormGrupoA.jsx`: parâmetro `mostrarNaoSeAplica` (padrão `true`)
+- [x] **Task 7 — Tela do grupo A.** Em `FormGrupoA.jsx`: parâmetro `mostrarNaoSeAplica` (padrão `true`)
   em `campoFechado`; pergunta principal logo depois das duas alturas; bloco condicional com as duas
   subperguntas (`false`), usando a classe da Task 6. Conferência manual (com o componente ainda usando a
   validação antiga, portanto o avanço não trava): CA-01 a CA-08 com `npm run dev`; conferir que
   fechamento, caixaria, dobradiças e corrediças **continuam** com "Não se aplica", que Dormitório/Home/
   Office não mudam (CA-02) e que não há campo numérico nem texto de orientação do balcão (CA-07).
-- [ ] **Task 8 — Ligar o componente ao arquivo de regras.** Em `StepPerguntasAmbienteVendedor.jsx`,
+  Pendente conferência manual do Everton: CA-01, CA-02, CA-03, CA-04, CA-05, CA-06, CA-07, CA-08.
+- [x] **Task 8 — Ligar o componente ao arquivo de regras.** Em `StepPerguntasAmbienteVendedor.jsx`,
   apagar as definições locais `:14-37` e importar `validarRespostasGrupo` de
   `../../../domain/validacaoVendedor.js`. Só agora, com a pergunta já visível na tela (Task 7).
   Validação: `npm run build` e `npm test`; conferência manual no `npm run dev`: (a) ambiente do grupo A
@@ -487,39 +488,46 @@ que acontecem na mesma task).
   (`Responda esta pergunta ou marque "Não se aplica"`) com rolagem até o primeiro erro (CA-09); (b)
   Editados sem subrespostas → `Responda sim ou não` em cada subpergunta, no próprio item (CA-11); (c)
   Convencionais/Não se aplica avançam (CA-10); (d) Dormitório, Home e Office avançam como hoje (CA-16).
-- [ ] **Task 9 — Pergunta nova no PDF (texto).** Em `pdfVendedor.js`: acrescentar a linha `{ campo:
+  Pendente conferência manual do Everton: CA-09 (rolagem até o erro e exibição em tela), CA-10, CA-11, CA-16 (fluxo no navegador).
+- [x] **Task 9 — Pergunta nova no PDF (texto).** Em `pdfVendedor.js`: acrescentar a linha `{ campo:
   'tipoBalcao', label: 'Balcões convencionais ou editados', tipo: 'balcao' }` ao grupo A entre
   `alturaArmario_mm` e `fechamentoTeto`; no laço (`:136-138`) usar `descreverRespostaBalcao(resp)` para
   `tipo === 'balcao'`; **ainda sem cor**. Atualizar **T-V03** e **T-V06** (3.2) e acrescentar **T1 a
   T9**. Validação: `npm test` — T-V03, T-V06, T-V04, T-V05, T1 a T9 verdes.
-- [ ] **Task 10 — Cor de alerta no PDF.** Em `pdfVendedor.js`: constante local `COR_ALERTA = [180, 0,
+- [x] **Task 10 — Cor de alerta no PDF.** Em `pdfVendedor.js`: constante local `COR_ALERTA = [180, 0,
   0]`; `escreverPergunta(pergunta, resposta, destaque = false)` aplica a cor ao rótulo e à resposta e
   **volta a preto ao final** (1.4); o laço passa `destaque`. Validação: `npm test` (nada deve mudar: a
   captura não registra cor) e **conferência manual** do PDF dos 7 casos (CA-35), incluindo uma pergunta
   destacada no fim de uma página.
-- [ ] **Task 11 — CSS do destaque da Revisão (compartilhado).** Acrescentar **no fim** de
+  Pendente conferência manual do Everton: CA-18, CA-19, CA-21, CA-22, CA-32, CA-33 (parte visual do destaque no PDF) e CA-35.
+- [x] **Task 11 — CSS do destaque da Revisão (compartilhado).** Acrescentar **no fim** de
   `StepRevisaoVendedor.module.css` a classe nova com `color: var(--ba-danger)`; nenhuma regra
   existente editada. Validação: `npm run build`.
-- [ ] **Task 12 — Revisão.** Em `StepRevisaoVendedor.jsx`: mesma linha nova no grupo A e uso de
+- [x] **Task 12 — Revisão.** Em `StepRevisaoVendedor.jsx`: mesma linha nova no grupo A e uso de
   `descreverRespostaBalcao`; aplicar a classe de destaque (Task 11) só quando `destaque`. Conferência
   manual: CA-27, CA-29, CA-36 (texto idêntico ao do PDF).
-- [ ] **Task 13 — Rascunho antigo.** Conferência manual de CA-28: salvar um rascunho com ambiente do
+  Pendente conferência manual do Everton: CA-27, CA-29, CA-36.
+- [x] **Task 13 — Rascunho antigo.** Conferência manual de CA-28: salvar um rascunho com ambiente do
   grupo A **sem** os campos novos (por exemplo antes da Task 1, ou editando a chave
   `byarabi_checklist_vendedor` no navegador), continuar até a Revisão: sem erro; linha `Balcões
   convencionais ou editados: —`; PDF com `Resposta: —`; ao voltar ao ambiente, a pergunta nova é exigida
   (validação ligada na Task 8).
-- [ ] **Task 14 — Isolamento.** Conferência manual de CA-30: percorrer o Cliente e abrir
+  Pendente conferência manual do Everton: CA-28.
+- [x] **Task 14 — Isolamento.** Conferência manual de CA-30: percorrer o Cliente e abrir
   `/futura/revisao`; nenhuma diferença visual. Conferir `/projetista`.
-- [ ] **Task 15 — Revisão de textos.** Conferir à mão que nenhum texto do aplicativo (tela, Revisão,
+  Pendente conferência manual do Everton: CA-30 (Cliente, `/futura/revisao` e `/projetista`).
+- [x] **Task 15 — Revisão de textos.** Conferir à mão que nenhum texto do aplicativo (tela, Revisão,
   PDF, mensagens) contém número de medida do balcão (nem `676`) nem orientação sobre balcões no campo
   Observações (CA-07).
-- [ ] **Task 16 — Rodar a suíte inteira e o build:** `npm test` verde e sem teste pulado; `npm run
+  Pendente conferência manual do Everton: CA-07 (conferência visual de tela, Revisão e PDF).
+- [x] **Task 16 — Rodar a suíte inteira e o build:** `npm test` verde e sem teste pulado; `npm run
   build` compila; conferir à mão `/vendedor/revisao` (Revisão do Projetista), `/futura/revisao` e
   `/projetista` no `npm run dev`. Dizer o resultado (passou/pulou/falhou). **Sugerir** (sem executar
   commit, merge ou push) o nome da branch (`feat/balcoes-convencionais-editados`) e o texto de commit,
   com prefixo em inglês, resto em português e linha final `Co-Authored-By: Claude Sonnet 5.5
   <noreply@anthropic.com>`. Perguntar ao Everton se o `CLAUDE.md` deve ser atualizado (validação do
   Projetista fora do `.jsx`; PDF do Projetista com cor de alerta).
+  Pendente conferência manual do Everton: `/vendedor/revisao`, `/futura/revisao` e `/projetista` no `npm run dev`.
 
 Se um teste novo falhar porque o código faz diferente do esperado acima, não ajuste o esperado para ficar verde: registre em Desvios e pare. Se um teste existente que não está na lista de afetados falhar, corrija o código, não o teste.
 
@@ -527,4 +535,11 @@ Se um teste novo falhar porque o código faz diferente do esperado acima, não a
 
 ## 5. Desvios
 
-*(vazia — será preenchida durante a implementação)*
+Registrados na revisão de 18/11/2026 (nenhum muda o comportamento descrito no PRD):
+
+1. `descreverRespostaBalcao` trata `tipoBalcao === ''` (texto vazio) como não respondida (`—`), igual a
+   `null`/ausente. O Spec não previa o valor `''`; o efeito é o mesmo da linha "não respondida".
+2. Acrescentado, com aprovação do Everton, o **T20** em `testes/V_validacao_projetista.test.js`: com
+   `tipoBalcao = "Editados"`, subpergunta com valor inválido (`"talvez"`, `"SIM"`) ou ausente também
+   bloqueia com `Responda sim ou não`. Fecha a lacuna apontada pelo teste de mutação (a validação só
+   rejeitando `null` passava despercebida).

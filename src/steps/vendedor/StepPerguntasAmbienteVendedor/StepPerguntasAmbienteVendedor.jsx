@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { BottomBar } from '../../../components/BottomBar/BottomBar.jsx'
 import { obterGrupo } from '../../../domain/gruposPerguntasVendedor.js'
+import { validarRespostasGrupo } from '../../../domain/validacaoVendedor.js'
 import { FormGrupoA } from './FormGrupoA.jsx'
 import { FormGrupoB } from './FormGrupoB.jsx'
 import { FormGrupoC } from './FormGrupoC.jsx'
@@ -10,31 +11,6 @@ import { scrollToFirstError } from '../../../utils/scrollUtils.js'
 import styles from './StepPerguntasAmbienteVendedor.module.css'
 
 const FORM_MAP = { A: FormGrupoA, B: FormGrupoB, C: FormGrupoC }
-
-const NAO_SE_APLICA = 'não se aplica'
-const CAMPOS_ALTURA = ['alturaBalcao_mm', 'alturaArmario_mm']
-
-const CAMPOS_OBRIGATORIOS_POR_GRUPO = {
-  A: ['alturaBalcao_mm', 'alturaArmario_mm', 'fechamentoTeto', 'caixaria', 'dobradicas', 'corredicas'],
-  B: ['caixaria', 'dobradicas', 'corredicas', 'fechamentoTeto'],
-  C: ['caixaria', 'dobradicas', 'corredicas'],
-}
-
-function respostaValida(campo, valor) {
-  if (valor === NAO_SE_APLICA) return true
-  if (CAMPOS_ALTURA.includes(campo)) return typeof valor === 'number' && valor > 0
-  return valor !== null && valor !== undefined
-}
-
-function validarRespostasGrupo(grupo, resp) {
-  const erros = {}
-  for (const campo of CAMPOS_OBRIGATORIOS_POR_GRUPO[grupo]) {
-    if (!respostaValida(campo, resp[campo])) {
-      erros[campo] = 'Responda esta pergunta ou marque "Não se aplica"'
-    }
-  }
-  return erros
-}
 
 export function StepPerguntasAmbienteVendedor() {
   const { instanceId } = useParams()

@@ -127,3 +127,9 @@
 }
 
 .espacoBar { height: 88px; }
+
+.subperguntas {
+  margin-left: 16px;
+  padding-left: 12px;
+  border-left: 2px solid var(--ba-line);
+}

@@ -55,3 +55,7 @@
 }
 
 .espacoBar { height: 20px; }
+
+.linhaDestaque {
+  color: var(--ba-danger);
+}

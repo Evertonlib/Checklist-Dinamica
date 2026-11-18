@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { formatarNomeAmbiente } from '../../../domain/ambientes.js'
 import { obterGrupo } from '../../../domain/gruposPerguntasVendedor.js'
+import { descreverRespostaBalcao } from '../../../domain/respostaBalcaoVendedor.js'
 import { gerarPdfVendedor } from '../../../services/pdfVendedor.js'
 import { BottomBar } from '../../../components/BottomBar/BottomBar.jsx'
 import styles from './StepRevisaoVendedor.module.css'
@@ -11,6 +12,7 @@ const PERGUNTAS_POR_GRUPO = {
   A: [
     { campo: 'alturaBalcao_mm', label: 'Altura do piso — balcões', tipo: 'altura' },
     { campo: 'alturaArmario_mm', label: 'Altura do piso — armários', tipo: 'altura' },
+    { campo: 'tipoBalcao', label: 'Balcões convencionais ou editados', tipo: 'balcao' },
     { campo: 'fechamentoTeto', label: 'Fechamento até o teto', tipo: 'fechamento' },
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
@@ -98,11 +100,20 @@ export function StepRevisaoVendedor() {
         return (
           <div key={instancia.instanceId} className={styles.secao}>
             <h3>{formatarNomeAmbiente(instancia)}</h3>
-            {PERGUNTAS_POR_GRUPO[grupo].map((item) => (
-              <p key={item.campo} className={styles.linhaResumo}>
-                <strong>{item.label}:</strong> {formatarResposta(item, resp[item.campo])}
-              </p>
-            ))}
+            {PERGUNTAS_POR_GRUPO[grupo].map((item) => {
+              const { texto, destaque } =
+                item.tipo === 'balcao'
+                  ? descreverRespostaBalcao(resp)
+                  : { texto: formatarResposta(item, resp[item.campo]), destaque: false }
+              const classe = destaque
+                ? `${styles.linhaResumo} ${styles.linhaDestaque}`
+                : styles.linhaResumo
+              return (
+                <p key={item.campo} className={classe}>
+                  <strong>{item.label}:</strong> {texto}
+                </p>
+              )
+            })}
             {resp.observacoes && (
               <p className={styles.linhaResumo}><strong>Observações:</strong> {resp.observacoes}</p>
             )}

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { obterGrupo } from '../src/domain/gruposPerguntasVendedor.js'
 import { carregarPdf } from './auxiliares/carregar_pdf.js'
 import { montarEstadoProjetista } from './auxiliares/construtores.js'
-import { sequencia, ausencia } from './auxiliares/leitura_pdf.js'
+import { sequencia, ausencia, secao } from './auxiliares/leitura_pdf.js'
 
 after(() => assertSemRede())
 
@@ -28,12 +28,14 @@ test('T-V02 — ambiente desconhecido cai no grupo A', () => {
   assert.equal(obterGrupo('ambiente_inexistente'), 'A')
 })
 
-test('T-V03 — grupo A: alturas, fechamento, caixaria, dobradiças e corrediças, nessa ordem', async () => {
+test('T-V03 — grupo A: alturas, pergunta de balcões, fechamento, caixaria, dobradiças e corrediças, nessa ordem', async () => {
   const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A' }]))
   assert.deepEqual(depoisDoNome(captura, 'Cozinha / Área de Serviço'), [
     'Altura do piso — balcões',
     'Resposta: —',
     'Altura do piso — armários',
+    'Resposta: —',
+    'Balcões convencionais ou editados',
     'Resposta: —',
     'Fechamento até o teto',
     'Resposta: —',
@@ -86,6 +88,7 @@ test('T-V06 — formatação das respostas: mm, "Não se aplica", NÃO/SIM e "�
   assert.deepEqual(respostas, [
     'Resposta: 850 mm',
     'Resposta: Não se aplica',
+    'Resposta: —',
     'Resposta: NÃO',
     'Resposta: —',
     'Resposta: Amortecimento',
@@ -124,4 +127,200 @@ test('T-V10 — observações do ambiente aparecem só quando preenchidas', asyn
   sequencia(com, ['Observações do ambiente', 'Resposta: TESTE de observação'])
   const sem = await pdf.projetista(montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp: { observacoes: '' } }]))
   ausencia(sem, { igual: 'Observações do ambiente' })
+})
+
+test('T1 — Convencionais', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp: { tipoBalcao: 'Convencionais' } }], ['9001'])
+  )
+  sequencia(captura, [
+    'Altura do piso — armários',
+    'Resposta: —',
+    'Balcões convencionais ou editados',
+    'Resposta: Convencionais',
+    'Fechamento até o teto',
+  ])
+})
+
+test('T2 — Não se aplica', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp: { tipoBalcao: 'não se aplica' } }], ['9001'])
+  )
+  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Não se aplica'])
+})
+
+test('T3 — Editados, Não e Não', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Não',
+            balcaoProfundidadeForaPadrao: 'Não',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Editados', 'Fechamento até o teto'])
+})
+
+test('T4 — Editados, só altura Sim', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Sim',
+            balcaoProfundidadeForaPadrao: 'Não',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Editados — altura fora do padrão'])
+})
+
+test('T5 — Editados, só profundidade Sim', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Não',
+            balcaoProfundidadeForaPadrao: 'Sim',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Editados — profundidade fora do padrão'])
+})
+
+test('T6 — Editados, altura Sim e profundidade Sim', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Sim',
+            balcaoProfundidadeForaPadrao: 'Sim',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(captura, [
+    'Balcões convencionais ou editados',
+    'Resposta: Editados — altura e profundidade fora do padrão',
+  ])
+})
+
+test('T7 — Dois ambientes', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Sim',
+            balcaoProfundidadeForaPadrao: 'Não',
+          },
+        },
+        {
+          tipo: 'varanda',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Convencionais',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Varanda / Área Gourmet']
+  sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), [
+    'Balcões convencionais ou editados',
+    'Resposta: Editados — altura fora do padrão',
+  ])
+  sequencia(secao(captura, 'Varanda / Área Gourmet', nomes), [
+    'Balcões convencionais ou editados',
+    'Resposta: Convencionais',
+  ])
+})
+
+test('T8 — Observações e ordem preservadas', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            tipoBalcao: 'Editados',
+            balcaoAlturaForaPadrao: 'Sim',
+            balcaoProfundidadeForaPadrao: 'Não',
+            observacoes: 'TESTE de observação',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  assert.deepEqual(depoisDoNome(captura, 'Cozinha / Área de Serviço'), [
+    'Altura do piso — balcões',
+    'Resposta: —',
+    'Altura do piso — armários',
+    'Resposta: —',
+    'Balcões convencionais ou editados',
+    'Resposta: Editados — altura fora do padrão',
+    'Fechamento até o teto',
+    'Resposta: —',
+    'Caixarias ou corpos',
+    'Resposta: —',
+    'Dobradiças',
+    'Resposta: —',
+    'Corrediças',
+    'Resposta: —',
+    'Observações do ambiente',
+    'Resposta: TESTE de observação',
+  ])
+})
+
+test('T9 — "Não" e números nunca no PDF', async () => {
+  const casos = [
+    { tipoBalcao: 'Convencionais' },
+    { tipoBalcao: 'não se aplica' },
+    { tipoBalcao: null },
+    { tipoBalcao: 'Editados', balcaoAlturaForaPadrao: 'Não', balcaoProfundidadeForaPadrao: 'Não' },
+    { tipoBalcao: 'Editados', balcaoAlturaForaPadrao: 'Sim', balcaoProfundidadeForaPadrao: 'Não' },
+    { tipoBalcao: 'Editados', balcaoAlturaForaPadrao: 'Não', balcaoProfundidadeForaPadrao: 'Sim' },
+    { tipoBalcao: 'Editados', balcaoAlturaForaPadrao: 'Sim', balcaoProfundidadeForaPadrao: 'Sim' },
+  ]
+  for (const resp of casos) {
+    const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp }], ['9001']))
+    ausencia(captura, { igual: 'Resposta: Não' })
+    ausencia(captura, { comeca: 'Altura fora do padrão' })
+    ausencia(captura, { comeca: 'Profundidade fora do padrão' })
+    ausencia(captura, { contem: '676' })
+    ausencia(captura, { contem: ' mm' })
+  }
 })

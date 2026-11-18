@@ -1,6 +1,9 @@
 import jsPDF from 'jspdf'
 import { formatarNomeAmbiente } from '../domain/ambientes.js'
 import { obterGrupo } from '../domain/gruposPerguntasVendedor.js'
+import { descreverRespostaBalcao } from '../domain/respostaBalcaoVendedor.js'
+
+const COR_ALERTA = [180, 0, 0] // mesma cor do risco ALTO do PDF do Cliente (pdf.js:12)
 
 function formatarDataLocal(data) {
   return data.toLocaleDateString('pt-BR')
@@ -17,6 +20,7 @@ const PERGUNTAS_POR_GRUPO = {
   A: [
     { campo: 'alturaBalcao_mm', label: 'Altura do piso — balcões', tipo: 'altura' },
     { campo: 'alturaArmario_mm', label: 'Altura do piso — armários', tipo: 'altura' },
+    { campo: 'tipoBalcao', label: 'Balcões convencionais ou editados', tipo: 'balcao' },
     { campo: 'fechamentoTeto', label: 'Fechamento até o teto', tipo: 'fechamento' },
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
@@ -96,17 +100,19 @@ export async function gerarPdfVendedor(state) {
     })
   }
 
-  const escreverPergunta = (pergunta, resposta) => {
+  const escreverPergunta = (pergunta, resposta, destaque = false) => {
     garantirEspaco(14)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(11)
-    doc.setTextColor(0, 0, 0)
+    if (destaque) doc.setTextColor(...COR_ALERTA)
+    else doc.setTextColor(0, 0, 0)
     escreverLinhas(doc.splitTextToSize(pergunta, larguraConteudo), margemEsquerda, 5)
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(12)
     escreverLinhas(doc.splitTextToSize(`Resposta: ${resposta}`, larguraConteudo), margemEsquerda, 4.5)
     y += 2
+    doc.setTextColor(0, 0, 0)
   }
 
   state.ambientesSelecionados.forEach((instancia, index) => {
@@ -134,7 +140,12 @@ export async function gerarPdfVendedor(state) {
     y += 7
 
     for (const item of PERGUNTAS_POR_GRUPO[grupo]) {
-      escreverPergunta(item.label, formatarResposta(item, resp[item.campo]))
+      if (item.tipo === 'balcao') {
+        const { texto, destaque } = descreverRespostaBalcao(resp)
+        escreverPergunta(item.label, texto, destaque)
+      } else {
+        escreverPergunta(item.label, formatarResposta(item, resp[item.campo]))
+      }
     }
 
     if (resp.observacoes) {

@@ -3,6 +3,9 @@ export const defaultsPorGrupo = {
   A: {
     alturaBalcao_mm: null,        // number | "não se aplica" | null (não respondido)
     alturaArmario_mm: null,       // number | "não se aplica" | null
+    tipoBalcao: null,             // "Convencionais" | "Editados" | "não se aplica" | null
+    balcaoAlturaForaPadrao: null, // "Sim" | "Não" | null
+    balcaoProfundidadeForaPadrao: null, // "Sim" | "Não" | null
     fechamentoTeto: null,         // "SIM" | "NAO" | "não se aplica" | null
     caixaria: null,               // "MDP" | "MDF" | "não se aplica" | null
     dobradicas: null,             // "Convencionais" | "Amortecimento" | "não se aplica" | null

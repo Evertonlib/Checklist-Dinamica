@@ -7,6 +7,8 @@ const OPCOES_FECHAMENTO = [{ valor: 'SIM', label: 'SIM' }, { valor: 'NAO', label
 const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
 const OPCOES_CORREDICAS = ['Ocultas']
+const OPCOES_TIPO_BALCAO = ['Convencionais', 'Editados']
+const OPCOES_SIM_NAO = ['Sim', 'Não']
 
 export function FormGrupoA({ instanceId, erros = {} }) {
   const { state, dispatch } = useFormContextVendedor()
@@ -52,7 +54,7 @@ export function FormGrupoA({ instanceId, erros = {} }) {
     )
   }
 
-  const campoFechado = (campo, pergunta, opcoes) => (
+  const campoFechado = (campo, pergunta, opcoes, mostrarNaoSeAplica = true) => (
     <div className={styles.campoFechado}>
       <p className={styles.pergunta}>{pergunta}</p>
       <div className={styles.opcoes}>
@@ -70,13 +72,15 @@ export function FormGrupoA({ instanceId, erros = {} }) {
             </button>
           )
         })}
-        <button
-          type="button"
-          className={resp[campo] === NAO_SE_APLICA ? styles.opcaoAtiva : styles.opcao}
-          onClick={() => set(campo, NAO_SE_APLICA)}
-        >
-          Não se aplica
-        </button>
+        {mostrarNaoSeAplica && (
+          <button
+            type="button"
+            className={resp[campo] === NAO_SE_APLICA ? styles.opcaoAtiva : styles.opcao}
+            onClick={() => set(campo, NAO_SE_APLICA)}
+          >
+            Não se aplica
+          </button>
+        )}
       </div>
       {erros[campo] && <span className={`${styles.erro} erro-campo`}>{erros[campo]}</span>}
     </div>
@@ -87,6 +91,22 @@ export function FormGrupoA({ instanceId, erros = {} }) {
       <FieldGroup titulo="Alturas de instalação">
         {campoAltura('alturaBalcao_mm', 'Qual altura do piso será instalada os balcões?')}
         {campoAltura('alturaArmario_mm', 'Qual altura do piso será instalada os armários?')}
+        {campoFechado(
+          'tipoBalcao',
+          'Os balcões deste ambiente serão convencionais ou editados?',
+          OPCOES_TIPO_BALCAO
+        )}
+        {resp.tipoBalcao === 'Editados' && (
+          <div className={styles.subperguntas}>
+            {campoFechado('balcaoAlturaForaPadrao', 'Altura fora do padrão?', OPCOES_SIM_NAO, false)}
+            {campoFechado(
+              'balcaoProfundidadeForaPadrao',
+              'Profundidade fora do padrão?',
+              OPCOES_SIM_NAO,
+              false
+            )}
+          </div>
+        )}
       </FieldGroup>
 
       <FieldGroup titulo="Acabamento e ferragens">
