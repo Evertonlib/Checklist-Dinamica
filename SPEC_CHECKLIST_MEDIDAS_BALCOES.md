@@ -543,3 +543,30 @@ Registrados na revisão de 18/11/2026 (nenhum muda o comportamento descrito no P
    `tipoBalcao = "Editados"`, subpergunta com valor inválido (`"talvez"`, `"SIM"`) ou ausente também
    bloqueia com `Responda sim ou não`. Fecha a lacuna apontada pelo teste de mutação (a validação só
    rejeitando `null` passava despercebida).
+3. **Formato da resposta quando há "Sim": uma linha por "Sim" (decisão do Everton em 18/11/2026, após
+   ver na tela do celular).** Este desvio **prevalece** sobre a tabela da Seção 1.4, sobre os testes T4,
+   T5, T6, T7, T8, T9 e T19 da Seção 3.1 e sobre o PRD 5.3/5.4 (CA-21, 22, 32, 33 e 34) **no que trata do
+   texto**; o PRD não foi alterado, por decisão do Everton. O texto principal passa a ser só `Editados`, e
+   cada subpergunta marcada "Sim" ganha uma linha própria logo abaixo, com marcador `•` (confirmado: o
+   `•` sai certo no PDF com a fonte padrão, código WinAnsi `0x95`):
+
+   | Situação | Linhas no PDF e na Revisão | Destaque |
+   |---|---|---|
+   | Convencionais | `Resposta: Convencionais` | não |
+   | Não se aplica | `Resposta: Não se aplica` | não |
+   | Não respondida | `Resposta: —` | não |
+   | Editados, Não/Não (ou subperguntas vazias) | `Resposta: Editados` | não |
+   | Só altura Sim | `Resposta: Editados` e `• Altura fora do padrão` | sim |
+   | Só profundidade Sim | `Resposta: Editados` e `• Profundidade fora do padrão` | sim |
+   | As duas Sim | `Resposta: Editados`, `• Altura fora do padrão` e `• Profundidade fora do padrão` (nessa ordem) | sim |
+
+   Regras mantidas: o "Não" das subperguntas nunca vira linha; subperguntas "Sim" guardadas com
+   `tipoBalcao` diferente de `Editados` não aparecem; destaque (vermelho) no bloco todo (pergunta,
+   resposta e linhas) só quando há ao menos um "Sim"; nenhum número de medida. **O que mudou no código:**
+   `descreverRespostaBalcao` passa a devolver `{ texto, destaque, linhas }` (`linhas`: uma por "Sim", com
+   o marcador já incluído); `escreverPergunta` do PDF ganha o 4º parâmetro `linhasExtras` e as escreve
+   recuadas (+5 mm) depois da linha "Resposta:", na mesma cor, e a cor volta a preto ao final como antes; a
+   Revisão desenha cada linha numa linha própria (`<br />`), sem CSS novo. **Testes:** T4, T5, T6, T7, T8
+   (PDF) e T19 (função pura) passam a esperar as linhas por extenso; o T9 mantém as proibições e ganha:
+   sem "Sim" na altura, nenhum texto contém `Altura fora do padrão` (idem profundidade). Tela, validação,
+   schema, T-V03 e T-V06 não mudam.

@@ -5,20 +5,23 @@ import { descreverRespostaBalcao } from '../src/domain/respostaBalcaoVendedor.js
 
 after(() => assertSemRede())
 
-test('T19 — Texto e destaque da resposta de balcões (função pura)', () => {
+// Desvio 3 do Spec: com algum "Sim", o texto principal é só "Editados" e há UMA linha por "Sim".
+test('T19 — Texto, linhas e destaque da resposta de balcões (função pura)', () => {
   // (a) campo ausente
-  assert.deepEqual(descreverRespostaBalcao({}), { texto: '—', destaque: false })
+  assert.deepEqual(descreverRespostaBalcao({}), { texto: '—', destaque: false, linhas: [] })
   // (b) tipoBalcao = null
-  assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: null }), { texto: '—', destaque: false })
+  assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: null }), { texto: '—', destaque: false, linhas: [] })
   // (c) "não se aplica"
   assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: 'não se aplica' }), {
     texto: 'Não se aplica',
     destaque: false,
+    linhas: [],
   })
   // (d) "Convencionais"
   assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: 'Convencionais' }), {
     texto: 'Convencionais',
     destaque: false,
+    linhas: [],
   })
   // (e) "Editados" com subperguntas null
   assert.deepEqual(
@@ -27,7 +30,7 @@ test('T19 — Texto e destaque da resposta de balcões (função pura)', () => {
       balcaoAlturaForaPadrao: null,
       balcaoProfundidadeForaPadrao: null,
     }),
-    { texto: 'Editados', destaque: false }
+    { texto: 'Editados', destaque: false, linhas: [] }
   )
   // (f) "Editados" com Não e Não
   assert.deepEqual(
@@ -36,7 +39,7 @@ test('T19 — Texto e destaque da resposta de balcões (função pura)', () => {
       balcaoAlturaForaPadrao: 'Não',
       balcaoProfundidadeForaPadrao: 'Não',
     }),
-    { texto: 'Editados', destaque: false }
+    { texto: 'Editados', destaque: false, linhas: [] }
   )
   // (g) "Editados" só altura Sim
   assert.deepEqual(
@@ -45,7 +48,7 @@ test('T19 — Texto e destaque da resposta de balcões (função pura)', () => {
       balcaoAlturaForaPadrao: 'Sim',
       balcaoProfundidadeForaPadrao: 'Não',
     }),
-    { texto: 'Editados — altura fora do padrão', destaque: true }
+    { texto: 'Editados', destaque: true, linhas: ['• Altura fora do padrão'] }
   )
   // (h) "Editados" só profundidade Sim
   assert.deepEqual(
@@ -54,29 +57,36 @@ test('T19 — Texto e destaque da resposta de balcões (função pura)', () => {
       balcaoAlturaForaPadrao: 'Não',
       balcaoProfundidadeForaPadrao: 'Sim',
     }),
-    { texto: 'Editados — profundidade fora do padrão', destaque: true }
+    { texto: 'Editados', destaque: true, linhas: ['• Profundidade fora do padrão'] }
   )
-  // (i) "Editados" altura Sim e profundidade Sim
+  // (i) "Editados" altura Sim e profundidade Sim: duas linhas, altura primeiro
   assert.deepEqual(
     descreverRespostaBalcao({
       tipoBalcao: 'Editados',
       balcaoAlturaForaPadrao: 'Sim',
       balcaoProfundidadeForaPadrao: 'Sim',
     }),
-    { texto: 'Editados — altura e profundidade fora do padrão', destaque: true }
+    {
+      texto: 'Editados',
+      destaque: true,
+      linhas: ['• Altura fora do padrão', '• Profundidade fora do padrão'],
+    }
   )
   // (j) valor desconhecido
   assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: 'Xyz' }), {
     texto: 'Xyz',
     destaque: false,
+    linhas: [],
   })
-  // (k) subperguntas "Sim" guardadas com tipoBalcao = "Convencionais"
+  // (k) subperguntas "Sim" guardadas com tipoBalcao = "Convencionais": não acendem nada
   assert.deepEqual(
     descreverRespostaBalcao({
       tipoBalcao: 'Convencionais',
       balcaoAlturaForaPadrao: 'Sim',
       balcaoProfundidadeForaPadrao: 'Sim',
     }),
-    { texto: 'Convencionais', destaque: false }
+    { texto: 'Convencionais', destaque: false, linhas: [] }
   )
+  // (l) texto vazio conta como não respondida (Desvio 1)
+  assert.deepEqual(descreverRespostaBalcao({ tipoBalcao: '' }), { texto: '—', destaque: false, linhas: [] })
 })

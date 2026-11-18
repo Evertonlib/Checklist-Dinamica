@@ -100,7 +100,7 @@ export async function gerarPdfVendedor(state) {
     })
   }
 
-  const escreverPergunta = (pergunta, resposta, destaque = false) => {
+  const escreverPergunta = (pergunta, resposta, destaque = false, linhasExtras = []) => {
     garantirEspaco(14)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(11)
@@ -111,6 +111,9 @@ export async function gerarPdfVendedor(state) {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(12)
     escreverLinhas(doc.splitTextToSize(`Resposta: ${resposta}`, larguraConteudo), margemEsquerda, 4.5)
+    for (const extra of linhasExtras) {
+      escreverLinhas(doc.splitTextToSize(extra, larguraConteudo - 5), margemEsquerda + 5, 4.5)
+    }
     y += 2
     doc.setTextColor(0, 0, 0)
   }
@@ -141,8 +144,8 @@ export async function gerarPdfVendedor(state) {
 
     for (const item of PERGUNTAS_POR_GRUPO[grupo]) {
       if (item.tipo === 'balcao') {
-        const { texto, destaque } = descreverRespostaBalcao(resp)
-        escreverPergunta(item.label, texto, destaque)
+        const { texto, destaque, linhas } = descreverRespostaBalcao(resp)
+        escreverPergunta(item.label, texto, destaque, linhas)
       } else {
         escreverPergunta(item.label, formatarResposta(item, resp[item.campo]))
       }

@@ -186,7 +186,13 @@ test('T4 — Editados, só altura Sim', async () => {
       ['9001']
     )
   )
-  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Editados — altura fora do padrão'])
+  sequencia(captura, [
+    'Balcões convencionais ou editados',
+    'Resposta: Editados',
+    '• Altura fora do padrão',
+    'Fechamento até o teto',
+  ])
+  ausencia(captura, { contem: 'Profundidade fora do padrão' })
 })
 
 test('T5 — Editados, só profundidade Sim', async () => {
@@ -206,7 +212,13 @@ test('T5 — Editados, só profundidade Sim', async () => {
       ['9001']
     )
   )
-  sequencia(captura, ['Balcões convencionais ou editados', 'Resposta: Editados — profundidade fora do padrão'])
+  sequencia(captura, [
+    'Balcões convencionais ou editados',
+    'Resposta: Editados',
+    '• Profundidade fora do padrão',
+    'Fechamento até o teto',
+  ])
+  ausencia(captura, { contem: 'Altura fora do padrão' })
 })
 
 test('T6 — Editados, altura Sim e profundidade Sim', async () => {
@@ -228,7 +240,10 @@ test('T6 — Editados, altura Sim e profundidade Sim', async () => {
   )
   sequencia(captura, [
     'Balcões convencionais ou editados',
-    'Resposta: Editados — altura e profundidade fora do padrão',
+    'Resposta: Editados',
+    '• Altura fora do padrão',
+    '• Profundidade fora do padrão',
+    'Fechamento até o teto',
   ])
 })
 
@@ -259,7 +274,8 @@ test('T7 — Dois ambientes', async () => {
   const nomes = ['Cozinha / Área de Serviço', 'Varanda / Área Gourmet']
   sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), [
     'Balcões convencionais ou editados',
-    'Resposta: Editados — altura fora do padrão',
+    'Resposta: Editados',
+    '• Altura fora do padrão',
   ])
   sequencia(secao(captura, 'Varanda / Área Gourmet', nomes), [
     'Balcões convencionais ou editados',
@@ -291,7 +307,8 @@ test('T8 — Observações e ordem preservadas', async () => {
     'Altura do piso — armários',
     'Resposta: —',
     'Balcões convencionais ou editados',
-    'Resposta: Editados — altura fora do padrão',
+    'Resposta: Editados',
+    '• Altura fora do padrão',
     'Fechamento até o teto',
     'Resposta: —',
     'Caixarias ou corpos',
@@ -318,9 +335,13 @@ test('T9 — "Não" e números nunca no PDF', async () => {
   for (const resp of casos) {
     const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp }], ['9001']))
     ausencia(captura, { igual: 'Resposta: Não' })
+    // o rótulo da subpergunta, sem o marcador "•", nunca aparece como linha própria
     ausencia(captura, { comeca: 'Altura fora do padrão' })
     ausencia(captura, { comeca: 'Profundidade fora do padrão' })
     ausencia(captura, { contem: '676' })
     ausencia(captura, { contem: ' mm' })
+    // "Não" nunca vira linha: sem "Sim" correspondente, a linha da subpergunta não existe
+    if (resp.balcaoAlturaForaPadrao !== 'Sim') ausencia(captura, { contem: 'Altura fora do padrão' })
+    if (resp.balcaoProfundidadeForaPadrao !== 'Sim') ausencia(captura, { contem: 'Profundidade fora do padrão' })
   }
 })

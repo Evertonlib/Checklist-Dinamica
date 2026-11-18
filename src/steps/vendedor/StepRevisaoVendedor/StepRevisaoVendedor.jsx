@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { formatarNomeAmbiente } from '../../../domain/ambientes.js'
@@ -101,16 +101,22 @@ export function StepRevisaoVendedor() {
           <div key={instancia.instanceId} className={styles.secao}>
             <h3>{formatarNomeAmbiente(instancia)}</h3>
             {PERGUNTAS_POR_GRUPO[grupo].map((item) => {
-              const { texto, destaque } =
+              const { texto, destaque, linhas } =
                 item.tipo === 'balcao'
                   ? descreverRespostaBalcao(resp)
-                  : { texto: formatarResposta(item, resp[item.campo]), destaque: false }
+                  : { texto: formatarResposta(item, resp[item.campo]), destaque: false, linhas: [] }
               const classe = destaque
                 ? `${styles.linhaResumo} ${styles.linhaDestaque}`
                 : styles.linhaResumo
               return (
                 <p key={item.campo} className={classe}>
                   <strong>{item.label}:</strong> {texto}
+                  {linhas.map((linha) => (
+                    <Fragment key={linha}>
+                      <br />
+                      {linha}
+                    </Fragment>
+                  ))}
                 </p>
               )
             })}
