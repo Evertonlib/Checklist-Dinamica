@@ -1,6 +1,7 @@
 # PRD — Pergunta "balcões convencionais ou editados?" no Checklist do Projetista
 
-> Documento de requisitos. Nenhum código foi escrito. Aguardando aprovação antes do Spec.
+> **Status: APROVADO pelo Everton em 17/11/2026.** Documento de requisitos. Nenhum código foi
+> escrito. Próxima etapa: Spec (com gate de aprovação próprio).
 >
 > Nome da feature: `CHECKLIST_MEDIDAS_BALCOES`. Este arquivo fica na raiz do projeto, como
 > pede a metodologia; os PRDs anteriores vivem em `PRDS_E_SPECS/` e o Everton pode mover
@@ -727,5 +728,5 @@ SIM`) **continua igual**.
 
 ---
 
-> Nenhum código será escrito antes da aprovação deste PRD e do Spec. Próximo passo, após
-> aprovação: gerar `SPEC_CHECKLIST_MEDIDAS_BALCOES.md`.
+> PRD aprovado em 17/11/2026. Nenhum código será escrito antes da aprovação do Spec. Próximo
+> passo: gerar `SPEC_CHECKLIST_MEDIDAS_BALCOES.md`.
