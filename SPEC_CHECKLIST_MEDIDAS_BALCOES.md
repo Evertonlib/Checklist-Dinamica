@@ -34,9 +34,8 @@ Observações (o código prevalece; o PRD não foi alterado):
   automaticamente, como `null`.
 - **Acréscimo do Spec que o PRD não prevê:** o arquivo `src/domain/respostaBalcaoVendedor.js` (Seção
   1.4). Ver a nota lá.
-- **Estado do repositório medido em 18/11/2026 (`git status`):** branch `main`;
-  `PRD_CHECKLIST_MEDIDAS_BALCOES.md` com modificação não commitada; `SPEC_CHECKLIST_MEDIDAS_BALCOES.md`
-  não rastreado. A Task 0 do Plano trata disso.
+- **Estado do repositório em 18/11/2026:** o PRD e o Spec já estão commitados na `main` (commit
+  `d9fe6cc`). A Task 0 do Plano só cria a branch da implementação a partir dela.
 - Nada mais divergiu. Nenhum item para "Desvios" no momento (a seção abaixo continua vazia).
 
 ---
@@ -436,15 +435,15 @@ Cada task é feita e conferida sozinha, na ordem abaixo. Rodar `npm test` ao fim
 deixar teste existente vermelho (exceto T-V03 e T-V06 entre o início da Task 9 e a sua própria edição,
 que acontecem na mesma task).
 
-- [ ] **Task 0 — Branch e documentos.** Toda a implementação é feita numa **branch própria criada a
-  partir da `main`**, antes da primeira task. Nada vai para a `main` durante o Plano; o merge será feito
-  pelo Everton depois, junto com outras melhorias do Checklist do Projetista (o deploy é automático a cada
-  push na `main`, `CLAUDE.md` do projeto). Criar a branch (nome sugerido: `feat/balcoes-convencionais-editados`),
-  levando consigo os dois documentos (`PRD_CHECKLIST_MEDIDAS_BALCOES.md`, hoje com modificação não
-  commitada, e `SPEC_CHECKLIST_MEDIDAS_BALCOES.md`, hoje não rastreado) e **commitar só esses dois
-  documentos** na branch (o Everton autorizou isso em 18/11/2026). **Sem push, sem merge.** Commit de código
-  continua só quando o Everton pedir. Validação: `git status` limpo na branch, e `git log` mostrando só o
-  commit dos documentos.
+- [ ] **Task 0 — Branch da implementação.** Toda a implementação é feita numa **branch própria criada a
+  partir da `main`**, antes da primeira task. O PRD e o Spec **já estão commitados na `main`** (o Everton
+  os commitou em 18/11/2026), então a branch já nasce com eles e **não há commit de documentos nesta
+  task**. Nada vai para a `main` durante o Plano; o merge será feito pelo Everton depois, junto com outras
+  melhorias do Checklist do Projetista (o deploy é automático a cada push na `main`, `CLAUDE.md` do
+  projeto). Criar a branch (nome sugerido: `feat/balcoes-convencionais-editados`) a partir da `main`
+  atualizada. **Sem push, sem merge.** Commit de código continua só quando o Everton pedir. Validação:
+  `git branch --show-current` mostra a branch nova; `git status` limpo; `git log` mostra, no topo, o
+  commit dos documentos que já veio da `main`, e nenhum commit novo.
 - [ ] **Task 1 — Schema.** Em `src/domain/schemaVendedor.js`, acrescentar ao grupo A, logo depois de
   `alturaArmario_mm`, `tipoBalcao`, `balcaoAlturaForaPadrao` e `balcaoProfundidadeForaPadrao`, todos
   `null`, com comentário de valores (1.1). Validação: `npm test` — T-V03 e T-V06 ainda não mudaram e
