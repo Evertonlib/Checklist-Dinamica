@@ -2,6 +2,7 @@ import { assertSemRede } from './auxiliares/travas.js'
 import { test, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { validarRespostasGrupo } from '../src/domain/validacaoVendedor.js'
+import { resolverAlteracaoModelo } from '../src/domain/puxadoresVendedor.js'
 
 after(() => assertSemRede())
 
@@ -12,24 +13,35 @@ const BASE_A = {
   caixaria: 'MDP',
   dobradicas: 'Convencionais',
   corredicas: 'Ocultas',
+  temPuxador: 'Não',
+}
+
+const BASE_B = {
+  caixaria: 'MDF',
+  dobradicas: 'Amortecimento',
+  corredicas: 'Ocultas',
+  fechamentoTeto: 'SIM',
+}
+
+const BASE_C = {
+  caixaria: 'MDF',
+  dobradicas: 'Amortecimento',
+  corredicas: 'Ocultas',
 }
 
 test('T17 — Grupos B e C intocados', () => {
   assert.deepEqual(
     validarRespostasGrupo('B', {
-      caixaria: 'MDF',
-      dobradicas: 'Amortecimento',
-      corredicas: 'Ocultas',
-      fechamentoTeto: 'SIM',
+      ...BASE_B,
+      temPuxador: 'Não',
     }),
     {}
   )
 
   assert.deepEqual(
     validarRespostasGrupo('C', {
-      caixaria: 'MDF',
-      dobradicas: 'Amortecimento',
-      corredicas: 'Ocultas',
+      ...BASE_C,
+      temPuxador: 'Não',
     }),
     {}
   )
@@ -221,4 +233,157 @@ test('T16 — Subrespostas antigas não são verificadas', () => {
       )
     }
   }
+})
+
+test('TP-06 — Pergunta "Tem puxador?" sem resposta bloqueia nos grupos A, B e C', () => {
+  const entradas = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais', temPuxador: null }],
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais', temPuxador: undefined }],
+    ['B', { ...BASE_B, temPuxador: null }],
+    ['B', { ...BASE_B }],
+    ['C', { ...BASE_C, temPuxador: null }],
+    ['C', { ...BASE_C }],
+  ]
+  for (const [grupo, resp] of entradas) {
+    assert.deepEqual(validarRespostasGrupo(grupo, resp), { temPuxador: 'Responda sim ou não' }, grupo)
+  }
+})
+
+test('TP-07 — "Tem puxador?" = Não libera o avanço nos grupos A, B e C, mesmo com lista preservada', () => {
+  const bases = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais' }],
+    ['B', BASE_B],
+    ['C', BASE_C],
+  ]
+  const listas = [[], [{ modelo: '', cor: '' }], [{ modelo: 'Roma', cor: 'Fendi' }]]
+  for (const [grupo, base] of bases) {
+    for (const puxadores of listas) {
+      assert.deepEqual(validarRespostasGrupo(grupo, { ...base, temPuxador: 'Não', puxadores }), {}, grupo)
+    }
+  }
+})
+
+test('TP-08 — "Tem puxador?" = Sim valida lista vazia e cada modelo e cor por índice', () => {
+  const baseA = { ...BASE_A, tipoBalcao: 'Convencionais', temPuxador: 'Sim' }
+  assert.deepEqual(validarRespostasGrupo('A', { ...baseA, puxadores: [] }), {
+    puxadores: 'Adicione pelo menos um puxador',
+  })
+  assert.deepEqual(validarRespostasGrupo('A', { ...baseA, puxadores: undefined }), {
+    puxadores: 'Adicione pelo menos um puxador',
+  })
+  assert.deepEqual(validarRespostasGrupo('A', { ...baseA, puxadores: [{ modelo: '', cor: '' }] }), {
+    puxador_0_modelo: 'Informe o modelo',
+    puxador_0_cor: 'Informe a cor',
+  })
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...baseA,
+      puxadores: [
+        { modelo: 'Roma', cor: 'Fendi' },
+        { modelo: 'Berlin', cor: '   ' },
+      ],
+    }),
+    { puxador_1_cor: 'Informe a cor' }
+  )
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...baseA,
+      puxadores: [
+        { modelo: '   ', cor: 'Fendi' },
+        { modelo: '', cor: '' },
+      ],
+    }),
+    {
+      puxador_0_modelo: 'Informe o modelo',
+      puxador_1_modelo: 'Informe o modelo',
+      puxador_1_cor: 'Informe a cor',
+    }
+  )
+  assert.deepEqual(
+    validarRespostasGrupo('A', { ...baseA, puxadores: [{ modelo: 'Roma', cor: 'Fendi' }] }),
+    {}
+  )
+})
+
+test('TP-09 — Modelo de cor única com "Sem cor" autopreenchido avança', () => {
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      tipoBalcao: 'Convencionais',
+      temPuxador: 'Sim',
+      puxadores: [
+        { modelo: 'Madri 150mm', cor: 'Sem cor' },
+        { modelo: 'Madri 270mm', cor: 'Sem cor' },
+        { modelo: 'Florença', cor: 'Sem cor' },
+      ],
+    }),
+    {}
+  )
+})
+
+test('TP-10 — Trocar modelo de cor única limpa "Sem cor" e volta a exigir Cor', () => {
+  const trocouRoma = resolverAlteracaoModelo('Madri 150mm', 'Sem cor', 'Roma')
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      tipoBalcao: 'Convencionais',
+      temPuxador: 'Sim',
+      puxadores: [trocouRoma],
+    }),
+    { puxador_0_cor: 'Informe a cor' }
+  )
+
+  const trocouZen = resolverAlteracaoModelo('Madri 150mm', 'Sem cor', 'Zen Cup')
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      tipoBalcao: 'Convencionais',
+      temPuxador: 'Sim',
+      puxadores: [trocouZen],
+    }),
+    { puxador_0_cor: 'Informe a cor' }
+  )
+
+  const apagouModelo = resolverAlteracaoModelo('Madri 150mm', 'Sem cor', '')
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      tipoBalcao: 'Convencionais',
+      temPuxador: 'Sim',
+      puxadores: [apagouModelo],
+    }),
+    {
+      puxador_0_modelo: 'Informe o modelo',
+      puxador_0_cor: 'Informe a cor',
+    }
+  )
+})
+
+test('TP-11 — Modelo livre digitado + Cor livre digitada avançam', () => {
+  assert.deepEqual(
+    validarRespostasGrupo('B', {
+      ...BASE_B,
+      temPuxador: 'Sim',
+      puxadores: [{ modelo: 'Zen Cup', cor: 'Gold' }],
+    }),
+    {}
+  )
+})
+
+test('TP-12 — Regras existentes intactas junto com puxadores', () => {
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      alturaBalcao_mm: 0,
+      tipoBalcao: 'Editados',
+      balcaoAlturaForaPadrao: null,
+      balcaoProfundidadeForaPadrao: 'Não',
+      temPuxador: null,
+    }),
+    {
+      alturaBalcao_mm: 'Responda esta pergunta ou marque "Não se aplica"',
+      balcaoAlturaForaPadrao: 'Responda sim ou não',
+      temPuxador: 'Responda sim ou não',
+    }
+  )
 })

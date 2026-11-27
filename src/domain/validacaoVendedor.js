@@ -1,5 +1,8 @@
 export const MSG_RESPONDA = 'Responda esta pergunta ou marque "Não se aplica"'
 export const MSG_RESPONDA_SIM_NAO = 'Responda sim ou não'
+export const MSG_INFORME_MODELO = 'Informe o modelo'
+export const MSG_INFORME_COR = 'Informe a cor'
+export const MSG_ADICIONE_PUXADOR = 'Adicione pelo menos um puxador'
 
 const NAO_SE_APLICA = 'não se aplica'
 const CAMPOS_ALTURA = ['alturaBalcao_mm', 'alturaArmario_mm']
@@ -36,6 +39,21 @@ export function validarRespostasGrupo(grupo, resp = {}) {
       if (resp[campo] !== 'Sim' && resp[campo] !== 'Não') {
         erros[campo] = MSG_RESPONDA_SIM_NAO
       }
+    }
+  }
+  if (resp.temPuxador !== 'Sim' && resp.temPuxador !== 'Não') {
+    erros.temPuxador = MSG_RESPONDA_SIM_NAO
+  } else if (resp.temPuxador === 'Sim') {
+    const lista = Array.isArray(resp.puxadores) ? resp.puxadores : []
+    if (lista.length === 0) {
+      erros.puxadores = MSG_ADICIONE_PUXADOR
+    } else {
+      lista.forEach((item, index) => {
+        const modelo = typeof item?.modelo === 'string' ? item.modelo.trim() : ''
+        const cor = typeof item?.cor === 'string' ? item.cor.trim() : ''
+        if (!modelo) erros[`puxador_${index}_modelo`] = MSG_INFORME_MODELO
+        if (!cor) erros[`puxador_${index}_cor`] = MSG_INFORME_COR
+      })
     }
   }
   return erros

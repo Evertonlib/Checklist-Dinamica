@@ -2,6 +2,7 @@ import jsPDF from 'jspdf'
 import { formatarNomeAmbiente } from '../domain/ambientes.js'
 import { obterGrupo } from '../domain/gruposPerguntasVendedor.js'
 import { descreverRespostaBalcao } from '../domain/respostaBalcaoVendedor.js'
+import { descreverRespostaPuxadores } from '../domain/puxadoresVendedor.js'
 
 const COR_ALERTA = [180, 0, 0] // mesma cor do risco ALTO do PDF do Cliente (pdf.js:12)
 
@@ -25,17 +26,20 @@ const PERGUNTAS_POR_GRUPO = {
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
     { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
+    { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
   B: [
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
     { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
     { campo: 'fechamentoTeto', label: 'Fechamento até o teto', tipo: 'fechamento' },
+    { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
   C: [
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
     { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
+    { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
 }
 
@@ -145,6 +149,9 @@ export async function gerarPdfVendedor(state) {
     for (const item of PERGUNTAS_POR_GRUPO[grupo]) {
       if (item.tipo === 'balcao') {
         const { texto, destaque, linhas } = descreverRespostaBalcao(resp)
+        escreverPergunta(item.label, texto, destaque, linhas)
+      } else if (item.tipo === 'puxadores') {
+        const { texto, destaque, linhas } = descreverRespostaPuxadores(resp)
         escreverPergunta(item.label, texto, destaque, linhas)
       } else {
         escreverPergunta(item.label, formatarResposta(item, resp[item.campo]))

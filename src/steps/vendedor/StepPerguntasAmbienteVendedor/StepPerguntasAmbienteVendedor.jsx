@@ -43,6 +43,19 @@ export function StepPerguntasAmbienteVendedor() {
     return Object.keys(novosErros).length === 0
   }
 
+  const limparErrosPuxadores = () => {
+    setErros((prev) => {
+      const chaves = Object.keys(prev)
+      const temErroPuxador = chaves.some((k) => k === 'puxadores' || k.startsWith('puxador_'))
+      if (!temErroPuxador) return prev
+      const proximoErros = {}
+      for (const k of chaves) {
+        if (k !== 'puxadores' && !k.startsWith('puxador_')) proximoErros[k] = prev[k]
+      }
+      return proximoErros
+    })
+  }
+
   const voltar = () => {
     if (anterior) {
       dispatch({ type: 'SET_META_VENDEDOR', campo: 'etapaAtual', valor: `ambiente/${anterior.instanceId}` })
@@ -71,7 +84,11 @@ export function StepPerguntasAmbienteVendedor() {
 
   return (
     <div className={styles.pagina}>
-      <FormComponent instanceId={instanceId} erros={erros} />
+      <FormComponent
+        instanceId={instanceId}
+        erros={erros}
+        onLimparErrosPuxadores={limparErrosPuxadores}
+      />
       <div className={styles.espacoBar} />
       <BottomBar onVoltar={voltar} onAvancar={avancar} avancarLabel={avancarLabel} mostrarBotaoVendedor={false} />
     </div>

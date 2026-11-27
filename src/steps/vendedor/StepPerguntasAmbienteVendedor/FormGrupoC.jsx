@@ -1,5 +1,6 @@
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { FieldGroup } from '../../../components/FieldGroup/FieldGroup.jsx'
+import { BlocoPuxadoresVendedor } from './BlocoPuxadoresVendedor.jsx'
 import styles from './StepPerguntasAmbienteVendedor.module.css'
 
 const NAO_SE_APLICA = 'não se aplica'
@@ -7,7 +8,7 @@ const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
 const OPCOES_CORREDICAS = ['Ocultas']
 
-export function FormGrupoC({ instanceId, erros = {} }) {
+export function FormGrupoC({ instanceId, erros = {}, onLimparErrosPuxadores }) {
   const { state, dispatch } = useFormContextVendedor()
   const resp = state.respostasPorAmbiente[instanceId] || {}
 
@@ -46,6 +47,12 @@ export function FormGrupoC({ instanceId, erros = {} }) {
         {campoFechado('caixaria', 'Caixarias ou corpos', OPCOES_CAIXARIA)}
         {campoFechado('dobradicas', 'Dobradiças', OPCOES_DOBRADICAS)}
         {campoFechado('corredicas', 'Corrediças', OPCOES_CORREDICAS)}
+        <BlocoPuxadoresVendedor
+          resp={resp}
+          erros={erros}
+          onSet={set}
+          onLimparErrosPuxadores={onLimparErrosPuxadores}
+        />
       </FieldGroup>
 
       <FieldGroup titulo="Observações (opcional)">

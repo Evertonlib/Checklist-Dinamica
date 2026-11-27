@@ -28,7 +28,7 @@ test('T-V02 — ambiente desconhecido cai no grupo A', () => {
   assert.equal(obterGrupo('ambiente_inexistente'), 'A')
 })
 
-test('T-V03 — grupo A: alturas, pergunta de balcões, fechamento, caixaria, dobradiças e corrediças, nessa ordem', async () => {
+test('T-V03 — grupo A: alturas, pergunta de balcões, fechamento, caixaria, dobradiças, corrediças e puxadores, nessa ordem', async () => {
   const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A' }]))
   assert.deepEqual(depoisDoNome(captura, 'Cozinha / Área de Serviço'), [
     'Altura do piso — balcões',
@@ -45,10 +45,12 @@ test('T-V03 — grupo A: alturas, pergunta de balcões, fechamento, caixaria, do
     'Resposta: —',
     'Corrediças',
     'Resposta: —',
+    'Puxadores',
+    'Resposta: —',
   ])
 })
 
-test('T-V04 — grupo B: fechamento por último e sem alturas', async () => {
+test('T-V04 — grupo B: fechamento e puxadores por último, sem alturas', async () => {
   const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'dormitorio_casal', grupo: 'B' }]))
   assert.deepEqual(depoisDoNome(captura, 'Dormitório Casal'), [
     'Caixarias ou corpos',
@@ -59,11 +61,13 @@ test('T-V04 — grupo B: fechamento por último e sem alturas', async () => {
     'Resposta: —',
     'Fechamento até o teto',
     'Resposta: —',
+    'Puxadores',
+    'Resposta: —',
   ])
   ausencia(captura, { comeca: 'Altura do piso — ' })
 })
 
-test('T-V05 — grupo C: sem alturas e sem fechamento', async () => {
+test('T-V05 — grupo C: sem alturas e sem fechamento, com puxadores por último', async () => {
   const captura = await pdf.projetista(montarEstadoProjetista([{ tipo: 'home', grupo: 'C' }]))
   assert.deepEqual(depoisDoNome(captura, 'Home / Sala'), [
     'Caixarias ou corpos',
@@ -71,6 +75,8 @@ test('T-V05 — grupo C: sem alturas e sem fechamento', async () => {
     'Dobradiças',
     'Resposta: —',
     'Corrediças',
+    'Resposta: —',
+    'Puxadores',
     'Resposta: —',
   ])
 })
@@ -92,6 +98,7 @@ test('T-V06 — formatação das respostas: mm, "Não se aplica", NÃO/SIM e "�
     'Resposta: NÃO',
     'Resposta: —',
     'Resposta: Amortecimento',
+    'Resposta: —',
     'Resposta: —',
   ])
   const sim = await pdf.projetista(
@@ -317,6 +324,8 @@ test('T8 — Observações e ordem preservadas', async () => {
     'Resposta: —',
     'Corrediças',
     'Resposta: —',
+    'Puxadores',
+    'Resposta: —',
     'Observações do ambiente',
     'Resposta: TESTE de observação',
   ])
@@ -344,4 +353,145 @@ test('T9 — "Não" e números nunca no PDF', async () => {
     if (resp.balcaoAlturaForaPadrao !== 'Sim') ausencia(captura, { contem: 'Altura fora do padrão' })
     if (resp.balcaoProfundidadeForaPadrao !== 'Sim') ausencia(captura, { contem: 'Profundidade fora do padrão' })
   }
+})
+
+test('TP-14 — PDF dos grupos A, B e C com Tem puxador? = Não (inclusive com lista preservada)', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: { temPuxador: 'Não', puxadores: [{ modelo: 'Roma', cor: 'Fendi' }] },
+        },
+        { tipo: 'dormitorio_casal', grupo: 'B', resp: { temPuxador: 'Não' } },
+        { tipo: 'home', grupo: 'C', resp: { temPuxador: 'Não' } },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Dormitório Casal', 'Home / Sala']
+  for (const nome of nomes) {
+    sequencia(secao(captura, nome, nomes), ['Puxadores', 'Resposta: Não'])
+  }
+  ausencia(captura, { contem: 'Roma' })
+  ausencia(captura, { igual: '• Roma — Fendi' })
+})
+
+test('TP-16 — PDF com 1 puxador e com múltiplos puxadores', async () => {
+  const capturaMulti = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            temPuxador: 'Sim',
+            puxadores: [
+              { modelo: 'Roma', cor: 'Fendi' },
+              { modelo: 'Madri 150mm', cor: 'Sem cor' },
+            ],
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(capturaMulti, [
+    'Corrediças',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: Sim',
+    '• Roma — Fendi',
+    '• Madri 150mm — Sem cor',
+  ])
+
+  const capturaUm = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'dormitorio_casal',
+          grupo: 'B',
+          resp: {
+            temPuxador: 'Sim',
+            puxadores: [{ modelo: 'Zen Cup', cor: 'Gold' }],
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  sequencia(capturaUm, [
+    'Fechamento até o teto',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: Sim',
+    '• Zen Cup — Gold',
+  ])
+})
+
+test('TP-17 — Ordem preservada e Puxadores antes de Observações do ambiente nos grupos A, B e C', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            temPuxador: 'Sim',
+            puxadores: [{ modelo: 'Roma', cor: 'Fendi' }],
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+        {
+          tipo: 'dormitorio_casal',
+          grupo: 'B',
+          resp: {
+            temPuxador: 'Sim',
+            puxadores: [{ modelo: 'Berlin', cor: 'Aço' }],
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+        {
+          tipo: 'home',
+          grupo: 'C',
+          resp: {
+            temPuxador: 'Sim',
+            puxadores: [{ modelo: 'Perfil Cava', cor: 'Alumínio' }],
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Dormitório Casal', 'Home / Sala']
+
+  sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), [
+    'Corrediças',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: Sim',
+    '• Roma — Fendi',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
+  sequencia(secao(captura, 'Dormitório Casal', nomes), [
+    'Fechamento até o teto',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: Sim',
+    '• Berlin — Aço',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
+  sequencia(secao(captura, 'Home / Sala', nomes), [
+    'Corrediças',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: Sim',
+    '• Perfil Cava — Alumínio',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
 })

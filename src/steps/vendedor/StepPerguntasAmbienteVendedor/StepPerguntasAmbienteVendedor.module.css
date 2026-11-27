@@ -133,3 +133,66 @@
   padding-left: 12px;
   border-left: 2px solid var(--ba-line);
 }
+
+.cardPuxador {
+  border: 1px solid var(--ba-line);
+  border-radius: var(--ba-radius-field);
+  background: var(--ba-white);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.cabecalhoPuxador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tituloPuxador {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--ba-ink);
+}
+
+.btnRemoverPuxador {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--ba-line);
+  background: var(--ba-paper);
+  color: var(--ba-ink);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.camposPuxador {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.campoPuxador {
+  display: flex;
+  flex-direction: column;
+}
+
+.campoPuxador label {
+  font-size: 0.9rem;
+  color: var(--ba-ink);
+  margin-bottom: 4px;
+}
+
+.btnAdicionarPuxador {
+  background: transparent;
+  color: var(--ba-muted-aa);
+  border: 1px solid var(--ba-line);
+  padding: 10px 16px;
+  border-radius: var(--ba-radius-pill);
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-height: 44px;
+  margin-bottom: 12px;
+}

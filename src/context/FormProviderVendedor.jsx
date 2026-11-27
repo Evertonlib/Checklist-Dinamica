@@ -27,9 +27,17 @@ function normalizarEstadoSalvo(estadoSalvo) {
   const respostasPorAmbiente = {}
 
   ambientesSelecionados.forEach((instancia) => {
-    respostasPorAmbiente[instancia.instanceId] = {
+    const defaults = {
       ...(defaultsPorGrupo[obterGrupo(instancia.tipo)] || {}),
-      ...(estadoSalvo?.respostasPorAmbiente?.[instancia.instanceId] || {}),
+      puxadores: [],
+    }
+    const salvo = estadoSalvo?.respostasPorAmbiente?.[instancia.instanceId] || {}
+    respostasPorAmbiente[instancia.instanceId] = {
+      ...defaults,
+      ...salvo,
+      puxadores: Array.isArray(salvo.puxadores)
+        ? salvo.puxadores.map((p) => (p && typeof p === 'object' ? { ...p } : p))
+        : [],
     }
   })
 
@@ -128,7 +136,10 @@ function reducer(state, action) {
       const novasRespostas = { ...state.respostasPorAmbiente }
       for (const inst of novas) {
         if (!novasRespostas[inst.instanceId]) {
-          novasRespostas[inst.instanceId] = { ...defaultsPorGrupo[obterGrupo(inst.tipo)] }
+          novasRespostas[inst.instanceId] = {
+            ...defaultsPorGrupo[obterGrupo(inst.tipo)],
+            puxadores: [],
+          }
         }
       }
       for (const old of existentes) {
