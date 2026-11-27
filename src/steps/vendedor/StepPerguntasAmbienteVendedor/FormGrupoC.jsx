@@ -1,12 +1,12 @@
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { FieldGroup } from '../../../components/FieldGroup/FieldGroup.jsx'
+import { BlocoCorredicasVendedor } from './BlocoCorredicasVendedor.jsx'
 import { BlocoPuxadoresVendedor } from './BlocoPuxadoresVendedor.jsx'
 import styles from './StepPerguntasAmbienteVendedor.module.css'
 
 const NAO_SE_APLICA = 'não se aplica'
 const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
-const OPCOES_CORREDICAS = ['Ocultas']
 
 export function FormGrupoC({ instanceId, erros = {}, onLimparErrosPuxadores }) {
   const { state, dispatch } = useFormContextVendedor()
@@ -46,7 +46,7 @@ export function FormGrupoC({ instanceId, erros = {}, onLimparErrosPuxadores }) {
       <FieldGroup titulo="Acabamento e ferragens">
         {campoFechado('caixaria', 'Caixarias ou corpos', OPCOES_CAIXARIA)}
         {campoFechado('dobradicas', 'Dobradiças', OPCOES_DOBRADICAS)}
-        {campoFechado('corredicas', 'Corrediças', OPCOES_CORREDICAS)}
+        <BlocoCorredicasVendedor resp={resp} erros={erros} onSet={set} />
         <BlocoPuxadoresVendedor
           resp={resp}
           erros={erros}

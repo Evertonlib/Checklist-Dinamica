@@ -1,5 +1,6 @@
 import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { FieldGroup } from '../../../components/FieldGroup/FieldGroup.jsx'
+import { BlocoCorredicasVendedor } from './BlocoCorredicasVendedor.jsx'
 import { BlocoPuxadoresVendedor } from './BlocoPuxadoresVendedor.jsx'
 import styles from './StepPerguntasAmbienteVendedor.module.css'
 
@@ -7,7 +8,6 @@ const NAO_SE_APLICA = 'não se aplica'
 const OPCOES_FECHAMENTO = [{ valor: 'SIM', label: 'SIM' }, { valor: 'NAO', label: 'NÃO' }]
 const OPCOES_CAIXARIA = ['MDP', 'MDF']
 const OPCOES_DOBRADICAS = ['Convencionais', 'Amortecimento']
-const OPCOES_CORREDICAS = ['Ocultas']
 
 export function FormGrupoB({ instanceId, erros = {}, onLimparErrosPuxadores }) {
   const { state, dispatch } = useFormContextVendedor()
@@ -51,7 +51,7 @@ export function FormGrupoB({ instanceId, erros = {}, onLimparErrosPuxadores }) {
       <FieldGroup titulo="Acabamento e ferragens">
         {campoFechado('caixaria', 'Caixarias ou corpos', OPCOES_CAIXARIA)}
         {campoFechado('dobradicas', 'Dobradiças', OPCOES_DOBRADICAS)}
-        {campoFechado('corredicas', 'Corrediças', OPCOES_CORREDICAS)}
+        <BlocoCorredicasVendedor resp={resp} erros={erros} onSet={set} />
         {campoFechado('fechamentoTeto', 'Haverá fechamento até o teto?', OPCOES_FECHAMENTO)}
         <BlocoPuxadoresVendedor
           resp={resp}

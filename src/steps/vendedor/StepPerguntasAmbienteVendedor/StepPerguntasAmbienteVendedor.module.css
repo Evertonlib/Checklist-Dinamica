@@ -196,3 +196,9 @@
   min-height: 44px;
   margin-bottom: 12px;
 }
+
+.opcoesVerticais {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

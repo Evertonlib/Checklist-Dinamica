@@ -495,3 +495,117 @@ test('TP-17 — Ordem preservada e Puxadores antes de Observações do ambiente 
     'Resposta: Obs ambiente 9001',
   ])
 })
+
+test('TC-09 — PDF com Ocultas, Não se aplica e — sem subopção', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        { tipo: 'cozinha', grupo: 'A', resp: { corredicas: 'Ocultas' } },
+        { tipo: 'dormitorio_casal', grupo: 'B', resp: { corredicas: 'não se aplica' } },
+        { tipo: 'home', grupo: 'C', resp: { corredicas: null } },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Dormitório Casal', 'Home / Sala']
+  sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), ['Corrediças', 'Resposta: Ocultas'])
+  sequencia(secao(captura, 'Dormitório Casal', nomes), ['Corrediças', 'Resposta: Não se aplica'])
+  sequencia(secao(captura, 'Home / Sala', nomes), ['Corrediças', 'Resposta: —'])
+  ausencia(captura, { contem: 'Extração total' })
+  ausencia(captura, { contem: 'Tip-on' })
+  ausencia(captura, { contem: 'Extração parcial' })
+})
+
+test('TC-10 — PDF com Hafele e Blum nos grupos A, B e C mantendo ordem e observações', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        {
+          tipo: 'cozinha',
+          grupo: 'A',
+          resp: {
+            corredicas: 'Hafele',
+            corredicasExtracao: 'Extração total',
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+        {
+          tipo: 'dormitorio_casal',
+          grupo: 'B',
+          resp: {
+            corredicas: 'Hafele',
+            corredicasExtracao: 'Tip-on',
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+        {
+          tipo: 'home',
+          grupo: 'C',
+          resp: {
+            corredicas: 'Blum',
+            corredicasExtracao: 'Extração parcial',
+            observacoes: 'Obs ambiente 9001',
+          },
+        },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Dormitório Casal', 'Home / Sala']
+  sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), [
+    'Dobradiças',
+    'Resposta: —',
+    'Corrediças',
+    'Resposta: Hafele — Extração total',
+    'Puxadores',
+    'Resposta: —',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
+  sequencia(secao(captura, 'Dormitório Casal', nomes), [
+    'Dobradiças',
+    'Resposta: —',
+    'Corrediças',
+    'Resposta: Hafele — Tip-on',
+    'Fechamento até o teto',
+    'Resposta: —',
+    'Puxadores',
+    'Resposta: —',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
+  sequencia(secao(captura, 'Home / Sala', nomes), [
+    'Dobradiças',
+    'Resposta: —',
+    'Corrediças',
+    'Resposta: Blum — Extração parcial',
+    'Puxadores',
+    'Resposta: —',
+    'Observações do ambiente',
+    'Resposta: Obs ambiente 9001',
+  ])
+})
+
+test('TC-11 — Compatibilidade de rascunho antigo sem campo corredicasExtracao (PDF)', async () => {
+  const estado = montarEstadoProjetista([{ tipo: 'cozinha', grupo: 'A', resp: { corredicas: 'Ocultas' } }], ['9001'])
+  delete estado.respostasPorAmbiente['cozinha-0'].corredicasExtracao
+  const captura = await pdf.projetista(estado)
+  sequencia(captura, ['Corrediças', 'Resposta: Ocultas'])
+})
+
+test('TC-12 — PDF com Hafele ou Blum sem subopção preenchida exibe só o modelo e não quebra', async () => {
+  const captura = await pdf.projetista(
+    montarEstadoProjetista(
+      [
+        { tipo: 'cozinha', grupo: 'A', resp: { corredicas: 'Blum', corredicasExtracao: null } },
+        { tipo: 'home', grupo: 'C', resp: { corredicas: 'Hafele', corredicasExtracao: null } },
+      ],
+      ['9001']
+    )
+  )
+  const nomes = ['Cozinha / Área de Serviço', 'Home / Sala']
+  sequencia(secao(captura, 'Cozinha / Área de Serviço', nomes), ['Corrediças', 'Resposta: Blum', 'Puxadores'])
+  sequencia(secao(captura, 'Home / Sala', nomes), ['Corrediças', 'Resposta: Hafele', 'Puxadores'])
+  ausencia(captura, { contem: 'null' })
+  ausencia(captura, { contem: 'undefined' })
+})

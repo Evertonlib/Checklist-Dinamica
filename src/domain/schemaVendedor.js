@@ -9,7 +9,8 @@ export const defaultsPorGrupo = {
     fechamentoTeto: null,         // "SIM" | "NAO" | "não se aplica" | null
     caixaria: null,               // "MDP" | "MDF" | "não se aplica" | null
     dobradicas: null,             // "Convencionais" | "Amortecimento" | "não se aplica" | null
-    corredicas: null,             // "Ocultas" | "não se aplica" | null (Telescópicas removida do formulário)
+    corredicas: null,             // "Ocultas" | "Hafele" | "Blum" | "não se aplica" | null
+    corredicasExtracao: null,     // "Extração total" | "Tip-on" | "Extração parcial" | null
     temPuxador: null,             // "Sim" | "Não" | null
     puxadores: [],                // Array<{ modelo: string, cor: string }>
     observacoes: '',              // opcional, texto livre, máx. 300 chars
@@ -18,6 +19,7 @@ export const defaultsPorGrupo = {
     caixaria: null,
     dobradicas: null,
     corredicas: null,
+    corredicasExtracao: null,
     fechamentoTeto: null,
     temPuxador: null,
     puxadores: [],
@@ -27,6 +29,7 @@ export const defaultsPorGrupo = {
     caixaria: null,
     dobradicas: null,
     corredicas: null,
+    corredicasExtracao: null,
     temPuxador: null,
     puxadores: [],
     observacoes: '',

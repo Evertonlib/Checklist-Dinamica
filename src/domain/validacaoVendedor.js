@@ -1,8 +1,11 @@
+import { modeloExigeExtracao, extracaoValidaParaModelo } from './corredicasVendedor.js'
+
 export const MSG_RESPONDA = 'Responda esta pergunta ou marque "Não se aplica"'
 export const MSG_RESPONDA_SIM_NAO = 'Responda sim ou não'
 export const MSG_INFORME_MODELO = 'Informe o modelo'
 export const MSG_INFORME_COR = 'Informe a cor'
 export const MSG_ADICIONE_PUXADOR = 'Adicione pelo menos um puxador'
+export const MSG_SELECIONE_EXTRACAO = 'Selecione uma opção'
 
 const NAO_SE_APLICA = 'não se aplica'
 const CAMPOS_ALTURA = ['alturaBalcao_mm', 'alturaArmario_mm']
@@ -33,6 +36,12 @@ export function validarRespostasGrupo(grupo, resp = {}) {
     if (!respostaValida(campo, resp[campo])) {
       erros[campo] = MSG_RESPONDA
     }
+  }
+  if (
+    modeloExigeExtracao(resp.corredicas) &&
+    !extracaoValidaParaModelo(resp.corredicas, resp.corredicasExtracao)
+  ) {
+    erros.corredicasExtracao = MSG_SELECIONE_EXTRACAO
   }
   if (grupo === 'A' && resp.tipoBalcao === 'Editados') {
     for (const campo of CAMPOS_SUBPERGUNTAS_BALCAO) {

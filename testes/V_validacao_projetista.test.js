@@ -387,3 +387,125 @@ test('TP-12 — Regras existentes intactas junto com puxadores', () => {
     }
   )
 })
+
+test('TC-04 — Corrediças sem resposta bloqueia nos grupos A, B e C', () => {
+  const msg = 'Responda esta pergunta ou marque "Não se aplica"'
+  const casos = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais' }],
+    ['B', { ...BASE_B, temPuxador: 'Não' }],
+    ['C', { ...BASE_C, temPuxador: 'Não' }],
+  ]
+  for (const [grupo, base] of casos) {
+    for (const vazio of [null, undefined]) {
+      assert.deepEqual(validarRespostasGrupo(grupo, { ...base, corredicas: vazio }), {
+        corredicas: msg,
+      })
+    }
+  }
+})
+
+test('TC-05 — Ocultas, Não se aplica e valor legado liberam o avanço nos grupos A, B e C sem subopção', () => {
+  const casos = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais' }],
+    ['B', { ...BASE_B, temPuxador: 'Não' }],
+    ['C', { ...BASE_C, temPuxador: 'Não' }],
+  ]
+  for (const [grupo, base] of casos) {
+    for (const valor of ['Ocultas', 'não se aplica', 'Telescópicas']) {
+      assert.deepEqual(
+        validarRespostasGrupo(grupo, { ...base, corredicas: valor, corredicasExtracao: null }),
+        {}
+      )
+      const semCampo = { ...base, corredicas: valor }
+      delete semCampo.corredicasExtracao
+      assert.deepEqual(validarRespostasGrupo(grupo, semCampo), {})
+    }
+  }
+})
+
+test('TC-06 — Hafele exige uma das 2 subopções válidas nos grupos A, B e C', () => {
+  const casos = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais' }],
+    ['B', { ...BASE_B, temPuxador: 'Não' }],
+    ['C', { ...BASE_C, temPuxador: 'Não' }],
+  ]
+  for (const [grupo, base] of casos) {
+    for (const invalido of [null, undefined, '']) {
+      assert.deepEqual(
+        validarRespostasGrupo(grupo, { ...base, corredicas: 'Hafele', corredicasExtracao: invalido }),
+        { corredicasExtracao: 'Selecione uma opção' }
+      )
+    }
+    for (const valido of ['Extração total', 'Tip-on']) {
+      assert.deepEqual(
+        validarRespostasGrupo(grupo, { ...base, corredicas: 'Hafele', corredicasExtracao: valido }),
+        {}
+      )
+    }
+  }
+
+  for (const incompativel of ['Extração parcial', 'valor invalido']) {
+    assert.deepEqual(
+      validarRespostasGrupo('A', {
+        ...BASE_A,
+        tipoBalcao: 'Convencionais',
+        corredicas: 'Hafele',
+        corredicasExtracao: incompativel,
+      }),
+      { corredicasExtracao: 'Selecione uma opção' }
+    )
+  }
+})
+
+test('TC-07 — Blum exige uma das 3 subopções válidas nos grupos A, B e C', () => {
+  const casos = [
+    ['A', { ...BASE_A, tipoBalcao: 'Convencionais' }],
+    ['B', { ...BASE_B, temPuxador: 'Não' }],
+    ['C', { ...BASE_C, temPuxador: 'Não' }],
+  ]
+  for (const [grupo, base] of casos) {
+    for (const invalido of [null, undefined, '', 'valor invalido']) {
+      assert.deepEqual(
+        validarRespostasGrupo(grupo, { ...base, corredicas: 'Blum', corredicasExtracao: invalido }),
+        { corredicasExtracao: 'Selecione uma opção' }
+      )
+    }
+    for (const valido of ['Extração total', 'Tip-on', 'Extração parcial']) {
+      assert.deepEqual(
+        validarRespostasGrupo(grupo, { ...base, corredicas: 'Blum', corredicasExtracao: valido }),
+        {}
+      )
+    }
+  }
+})
+
+test('TC-08 — Regras existentes do Projetista intactas junto com corrediças', () => {
+  assert.deepEqual(
+    validarRespostasGrupo('A', {
+      ...BASE_A,
+      alturaBalcao_mm: 0,
+      tipoBalcao: 'Editados',
+      balcaoAlturaForaPadrao: null,
+      balcaoProfundidadeForaPadrao: 'Não',
+      temPuxador: null,
+      corredicas: 'Blum',
+      corredicasExtracao: null,
+    }),
+    {
+      alturaBalcao_mm: 'Responda esta pergunta ou marque "Não se aplica"',
+      balcaoAlturaForaPadrao: 'Responda sim ou não',
+      corredicasExtracao: 'Selecione uma opção',
+      temPuxador: 'Responda sim ou não',
+    }
+  )
+})
+
+test('TC-11 — Compatibilidade de rascunho antigo sem campo corredicasExtracao (validação)', () => {
+  const rascunhoLegado = {
+    ...BASE_A,
+    tipoBalcao: 'Convencionais',
+    corredicas: 'Ocultas',
+  }
+  delete rascunhoLegado.corredicasExtracao
+  assert.deepEqual(validarRespostasGrupo('A', rascunhoLegado), {})
+})

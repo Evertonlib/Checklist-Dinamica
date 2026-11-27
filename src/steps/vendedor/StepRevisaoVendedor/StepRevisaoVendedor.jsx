@@ -4,6 +4,7 @@ import { useFormContextVendedor } from '../../../context/FormContextVendedor.js'
 import { formatarNomeAmbiente } from '../../../domain/ambientes.js'
 import { obterGrupo } from '../../../domain/gruposPerguntasVendedor.js'
 import { descreverRespostaBalcao } from '../../../domain/respostaBalcaoVendedor.js'
+import { descreverRespostaCorredicas } from '../../../domain/corredicasVendedor.js'
 import { descreverRespostaPuxadores } from '../../../domain/puxadoresVendedor.js'
 import { gerarPdfVendedor } from '../../../services/pdfVendedor.js'
 import { BottomBar } from '../../../components/BottomBar/BottomBar.jsx'
@@ -17,20 +18,20 @@ const PERGUNTAS_POR_GRUPO = {
     { campo: 'fechamentoTeto', label: 'Fechamento até o teto', tipo: 'fechamento' },
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
-    { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
+    { campo: 'corredicas', label: 'Corrediças', tipo: 'corredicas' },
     { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
   B: [
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
-    { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
+    { campo: 'corredicas', label: 'Corrediças', tipo: 'corredicas' },
     { campo: 'fechamentoTeto', label: 'Fechamento até o teto', tipo: 'fechamento' },
     { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
   C: [
     { campo: 'caixaria', label: 'Caixarias ou corpos', tipo: 'texto' },
     { campo: 'dobradicas', label: 'Dobradiças', tipo: 'texto' },
-    { campo: 'corredicas', label: 'Corrediças', tipo: 'texto' },
+    { campo: 'corredicas', label: 'Corrediças', tipo: 'corredicas' },
     { campo: 'temPuxador', label: 'Puxadores', tipo: 'puxadores' },
   ],
 }
@@ -108,9 +109,11 @@ export function StepRevisaoVendedor() {
               const { texto, destaque, linhas } =
                 item.tipo === 'balcao'
                   ? descreverRespostaBalcao(resp)
-                  : item.tipo === 'puxadores'
-                    ? descreverRespostaPuxadores(resp)
-                    : { texto: formatarResposta(item, resp[item.campo]), destaque: false, linhas: [] }
+                  : item.tipo === 'corredicas'
+                    ? descreverRespostaCorredicas(resp)
+                    : item.tipo === 'puxadores'
+                      ? descreverRespostaPuxadores(resp)
+                      : { texto: formatarResposta(item, resp[item.campo]), destaque: false, linhas: [] }
               const classe = destaque
                 ? `${styles.linhaResumo} ${styles.linhaDestaque}`
                 : styles.linhaResumo
