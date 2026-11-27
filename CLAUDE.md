@@ -56,7 +56,7 @@ Toda a lógica de negócio vive aqui, desacoplada da UI:
 - `ccBuilder.js` — monta os Clientes Cientes / avisos a partir das respostas.
 - `schema.js` / `schemaVendedor.js` — estado inicial e defaults por tipo de ambiente (`formType`) / grupo.
 - `ambientes.js` — catálogo de ambientes e `formatarNomeAmbiente`.
-- `checklistTextos.js`, `gruposPerguntasVendedor.js` — textos e agrupamentos; `validacaoVendedor.js` — validação do Projetista; `respostaBalcaoVendedor.js` — texto e destaque da pergunta de balcões (PDF e Revisão).
+- `checklistTextos.js`, `gruposPerguntasVendedor.js` — textos e agrupamentos; `validacaoVendedor.js` — validação do Projetista; `respostaBalcaoVendedor.js` — balcões (PDF/Revisão); `puxadoresVendedor.js` — catálogo, cores dependentes e formatação de puxadores (PDF/Revisão).
 
 Ao mudar comportamento de score, CC ou perguntas, editar o `domain/` — não espalhar regra pelos componentes de step.
 
